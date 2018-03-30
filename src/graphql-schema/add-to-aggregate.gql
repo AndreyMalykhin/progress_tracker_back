@@ -1,0 +1,7 @@
+type AddToAggregateResponse {
+  trackable: Aggregate!
+}
+
+extend type Mutation {
+  addToAggregate(ids: [ID!]!, aggregateId: ID!): AddToAggregateResponse!
+}

@@ -1,0 +1,10 @@
+type User {
+  id: ID!
+  isReported: Boolean!
+  name: String!
+  rating: Int!
+  avatarUrlSmall: String!
+  avatarUrlMedium: String!
+  rewardableReviewsLeft: Int!
+  isMuted: Boolean!
+}

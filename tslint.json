@@ -1,0 +1,12 @@
+{
+  "defaultSeverity": "error",
+  "extends": ["tslint:recommended", "tslint-config-prettier"],
+  "jsRules": {},
+  "rules": {
+    "no-relative-imports": true
+  },
+  "rulesDirectory": ["node_modules/tslint-microsoft-contrib"],
+  "linterOptions": {
+    "exclude": ["node_modules/**/*"]
+  }
+}

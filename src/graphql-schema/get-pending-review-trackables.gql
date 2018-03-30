@@ -1,0 +1,6 @@
+extend type Query {
+  getPendingReviewTrackables(
+    audience: Audience!
+    after: Float
+  ): TrackableConnection!
+}

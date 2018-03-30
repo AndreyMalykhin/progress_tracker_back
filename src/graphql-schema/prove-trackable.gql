@@ -1,0 +1,9 @@
+type ProveTrackableResponse {
+  removedAggregateId: ID
+  aggregate: Aggregate
+  trackable: ITrackable!
+}
+
+extend type Mutation {
+  proveTrackable(id: ID!, assetId: ID!): ProveTrackableResponse!
+}

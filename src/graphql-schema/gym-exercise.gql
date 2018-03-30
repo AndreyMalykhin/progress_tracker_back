@@ -1,0 +1,12 @@
+type GymExercise implements ITrackable, IPrimitiveTrackable {
+  id: ID!
+  order: Float!
+  status: TrackableStatus!
+  statusChangeDate: Float
+  iconName: String!
+  title: String!
+  recentEntries: [GymExerciseEntry!]!
+  isPublic: Boolean!
+  creationDate: Float!
+  user: User!
+}

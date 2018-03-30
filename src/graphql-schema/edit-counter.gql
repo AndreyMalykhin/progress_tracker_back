@@ -1,0 +1,13 @@
+input EditCounterInput {
+  id: ID!
+  title: String
+  iconName: String
+}
+
+type EditCounterResponse {
+  trackable: Counter!
+}
+
+extend type Mutation {
+  editCounter(counter: EditCounterInput!): EditCounterResponse!
+}

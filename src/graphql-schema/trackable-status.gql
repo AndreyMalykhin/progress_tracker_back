@@ -1,0 +1,8 @@
+enum TrackableStatus {
+  Active
+  Expired
+  PendingProof
+  PendingReview
+  Approved
+  Rejected
+}

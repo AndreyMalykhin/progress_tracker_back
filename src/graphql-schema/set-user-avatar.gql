@@ -1,0 +1,7 @@
+type SetUserAvatarResponse {
+  user: User!
+}
+
+extend type Mutation {
+  setUserAvatar(avatarId: ID): SetUserAvatarResponse!
+}

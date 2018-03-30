@@ -1,0 +1,7 @@
+type NumericalGoalProgressChangedActivity implements IActivity, ITrackableActivity {
+  id: ID!
+  date: Float!
+  user: User!
+  trackable: NumericalGoal!
+  delta: Float!
+}

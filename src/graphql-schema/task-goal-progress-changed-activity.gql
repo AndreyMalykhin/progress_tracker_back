@@ -1,0 +1,7 @@
+type TaskGoalProgressChangedActivity implements IActivity, ITrackableActivity {
+  id: ID!
+  date: Float!
+  user: User!
+  trackable: TaskGoal!
+  task: Task!
+}

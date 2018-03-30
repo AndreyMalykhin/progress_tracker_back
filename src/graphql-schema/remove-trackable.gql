@@ -1,0 +1,8 @@
+type RemoveTrackableResponse {
+  removedAggregateId: ID
+  aggregate: Aggregate
+}
+
+extend type Mutation {
+  removeTrackable(id: ID!): RemoveTrackableResponse!
+}

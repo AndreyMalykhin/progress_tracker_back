@@ -1,0 +1,16 @@
+input EditNumericalGoalInput {
+  id: ID!
+  title: String
+  deadlineDate: Float
+  difficulty: Difficulty
+  iconName: String
+  progressDisplayMode: ProgressDisplayMode
+}
+
+type EditNumericalGoalResponse {
+  trackable: NumericalGoal!
+}
+
+extend type Mutation {
+  editNumericalGoal(goal: EditNumericalGoalInput!): EditNumericalGoalResponse!
+}

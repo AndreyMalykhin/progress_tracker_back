@@ -1,0 +1,8 @@
+type GymExerciseEntry {
+  id: ID!
+  gymExercise: GymExercise!
+  date: Float!
+  setCount: Int!
+  repetitionCount: Int!
+  weight: Float!
+}

@@ -1,0 +1,7 @@
+type CounterProgressChangedActivity implements IActivity, ITrackableActivity {
+  id: ID!
+  date: Float!
+  user: User!
+  trackable: Counter!
+  delta: Float!
+}

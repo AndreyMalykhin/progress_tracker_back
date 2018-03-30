@@ -1,0 +1,9 @@
+type ActivityEdge {
+  cursor: Float!
+  node: IActivity!
+}
+
+type ActivityConnection {
+  edges: [ActivityEdge!]!
+  pageInfo: PageInfo!
+}

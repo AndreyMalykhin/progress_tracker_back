@@ -1,0 +1,14 @@
+interface IGoal {
+  proofPhotoUrlMedium: String
+  progress: Float!
+  maxProgress: Float!
+  progressDisplayMode: ProgressDisplayMode!
+  difficulty: Difficulty!
+  deadlineDate: Float
+  creationDate: Float!
+  achievementDate: Float
+  rating: Int
+  approveCount: Int
+  rejectCount: Int
+  myReviewStatus: ReviewStatus
+}

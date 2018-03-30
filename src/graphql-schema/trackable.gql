@@ -1,0 +1,10 @@
+interface ITrackable {
+  id: ID!
+  title: String!
+  order: Float!
+  status: TrackableStatus!
+  statusChangeDate: Float
+  isPublic: Boolean!
+  creationDate: Float!
+  user: User!
+}

@@ -1,0 +1,7 @@
+type GoalApprovedActivity implements IActivity, ITrackableActivity {
+  id: ID!
+  date: Float!
+  user: User!
+  trackable: ITrackable!
+  ratingDelta: Int
+}

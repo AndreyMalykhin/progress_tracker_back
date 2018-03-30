@@ -1,0 +1,7 @@
+type SetUserMutedResponse {
+  user: User!
+}
+
+extend type Mutation {
+  setUserMuted(id: ID!, isMuted: Boolean!): SetUserMutedResponse!
+}

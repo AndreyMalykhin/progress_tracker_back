@@ -1,0 +1,23 @@
+input AddTaskGoalTaskInput {
+  id: ID
+  title: String!
+}
+
+input AddTaskGoalInput {
+  id: ID
+  title: String!
+  deadlineDate: Float
+  difficulty: Difficulty!
+  iconName: String!
+  isPublic: Boolean!
+  progressDisplayMode: ProgressDisplayMode!
+  tasks: [AddTaskGoalTaskInput!]!
+}
+
+type AddTaskGoalResponse {
+  trackable: TaskGoal!
+}
+
+extend type Mutation {
+  addTaskGoal(goal: AddTaskGoalInput!): AddTaskGoalResponse!
+}

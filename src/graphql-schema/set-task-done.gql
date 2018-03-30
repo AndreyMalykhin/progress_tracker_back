@@ -1,0 +1,7 @@
+type SetTaskDoneResponse {
+  task: Task!
+}
+
+extend type Mutation {
+  setTaskDone(id: ID!, isDone: Boolean!): SetTaskDoneResponse!
+}

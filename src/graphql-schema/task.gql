@@ -1,0 +1,6 @@
+type Task {
+  id: ID!
+  goal: TaskGoal!
+  isDone: Boolean!
+  title: String!
+}

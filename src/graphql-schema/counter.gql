@@ -1,0 +1,13 @@
+type Counter implements ITrackable, IPrimitiveTrackable, IAggregatable {
+  id: ID!
+  order: Float!
+  parent: Aggregate
+  status: TrackableStatus!
+  statusChangeDate: Float
+  progress: Float!
+  iconName: String!
+  title: String!
+  isPublic: Boolean!
+  creationDate: Float!
+  user: User!
+}

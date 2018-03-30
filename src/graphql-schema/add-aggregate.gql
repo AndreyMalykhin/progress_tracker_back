@@ -1,0 +1,16 @@
+input AddAggregateChildInput {
+  id: ID!
+}
+
+input AddAggregateInput {
+  id: ID
+  children: [AddAggregateChildInput!]!
+}
+
+type AddAggregateResponse {
+  trackable: Aggregate!
+}
+
+extend type Mutation {
+  addAggregate(aggregate: AddAggregateInput!): AddAggregateResponse!
+}

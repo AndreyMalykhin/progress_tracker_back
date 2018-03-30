@@ -1,0 +1,9 @@
+type LoginResponse {
+  user: User!
+  accessToken: String!
+  isNewUser: Boolean!
+}
+
+extend type Mutation {
+  login(facebookAccessToken: String!): LoginResponse!
+}

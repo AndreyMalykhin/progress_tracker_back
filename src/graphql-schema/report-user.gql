@@ -1,0 +1,7 @@
+type ReportUserResponse {
+  user: User!
+}
+
+extend type Mutation {
+  reportUser(id: ID!, reason: ReportReason!): ReportUserResponse!
+}

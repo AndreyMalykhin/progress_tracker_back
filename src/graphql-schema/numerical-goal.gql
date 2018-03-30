@@ -1,0 +1,23 @@
+type NumericalGoal implements ITrackable, IPrimitiveTrackable, IAggregatable, IGoal {
+  id: ID!
+  order: Float!
+  parent: Aggregate
+  status: TrackableStatus!
+  achievementDate: Float
+  statusChangeDate: Float
+  progress: Float!
+  maxProgress: Float!
+  iconName: String!
+  title: String!
+  progressDisplayMode: ProgressDisplayMode!
+  isPublic: Boolean!
+  proofPhotoUrlMedium: String
+  difficulty: Difficulty!
+  deadlineDate: Float
+  creationDate: Float!
+  rating: Int
+  approveCount: Int
+  rejectCount: Int
+  myReviewStatus: ReviewStatus
+  user: User!
+}

@@ -1,0 +1,7 @@
+type AddCounterProgressResponse {
+  trackable: Counter!
+}
+
+extend type Mutation {
+  addCounterProgress(id: ID!, value: Float!): AddCounterProgressResponse!
+}

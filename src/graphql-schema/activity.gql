@@ -1,0 +1,5 @@
+interface IActivity {
+  id: ID!
+  date: Float!
+  user: User!
+}

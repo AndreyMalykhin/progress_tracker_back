@@ -1,0 +1,9 @@
+type TrackableEdge {
+  cursor: Float!
+  node: ITrackable!
+}
+
+type TrackableConnection {
+  edges: [TrackableEdge!]!
+  pageInfo: PageInfo!
+}

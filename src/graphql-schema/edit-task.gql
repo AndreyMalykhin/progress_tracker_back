@@ -1,0 +1,12 @@
+input EditTaskInput {
+  id: ID!
+  title: String!
+}
+
+type EditTaskResponse {
+  task: Task!
+}
+
+extend type Mutation {
+  editTask(task: EditTaskInput!): EditTaskResponse!
+}

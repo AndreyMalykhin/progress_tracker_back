@@ -1,0 +1,8 @@
+type ExternalGoalReviewedActivity implements IActivity, ITrackableActivity {
+  id: ID!
+  date: Float!
+  user: User!
+  trackable: ITrackable!
+  isApprove: Boolean!
+  ratingDelta: Int
+}

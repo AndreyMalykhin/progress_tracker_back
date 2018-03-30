@@ -1,0 +1,7 @@
+type ReorderTrackableResponse {
+  trackable: ITrackable!
+}
+
+extend type Mutation {
+  reorderTrackable(sourceId: ID!, destinationId: ID!): ReorderTrackableResponse!
+}

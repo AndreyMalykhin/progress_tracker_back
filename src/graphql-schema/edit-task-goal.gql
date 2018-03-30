@@ -1,0 +1,16 @@
+input EditTaskGoalInput {
+  id: ID!
+  title: String
+  deadlineDate: Float
+  difficulty: Difficulty
+  iconName: String
+  progressDisplayMode: ProgressDisplayMode
+}
+
+type EditTaskGoalResponse {
+  trackable: TaskGoal!
+}
+
+extend type Mutation {
+  editTaskGoal(goal: EditTaskGoalInput!): EditTaskGoalResponse!
+}

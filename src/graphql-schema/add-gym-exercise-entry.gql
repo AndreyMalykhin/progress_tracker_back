@@ -1,0 +1,17 @@
+input AddGymExerciseEntryInput {
+  gymExerciseId: ID!
+  id: ID
+  setCount: Int!
+  repetitionCount: Int!
+  weight: Float!
+}
+
+type AddGymExerciseEntryResponse {
+  entry: GymExerciseEntry!
+}
+
+extend type Mutation {
+  addGymExerciseEntry(
+    entry: AddGymExerciseEntryInput!
+  ): AddGymExerciseEntryResponse!
+}

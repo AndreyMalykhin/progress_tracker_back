@@ -1,0 +1,9 @@
+type UserEdge {
+  cursor: Float!
+  node: User!
+}
+
+type UserConnection {
+  edges: [UserEdge!]!
+  pageInfo: PageInfo!
+}

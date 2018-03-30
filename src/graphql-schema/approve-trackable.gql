@@ -1,0 +1,3 @@
+extend type Mutation {
+  approveTrackable(id: ID!, difficulty: Difficulty!): ReviewTrackableResponse!
+}

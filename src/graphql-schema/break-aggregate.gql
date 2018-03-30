@@ -1,0 +1,7 @@
+type BreakAggregateResponse {
+  trackables: [ITrackable!]!
+}
+
+extend type Mutation {
+  breakAggregate(id: ID!): BreakAggregateResponse!
+}

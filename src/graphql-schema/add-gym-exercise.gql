@@ -1,0 +1,14 @@
+input AddGymExerciseInput {
+  id: ID
+  title: String!
+  iconName: String!
+  isPublic: Boolean!
+}
+
+type AddGymExerciseResponse {
+  trackable: GymExercise!
+}
+
+extend type Mutation {
+  addGymExercise(gymExercise: AddGymExerciseInput!): AddGymExerciseResponse!
+}

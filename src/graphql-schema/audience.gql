@@ -1,0 +1,5 @@
+enum Audience {
+  Me
+  Friends
+  Global
+}

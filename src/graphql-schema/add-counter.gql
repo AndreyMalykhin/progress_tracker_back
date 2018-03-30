@@ -1,0 +1,14 @@
+input AddCounterInput {
+  id: ID
+  title: String!
+  iconName: String!
+  isPublic: Boolean!
+}
+
+type AddCounterResponse {
+  trackable: Counter!
+}
+
+extend type Mutation {
+  addCounter(counter: AddCounterInput!): AddCounterResponse!
+}

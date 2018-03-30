@@ -1,0 +1,13 @@
+input EditGymExerciseInput {
+  id: ID!
+  title: String
+  iconName: String
+}
+
+type EditGymExerciseResponse {
+  trackable: GymExercise!
+}
+
+extend type Mutation {
+  editGymExercise(gymExercise: EditGymExerciseInput!): EditGymExerciseResponse!
+}

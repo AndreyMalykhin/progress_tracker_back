@@ -1,0 +1,12 @@
+input EditAggregateInput {
+  id: ID!
+  title: String
+}
+
+type EditAggregateResponse {
+  trackable: Aggregate!
+}
+
+extend type Mutation {
+  editAggregate(aggregate: EditAggregateInput!): EditAggregateResponse!
+}

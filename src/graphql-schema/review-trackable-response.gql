@@ -1,0 +1,5 @@
+type ReviewTrackableResponse {
+  trackable: ITrackable!
+  user: User!
+  bonusRating: Int
+}

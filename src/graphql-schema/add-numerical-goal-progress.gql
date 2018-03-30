@@ -1,0 +1,10 @@
+type AddNumericalGoalProgressResponse {
+  trackable: NumericalGoal!
+}
+
+extend type Mutation {
+  addNumericalGoalProgress(
+    id: ID!
+    value: Float!
+  ): AddNumericalGoalProgressResponse!
+}

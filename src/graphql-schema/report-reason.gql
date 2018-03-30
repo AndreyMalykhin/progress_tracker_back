@@ -1,0 +1,6 @@
+enum ReportReason {
+  Cheating
+  Abuse
+  Spam
+  Other
+}

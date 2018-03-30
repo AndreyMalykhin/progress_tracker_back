@@ -1,0 +1,11 @@
+input EditUserInput {
+  name: String
+}
+
+type EditUserResponse {
+  user: User!
+}
+
+extend type Mutation {
+  editUser(user: EditUserInput!): EditUserResponse!
+}

@@ -1,0 +1,18 @@
+{
+  "compilerOptions": {
+    "module": "commonjs",
+    "esModuleInterop": true,
+    "target": "es6",
+    "moduleResolution": "node",
+    "sourceMap": true,
+    "outDir": "build",
+    "baseUrl": "src",
+    "skipLibCheck": true,
+    "strict": true,
+    "paths": {
+      "*": ["*", "src/typings/*"]
+    }
+  },
+  "include": ["src/**/*"],
+  "exclude": ["build", "node_modules"]
+}

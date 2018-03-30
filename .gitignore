@@ -1,0 +1,8 @@
+build/
+temp/
+uploads/
+node_modules/
+.vscode/
+yarn-error.log
+.env.local
+.env.production.local

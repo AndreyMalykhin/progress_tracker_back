@@ -1,0 +1,3 @@
+extend type Query {
+  getActivities(audience: Audience!, after: Float): ActivityConnection!
+}

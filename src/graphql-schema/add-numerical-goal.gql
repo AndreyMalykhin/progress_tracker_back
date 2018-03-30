@@ -1,0 +1,18 @@
+input AddNumericalGoalInput {
+  id: ID
+  title: String!
+  deadlineDate: Float
+  difficulty: Difficulty!
+  iconName: String!
+  isPublic: Boolean!
+  progressDisplayMode: ProgressDisplayMode!
+  maxProgress: Float!
+}
+
+type AddNumericalGoalResponse {
+  trackable: NumericalGoal!
+}
+
+extend type Mutation {
+  addNumericalGoal(goal: AddNumericalGoalInput!): AddNumericalGoalResponse!
+}

@@ -1,0 +1,3 @@
+extend type Query {
+  getFriends(after: Float): UserConnection!
+}

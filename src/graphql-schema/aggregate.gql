@@ -1,0 +1,13 @@
+type Aggregate implements ITrackable {
+  id: ID!
+  title: String!
+  order: Float!
+  status: TrackableStatus!
+  statusChangeDate: Float
+  progress: Float!
+  maxProgress: Float
+  children: [ITrackable!]!
+  isPublic: Boolean!
+  creationDate: Float!
+  user: User!
+}
