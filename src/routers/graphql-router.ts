@@ -4,23 +4,29 @@ import express from "express";
 import graphqlResolvers from "graphql-resolvers/graphql-resolvers";
 import graphqlTypes from "graphql-schema/graphql-types";
 import { makeExecutableSchema } from "graphql-tools";
-import { IEnvConfig } from "utils/env-config";
+import DIContainer from "utils/di-container";
 
-function makeGraphqlRouter(envConfig: IEnvConfig) {
+function makeGraphqlRouter(diContainer: DIContainer) {
   const router = express.Router();
   const schema = makeExecutableSchema({
     resolvers: graphqlResolvers,
     typeDefs: graphqlTypes
   });
+  const { isDevEnv } = diContainer.envConfig;
   router.use(
     "/graphql",
     bodyParser.json(),
     graphqlExpress((req, res) => {
-      return { schema, context: { req, res } };
+      return {
+        context: { req, res, diContainer },
+        debug: isDevEnv,
+        schema,
+        tracing: isDevEnv
+      };
     })
   );
 
-  if (envConfig.isDevEnv) {
+  if (isDevEnv) {
     router.use("/graphiql", graphiqlExpress({ endpointURL: "/graphql" }));
   }
 

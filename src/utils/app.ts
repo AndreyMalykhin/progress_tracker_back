@@ -12,7 +12,7 @@ function makeApp(diContainer: DIContainer) {
     app.use(morgan("dev"));
   }
 
-  app.use(makeGraphqlRouter(diContainer.envConfig));
+  app.use(makeGraphqlRouter(diContainer));
   app.use(makeAssetRouter());
   app.use(makeAvatarRouter());
   return app;

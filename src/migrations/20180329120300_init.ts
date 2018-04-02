@@ -290,10 +290,14 @@ function createUsers(knex: Knex) {
       .timestamp("creationDate", true)
       .notNullable()
       .defaultTo(knex.fn.now());
-    table.string("facebookId").unique();
-    table.string("facebookAccessToken");
+    table
+      .string("facebookId")
+      .notNullable()
+      .unique();
+    table.string("facebookAccessToken").notNullable();
     table
       .integer("avatarId")
+      .notNullable()
       .unsigned()
       .references("id")
       .inTable("avatars")
@@ -301,7 +305,8 @@ function createUsers(knex: Knex) {
     table
       .integer("rating")
       .notNullable()
-      .unsigned();
+      .unsigned()
+      .defaultTo(0);
   });
 }
 
