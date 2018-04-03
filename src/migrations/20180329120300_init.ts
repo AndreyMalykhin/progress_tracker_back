@@ -128,6 +128,7 @@ async function createTrackableStatuses(knex: Knex) {
 function createAvatars(knex: Knex) {
   return knex.schema.createTable("avatars", table => {
     table.increments("id").unsigned();
+    table.uuid("clientId").index();
     table.string("urlSmall").notNullable();
     table.string("urlMedium").notNullable();
   });
@@ -136,6 +137,7 @@ function createAvatars(knex: Knex) {
 function createAssets(knex: Knex) {
   return knex.schema.createTable("assets", table => {
     table.increments("id").unsigned();
+    table.uuid("clientId").index();
     table.string("urlMedium").notNullable();
   });
 }
@@ -294,7 +296,7 @@ function createUsers(knex: Knex) {
       .string("facebookId")
       .notNullable()
       .unique();
-    table.string("facebookAccessToken").notNullable();
+    table.text("facebookAccessToken").notNullable();
     table
       .integer("avatarId")
       .notNullable()
@@ -313,6 +315,7 @@ function createUsers(knex: Knex) {
 function createTrackables(knex: Knex) {
   return knex.schema.createTable("trackables", table => {
     table.increments("id").unsigned();
+    table.uuid("clientId").index();
     table
       .integer("typeId")
       .unsigned()
@@ -389,6 +392,7 @@ function createTrackables(knex: Knex) {
 function createTasks(knex: Knex) {
   return knex.schema.createTable("tasks", table => {
     table.increments("id").unsigned();
+    table.uuid("clientId").index();
     table
       .timestamp("creationDate", true)
       .notNullable()
@@ -408,6 +412,7 @@ function createTasks(knex: Knex) {
 function createGymExerciseEntries(knex: Knex) {
   return knex.schema.createTable("gymExerciseEntries", table => {
     table.increments("id").unsigned();
+    table.uuid("clientId").index();
     table
       .timestamp("date", true)
       .notNullable()

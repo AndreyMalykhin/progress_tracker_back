@@ -14,7 +14,7 @@ async function avatarUrlSmall(
   args: undefined,
   context: IGraphqlContext
 ) {
-  const avatar = await context.diContainer.avatarService.getById(user.avatarId);
+  const avatar = await context.loaderMap.avatar.load(user.avatarId);
   return avatar.urlSmall;
 }
 
@@ -23,7 +23,7 @@ async function avatarUrlMedium(
   args: undefined,
   context: IGraphqlContext
 ) {
-  const avatar = await context.diContainer.avatarService.getById(user.avatarId);
+  const avatar = await context.loaderMap.avatar.load(user.avatarId);
   return avatar.urlMedium;
 }
 

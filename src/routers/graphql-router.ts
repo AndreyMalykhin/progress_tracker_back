@@ -1,10 +1,12 @@
 import { graphiqlExpress, graphqlExpress } from "apollo-server-express";
 import bodyParser from "body-parser";
 import express from "express";
-import graphqlResolvers from "graphql-resolvers/graphql-resolvers";
-import graphqlTypes from "graphql-schema/graphql-types";
+import graphqlResolvers from "gql-resolvers/graphql-resolvers";
+import graphqlTypes from "gql-schema/graphql-types";
 import { makeExecutableSchema } from "graphql-tools";
+import { makeAuthMiddleware } from "utils/auth-middleware";
 import DIContainer from "utils/di-container";
+import IGraphqlContext from "utils/graphql-context";
 
 function makeGraphqlRouter(diContainer: DIContainer) {
   const router = express.Router();
@@ -13,12 +15,18 @@ function makeGraphqlRouter(diContainer: DIContainer) {
     typeDefs: graphqlTypes
   });
   const { isDevEnv } = diContainer.envConfig;
+  const isTerminating = false;
   router.use(
     "/graphql",
     bodyParser.json(),
+    makeAuthMiddleware(diContainer, isTerminating),
     graphqlExpress((req, res) => {
       return {
-        context: { req, res, diContainer },
+        context: {
+          diContainer,
+          loaderMap: diContainer.loaderMapFactory(),
+          session: res!.locals.session
+        } as IGraphqlContext,
         debug: isDevEnv,
         schema,
         tracing: isDevEnv
@@ -27,7 +35,13 @@ function makeGraphqlRouter(diContainer: DIContainer) {
   );
 
   if (isDevEnv) {
-    router.use("/graphiql", graphiqlExpress({ endpointURL: "/graphql" }));
+    router.use(
+      "/graphiql",
+      graphiqlExpress({
+        endpointURL: "/graphql",
+        variables: { accessToken: "" }
+      })
+    );
   }
 
   return router;

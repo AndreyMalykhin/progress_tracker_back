@@ -1,5 +1,6 @@
 import jwt from "jsonwebtoken";
 import Knex from "knex";
+import AccessTokenService from "services/access-token-service";
 import AvatarService from "services/avatar-service";
 import FacebookService, {
   FacebookError,
@@ -27,6 +28,7 @@ async function loginResolver(
     facebookService,
     userService,
     avatarService,
+    accessTokenService,
     friendSynchronizer,
     envConfig,
     db
@@ -55,12 +57,14 @@ async function loginResolver(
     }
   });
 
-  friendSynchronizer.sync(user!.id, facebookAccessToken);
+  friendSynchronizer
+    .sync(user!.id, facebookAccessToken)
+    .catch(e => log.error("loginResolver", e));
   const accessToken = await makeAccessToken(
     user!.id,
-    envConfig,
     facebookAccessToken,
-    facebookService
+    facebookService,
+    accessTokenService
   );
   return {
     accessToken,
@@ -104,20 +108,14 @@ async function addUser(
 
 async function makeAccessToken(
   userId: string,
-  envConfig: IEnvConfig,
   facebookAccessToken: string,
-  facebookService: FacebookService
+  facebookService: FacebookService,
+  accessTokenService: AccessTokenService
 ) {
   const facebookTokenInfo = await facebookService.getTokenInfo(
     facebookAccessToken
   );
-  return jwt.sign(
-    {
-      exp: facebookTokenInfo.expires_at,
-      id: userId
-    },
-    envConfig.secret
-  );
+  return await accessTokenService.sign(facebookTokenInfo.expires_at, userId);
 }
 
 export default loginResolver;

@@ -29,6 +29,10 @@ class AvatarService {
       .where("id", id)
       .first();
   }
+
+  public async getByIds(ids: string[]): Promise<IAvatar[]> {
+    return await this.db("avatars").whereIn("id", ids);
+  }
 }
 
 export default AvatarService;

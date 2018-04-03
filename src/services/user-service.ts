@@ -39,6 +39,10 @@ class UserService {
     return rows[0];
   }
 
+  public async getByIds(ids: string[]): Promise<IUser[]> {
+    return await this.db("users").whereIn("id", ids);
+  }
+
   public async addFriend(
     srcId: string,
     targetId: string,
