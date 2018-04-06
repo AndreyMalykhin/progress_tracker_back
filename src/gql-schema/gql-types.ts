@@ -71,7 +71,7 @@ import unaggregateTrackableDefinition from "gql-schema/unaggregate-trackable.gql
 import userConnectionDefinition from "gql-schema/user-connection.gql";
 import userDefinition from "gql-schema/user.gql";
 
-const graphqlTypes = [
+const gqlTypes = [
   schemaDefinition,
   userConnectionDefinition,
   activityConnectionDefinition,
@@ -151,4 +151,4 @@ const graphqlTypes = [
   addToAggregateDefinition
 ];
 
-export default graphqlTypes;
+export default gqlTypes;

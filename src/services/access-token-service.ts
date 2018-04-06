@@ -1,5 +1,6 @@
 import jwt from "jsonwebtoken";
 import { IEnvConfig } from "utils/env-config";
+import ID from "utils/id";
 import { ISession } from "utils/session";
 
 class AccessTokenService {
@@ -9,7 +10,7 @@ class AccessTokenService {
     this.envConfig = envConfig;
   }
 
-  public sign(expirationDate: number, userId: string) {
+  public sign(expirationDate: number, userId: ID) {
     return new Promise((resolve, reject) => {
       jwt.sign(
         {

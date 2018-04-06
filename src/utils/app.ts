@@ -2,7 +2,7 @@ import express from "express";
 import morgan from "morgan";
 import { makeAssetRouter } from "routers/asset-router";
 import { makeAvatarRouter } from "routers/avatar-router";
-import { makeGraphqlRouter } from "routers/graphql-router";
+import { makeGqlRouter } from "routers/gql-router";
 import DIContainer from "utils/di-container";
 import { makeErrorMiddleware } from "utils/error-middleware";
 
@@ -13,7 +13,7 @@ function makeApp(diContainer: DIContainer) {
     app.use(morgan("dev"));
   }
 
-  app.use(makeGraphqlRouter(diContainer));
+  app.use(makeGqlRouter(diContainer));
   app.use(makeAssetRouter(diContainer));
   app.use(makeAvatarRouter(diContainer));
   app.use(makeErrorMiddleware());

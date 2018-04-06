@@ -1,9 +1,13 @@
 import Bottle from "bottlejs";
 import Knex from "knex";
 import AccessTokenService from "services/access-token-service";
+import ActivityService from "services/activity-service";
+import AssetService from "services/asset-service";
 import AvatarService from "services/avatar-service";
 import FacebookService from "services/facebook-service";
 import FriendSynchronizer from "services/friend-synchronizer";
+import IconService from "services/icon-service";
+import TrackableService from "services/trackable-service";
 import UserService from "services/user-service";
 import { IEnvConfig, makeEnvConfig } from "utils/env-config";
 import { IFetcher, makeFetcher } from "utils/fetcher";
@@ -37,6 +41,22 @@ class DIContainer {
     return this.impl.avatarService;
   }
 
+  public get activityService(): ActivityService {
+    return this.impl.activityService;
+  }
+
+  public get trackableService(): TrackableService {
+    return this.impl.trackableService;
+  }
+
+  public get iconService(): IconService {
+    return this.impl.iconService;
+  }
+
+  public get assetService(): AssetService {
+    return this.impl.assetService;
+  }
+
   public get accessTokenService(): AccessTokenService {
     return this.impl.accessTokenService;
   }
@@ -58,12 +78,24 @@ function makeDIContainer() {
   const di = new Bottle();
   di.factory("envConfig", makeEnvConfig);
   di.serviceFactory("db", makeDb, "envConfig");
-  di.serviceFactory("loaderMapFactory", makeLoaderMapFactory, "avatarService");
+  di.serviceFactory(
+    "loaderMapFactory",
+    makeLoaderMapFactory,
+    "avatarService",
+    "userService",
+    "iconService",
+    "trackableService",
+    "assetService"
+  );
   di.service("fetcher", makeFetcher);
   di.service("avatarService", AvatarService, "db");
+  di.service("assetService", AssetService, "db");
+  di.service("activityService", ActivityService, "db");
   di.service("accessTokenService", AccessTokenService, "envConfig");
   di.service("facebookService", FacebookService, "fetcher", "envConfig");
-  di.service("userService", UserService, "db", "avatarService");
+  di.service("userService", UserService, "db");
+  di.service("trackableService", TrackableService, "db", "activityService");
+  di.service("iconService", IconService, "db");
   di.service(
     "friendSynchronizer",
     FriendSynchronizer,

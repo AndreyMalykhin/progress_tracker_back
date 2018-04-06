@@ -1,5 +1,23 @@
 import * as Knex from "knex";
 
+async function createReviewStatuses(knex: Knex) {
+  await knex.schema.createTable("reviewStatuses", table => {
+    table
+      .integer("id")
+      .unsigned()
+      .primary();
+    table
+      .string("name", 32)
+      .notNullable()
+      .unique();
+  });
+
+  await knex("reviewStatuses").insert([
+    { id: 1, name: "Approved" },
+    { id: 2, name: "Rejected" }
+  ]);
+}
+
 async function createRejectReasons(knex: Knex) {
   await knex.schema.createTable("rejectReasons", table => {
     table
@@ -289,7 +307,7 @@ function createUsers(knex: Knex) {
     table.increments("id").unsigned();
     table.string("name", 128).notNullable();
     table
-      .timestamp("creationDate", true)
+      .timestamp("creationDate")
       .notNullable()
       .defaultTo(knex.fn.now());
     table
@@ -309,6 +327,10 @@ function createUsers(knex: Knex) {
       .notNullable()
       .unsigned()
       .defaultTo(0);
+    table
+      .integer("rewardableReviewsLeft")
+      .notNullable()
+      .unsigned();
   });
 }
 
@@ -338,11 +360,11 @@ function createTrackables(knex: Knex) {
       .boolean("isPublic")
       .notNullable()
       .index();
-    table.timestamp("statusChangeDate", true);
-    table.timestamp("achievementDate", true);
+    table.timestamp("statusChangeDate");
+    table.timestamp("achievementDate");
     table.dateTime("deadlineDate");
     table
-      .timestamp("creationDate", true)
+      .timestamp("creationDate")
       .notNullable()
       .defaultTo(knex.fn.now());
     table
@@ -394,7 +416,7 @@ function createTasks(knex: Knex) {
     table.increments("id").unsigned();
     table.uuid("clientId").index();
     table
-      .timestamp("creationDate", true)
+      .timestamp("creationDate")
       .notNullable()
       .defaultTo(knex.fn.now());
     table.boolean("isDone").notNullable();
@@ -414,7 +436,7 @@ function createGymExerciseEntries(knex: Knex) {
     table.increments("id").unsigned();
     table.uuid("clientId").index();
     table
-      .timestamp("date", true)
+      .timestamp("date")
       .notNullable()
       .defaultTo(knex.fn.now());
     table
@@ -440,7 +462,7 @@ function createActivities(knex: Knex) {
       .references("id")
       .inTable("activityTypes");
     table
-      .timestamp("date", true)
+      .timestamp("date")
       .notNullable()
       .defaultTo(knex.fn.now());
     table
@@ -471,38 +493,8 @@ function createActivities(knex: Knex) {
   });
 }
 
-async function createUserApproves(knex: Knex) {
-  await knex.schema.createTable("userApproves", table => {
-    table
-      .timestamp("date", true)
-      .notNullable()
-      .defaultTo(knex.fn.now());
-    table
-      .integer("userId")
-      .unsigned()
-      .notNullable()
-      .references("id")
-      .inTable("users");
-    table
-      .integer("trackableId")
-      .unsigned()
-      .notNullable()
-      .references("id")
-      .inTable("trackables");
-    table
-      .integer("difficulty")
-      .notNullable()
-      .unsigned();
-    table.primary(["trackableId", "userId"]);
-  });
-}
-
-async function createUserRejects(knex: Knex) {
-  await knex.schema.createTable("userRejects", table => {
-    table
-      .timestamp("date", true)
-      .notNullable()
-      .defaultTo(knex.fn.now());
+async function createReviews(knex: Knex) {
+  await knex.schema.createTable("reviews", table => {
     table
       .integer("userId")
       .unsigned()
@@ -517,10 +509,20 @@ async function createUserRejects(knex: Knex) {
       .inTable("trackables");
     table
       .integer("reasonId")
-      .notNullable()
       .unsigned()
       .references("id")
       .inTable("rejectReasons");
+    table.integer("difficulty").unsigned();
+    table
+      .timestamp("date")
+      .notNullable()
+      .defaultTo(knex.fn.now());
+    table
+      .integer("status")
+      .notNullable()
+      .unsigned()
+      .references("id")
+      .inTable("reviewStatuses");
     table.primary(["trackableId", "userId"]);
   });
 }
@@ -528,7 +530,7 @@ async function createUserRejects(knex: Knex) {
 async function createReportedUsers(knex: Knex) {
   await knex.schema.createTable("reportedUsers", table => {
     table
-      .timestamp("date", true)
+      .timestamp("date")
       .notNullable()
       .defaultTo(knex.fn.now());
     table
@@ -556,7 +558,7 @@ async function createReportedUsers(knex: Knex) {
 async function createMutedUsers(knex: Knex) {
   await knex.schema.createTable("mutedUsers", table => {
     table
-      .timestamp("date", true)
+      .timestamp("date")
       .notNullable()
       .defaultTo(knex.fn.now());
     table
@@ -578,7 +580,7 @@ async function createMutedUsers(knex: Knex) {
 async function createFriends(knex: Knex) {
   await knex.schema.createTable("friends", table => {
     table
-      .timestamp("date", true)
+      .timestamp("date")
       .notNullable()
       .defaultTo(knex.fn.now());
     table
@@ -598,6 +600,7 @@ async function createFriends(knex: Knex) {
 }
 
 exports.up = async (knex: Knex) => {
+  await createReviewStatuses(knex);
   await createRejectReasons(knex);
   await createReportReasons(knex);
   await createProgressDisplayModes(knex);
@@ -612,8 +615,7 @@ exports.up = async (knex: Knex) => {
   await createTasks(knex);
   await createGymExerciseEntries(knex);
   await createActivities(knex);
-  await createUserApproves(knex);
-  await createUserRejects(knex);
+  await createReviews(knex);
   await createReportedUsers(knex);
   await createMutedUsers(knex);
   await createFriends(knex);
@@ -624,8 +626,7 @@ exports.down = async (knex: Knex) => {
     "friends",
     "mutedUsers",
     "reportedUsers",
-    "userApproves",
-    "userRejects",
+    "reviews",
     "activities",
     "gymExerciseEntries",
     "tasks",
@@ -639,10 +640,11 @@ exports.down = async (knex: Knex) => {
     "activityTypes",
     "progressDisplayModes",
     "reportReasons",
-    "rejectReasons"
+    "rejectReasons",
+    "reviewStatuses"
   ];
 
   for (const table of tables) {
-    await knex.schema.dropTable(table);
+    await knex.schema.dropTableIfExists(table);
   }
 };

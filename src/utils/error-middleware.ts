@@ -1,13 +1,10 @@
 import { ErrorRequestHandler } from "express";
-import { makeLog } from "utils/log";
-
-const log = makeLog("error-middleware");
+import handleError from "utils/handle-error";
 
 function makeErrorMiddleware(): ErrorRequestHandler {
   return (e, req, res) => {
-    // TODO
-    log.error("makeErrorMiddleware", e);
-    res.status(e.status || 500).json({ errors: [{ message: e.message }] });
+    const errors = [handleError(e, res)];
+    res.json({ errors });
   };
 }
 

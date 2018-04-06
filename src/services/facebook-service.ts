@@ -1,6 +1,7 @@
 import { stringify } from "querystring";
 import { IEnvConfig } from "utils/env-config";
 import { IFetcher } from "utils/fetcher";
+import ID from "utils/id";
 
 interface IError {
   message: string;
@@ -33,7 +34,7 @@ interface IFacebookPicture {
 }
 
 interface IFacebookUser {
-  id: string;
+  id: ID;
   name: string;
 }
 

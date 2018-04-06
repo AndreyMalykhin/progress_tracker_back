@@ -9,7 +9,6 @@ import addTaskGoalResolver from "gql-resolvers/add-task-goal-resolver";
 import addToAggregateResolver from "gql-resolvers/add-to-aggregate-resolver";
 import approveTrackableResolver from "gql-resolvers/approve-trackable-resolver";
 import breakAggregateResolver from "gql-resolvers/break-aggregate-resolver";
-import checkAuthResolver from "gql-resolvers/check-auth-resolver";
 import editAggregateResolver from "gql-resolvers/edit-aggregate-resolver";
 import editCounterResolver from "gql-resolvers/edit-counter-resolver";
 import editGymExerciseResolver from "gql-resolvers/edit-gym-exercise-resolver";
@@ -26,9 +25,8 @@ import setTaskDoneResolver from "gql-resolvers/set-task-done-resolver";
 import setUserAvatarResolver from "gql-resolvers/set-user-avatar-resolver";
 import setUserMutedResolver from "gql-resolvers/set-user-muted-resolver";
 import unaggregateTrackableResolver from "gql-resolvers/unaggregate-trackable-resolver";
-import { combineResolvers } from "graphql-resolvers";
 
-const graphqlMutations = {
+const gqlMutations = {
   addAggregate: addAggregateResolver,
   addCounter: addCounterResolver,
   addCounterProgress: addCounterProgressResolver,
@@ -36,7 +34,7 @@ const graphqlMutations = {
   addGymExerciseEntry: addGymExerciseEntryResolver,
   addNumericalGoal: addNumericalGoalResolver,
   addNumericalGoalProgress: addNumericalGoalProgressResolver,
-  addTaskGoal: combineResolvers(checkAuthResolver, addTaskGoalResolver),
+  addTaskGoal: addTaskGoalResolver,
   addToAggregate: addToAggregateResolver,
   approveTrackable: approveTrackableResolver,
   breakAggregate: breakAggregateResolver,
@@ -58,4 +56,4 @@ const graphqlMutations = {
   unaggregateTrackable: unaggregateTrackableResolver
 };
 
-export default graphqlMutations;
+export default gqlMutations;

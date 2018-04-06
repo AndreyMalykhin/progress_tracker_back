@@ -1,10 +1,9 @@
 import ID from "utils/id";
 
-interface IAvatar {
+interface IAsset {
   id: ID;
   clientId?: ID;
-  urlSmall: string;
   urlMedium: string;
 }
 
-export { IAvatar };
+export { IAsset };

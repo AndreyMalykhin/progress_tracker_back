@@ -1,5 +1,6 @@
 import Knex from "knex";
 import { IAvatar } from "models/avatar";
+import ID from "utils/id";
 
 interface IAddInput {
   urlSmall: string;
@@ -24,13 +25,13 @@ class AvatarService {
     return rows[0];
   }
 
-  public async getById(id: string): Promise<IAvatar> {
+  public async getById(id: ID): Promise<IAvatar | undefined> {
     return await this.db("avatars")
       .where("id", id)
       .first();
   }
 
-  public async getByIds(ids: string[]): Promise<IAvatar[]> {
+  public async getByIds(ids: ID[]): Promise<IAvatar[]> {
     return await this.db("avatars").whereIn("id", ids);
   }
 }

@@ -1,6 +1,7 @@
 import Knex from "knex";
 import FacebookService from "services/facebook-service";
 import UserService from "services/user-service";
+import ID from "utils/id";
 
 class FriendSynchronizer {
   private userService: UserService;
@@ -14,7 +15,7 @@ class FriendSynchronizer {
     this.facebookService = facebookService;
   }
 
-  public async sync(userId: string, facebookAccessToken: string) {
+  public async sync(userId: ID, facebookAccessToken: string) {
     const remoteFriendIds = await this.getRemoteFriendIds(facebookAccessToken);
     const localFriendIds = await this.getLocalFriendIds(userId);
 
@@ -60,10 +61,10 @@ class FriendSynchronizer {
     return remoteFriendIds;
   }
 
-  private async getLocalFriendIds(userId: string) {
-    const localFriendIds: { [facebookId: string]: string } = {};
+  private async getLocalFriendIds(userId: ID) {
+    const localFriendIds: { [facebookId: string]: ID } = {};
 
-    for (const friend of await this.userService.getFriends(userId)) {
+    for (const friend of await this.userService.getUserFriends(userId)) {
       localFriendIds[friend.facebookId!] = friend.id;
     }
 

@@ -1,18 +1,23 @@
 import { graphiqlExpress, graphqlExpress } from "apollo-server-express";
 import bodyParser from "body-parser";
-import express from "express";
-import graphqlResolvers from "gql-resolvers/graphql-resolvers";
-import graphqlTypes from "gql-schema/graphql-types";
-import { makeExecutableSchema } from "graphql-tools";
+import express, { Response } from "express";
+import gqlResolvers from "gql-resolvers/gql-resolvers";
+import gqlTypes from "gql-schema/gql-types";
+import { IResolvers, makeExecutableSchema } from "graphql-tools";
 import { makeAuthMiddleware } from "utils/auth-middleware";
+import ConstraintViolationError from "utils/constraint-violation-error";
 import DIContainer from "utils/di-container";
 import IGraphqlContext from "utils/graphql-context";
+import handleError from "utils/handle-error";
+import { makeLog } from "utils/log";
 
-function makeGraphqlRouter(diContainer: DIContainer) {
+const log = makeLog("gql-router");
+
+function makeGqlRouter(diContainer: DIContainer) {
   const router = express.Router();
   const schema = makeExecutableSchema({
-    resolvers: graphqlResolvers,
-    typeDefs: graphqlTypes
+    resolvers: gqlResolvers,
+    typeDefs: gqlTypes
   });
   const { isDevEnv } = diContainer.envConfig;
   const isTerminating = false;
@@ -28,6 +33,7 @@ function makeGraphqlRouter(diContainer: DIContainer) {
           session: res!.locals.session
         } as IGraphqlContext,
         debug: isDevEnv,
+        formatError: (error: any) => handleError(error, res!),
         schema,
         tracing: isDevEnv
       };
@@ -47,4 +53,4 @@ function makeGraphqlRouter(diContainer: DIContainer) {
   return router;
 }
 
-export { makeGraphqlRouter };
+export { makeGqlRouter };

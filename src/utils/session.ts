@@ -1,5 +1,7 @@
+import ID from "utils/id";
+
 interface ISession {
-  userId: string;
+  userId: ID;
 }
 
 export { ISession };

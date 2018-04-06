@@ -11,6 +11,7 @@ import FacebookService, {
 import UserService from "services/user-service";
 import { IEnvConfig } from "utils/env-config";
 import IGraphqlContext from "utils/graphql-context";
+import ID from "utils/id";
 import { makeLog } from "utils/log";
 
 interface IArgs {
@@ -107,7 +108,7 @@ async function addUser(
 }
 
 async function makeAccessToken(
-  userId: string,
+  userId: ID,
   facebookAccessToken: string,
   facebookService: FacebookService,
   accessTokenService: AccessTokenService
