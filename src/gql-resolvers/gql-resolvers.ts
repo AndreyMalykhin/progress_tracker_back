@@ -4,6 +4,8 @@ import difficultyResolver from "gql-resolvers/difficulty-resolver";
 import goalResolver from "gql-resolvers/goal-resolver";
 import gqlMutations from "gql-resolvers/gql-mutations";
 import gqlQueries from "gql-resolvers/gql-queries";
+import gymExerciseEntryResolver from "gql-resolvers/gym-exercise-entry-resolver";
+import gymExerciseResolver from "gql-resolvers/gym-exercise-resolver";
 import numericalGoalResolver from "gql-resolvers/numerical-goal-resolver";
 import primitiveTrackableResolver from "gql-resolvers/primitive-trackable-resolver";
 import progressDisplayModeResolver from "gql-resolvers/progress-display-mode-resolver";
@@ -18,6 +20,8 @@ import { IResolvers } from "graphql-tools";
 const gqlResolvers = {
   Counter: counterResolver,
   Difficulty: difficultyResolver,
+  GymExercise: gymExerciseResolver,
+  GymExerciseEntry: gymExerciseEntryResolver,
   IAggregatable: aggregatableResolver,
   IGoal: goalResolver,
   IPrimitiveTrackable: primitiveTrackableResolver,

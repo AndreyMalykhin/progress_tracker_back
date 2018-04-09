@@ -2,6 +2,10 @@ import Bottle from "bottlejs";
 import { IAddAvatarCmd, makeAddAvatarCmd } from "commands/add-avatar-cmd";
 import { IAddCounterCmd, makeAddCounterCmd } from "commands/add-counter-cmd";
 import {
+  IAddGymExerciseCmd,
+  makeAddGymExerciseCmd
+} from "commands/add-gym-exercise-cmd";
+import {
   IAddNumericalGoalCmd,
   makeAddNumericalGoalCmd
 } from "commands/add-numerical-goal-cmd";
@@ -16,6 +20,7 @@ import AccessTokenIssuer from "services/access-token-issuer";
 import AssetFetcher from "services/asset-fetcher";
 import AvatarFetcher from "services/avatar-fetcher";
 import Facebook from "services/facebook";
+import GymExerciseEntryFetcher from "services/gym-exercise-entry-fetcher";
 import IconFetcher from "services/icon-fetcher";
 import MuteFetcher from "services/mute-fetcher";
 import ReviewFetcher from "services/review-fetcher";
@@ -79,6 +84,10 @@ class DIContainer {
     return this.impl.taskFetcher;
   }
 
+  public get gymExerciseEntryFetcher(): GymExerciseEntryFetcher {
+    return this.impl.gymExerciseEntryFetcher;
+  }
+
   public get assetFetcher(): AssetFetcher {
     return this.impl.assetFetcher;
   }
@@ -118,6 +127,10 @@ class DIContainer {
   public get addCounterCmd(): IAddCounterCmd {
     return this.impl.addCounterCmd;
   }
+
+  public get addGymExerciseCmd(): IAddGymExerciseCmd {
+    return this.impl.addGymExerciseCmd;
+  }
 }
 
 function makeDIContainer() {
@@ -154,11 +167,13 @@ function makeDIContainer() {
   di.serviceFactory("addTaskGoalCmd", makeAddTaskGoalCmd, "db");
   di.serviceFactory("addNumericalGoalCmd", makeAddNumericalGoalCmd, "db");
   di.serviceFactory("addCounterCmd", makeAddCounterCmd, "db");
+  di.serviceFactory("addGymExerciseCmd", makeAddGymExerciseCmd, "db");
   di.service("fetcher", makeFetcher);
   di.service("avatarFetcher", AvatarFetcher, "db");
   di.service("reviewFetcher", ReviewFetcher, "db");
   di.service("assetFetcher", AssetFetcher, "db");
   di.service("taskFetcher", TaskFetcher, "db");
+  di.service("gymExerciseEntryFetcher", GymExerciseEntryFetcher, "db");
   di.service("accessTokenIssuer", AccessTokenIssuer, "envConfig");
   di.service("facebook", Facebook, "fetcher", "envConfig");
   di.service("userFetcher", UserFetcher, "db");

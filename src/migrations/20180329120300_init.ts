@@ -440,11 +440,11 @@ function createGymExerciseEntries(knex: Knex) {
       .unsigned()
       .notNullable()
       .references("id")
-      .inTable("trackables")
-      .index();
+      .inTable("trackables");
     table.integer("setCount").notNullable();
     table.integer("repetitionCount").notNullable();
     table.integer("weight").notNullable();
+    table.index(["gymExerciseId", "date"]);
   });
 }
 
