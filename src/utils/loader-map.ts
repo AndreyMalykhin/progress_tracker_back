@@ -4,11 +4,11 @@ import { IAvatar } from "models/avatar";
 import { IIcon } from "models/icon";
 import { ITrackable } from "models/trackable";
 import { IUser } from "models/user";
-import AssetService from "services/asset-service";
-import AvatarService from "services/avatar-service";
-import IconService from "services/icon-service";
-import TrackableService from "services/trackable-service";
-import UserService from "services/user-service";
+import AssetFetcher from "services/asset-fetcher";
+import AvatarFetcher from "services/avatar-fetcher";
+import IconFetcher from "services/icon-fetcher";
+import TrackableFetcher from "services/trackable-fetcher";
+import UserFetcher from "services/user-fetcher";
 import ID from "utils/id";
 
 type ILoaderMapFactory = () => ILoaderMap;
@@ -22,54 +22,54 @@ interface ILoaderMap {
 }
 
 function makeLoaderMapFactory(
-  avatarService: AvatarService,
-  userService: UserService,
-  iconService: IconService,
-  trackableService: TrackableService,
-  assetService: AssetService
+  avatarFetcher: AvatarFetcher,
+  userFetcher: UserFetcher,
+  iconFetcher: IconFetcher,
+  trackableFetcher: TrackableFetcher,
+  assetFetcher: AssetFetcher
 ): ILoaderMapFactory {
   return () => {
     return {
-      asset: makeAssetLoader(assetService),
-      avatar: makeAvatarLoader(avatarService),
-      icon: makeIconLoader(iconService),
-      trackable: makeTrackableLoader(trackableService),
-      user: makeUserLoader(userService)
+      asset: makeAssetLoader(assetFetcher),
+      avatar: makeAvatarLoader(avatarFetcher),
+      icon: makeIconLoader(iconFetcher),
+      trackable: makeTrackableLoader(trackableFetcher),
+      user: makeUserLoader(userFetcher)
     };
   };
 }
 
-function makeAvatarLoader(avatarService: AvatarService) {
+function makeAvatarLoader(avatarFetcher: AvatarFetcher) {
   return new DataLoader<ID, IAvatar>(async ids => {
-    const rows = await avatarService.getByIds(ids);
+    const rows = await avatarFetcher.getByIds(ids);
     return mapRowsToIds(rows, ids);
   });
 }
 
-function makeUserLoader(userService: UserService) {
+function makeUserLoader(userFetcher: UserFetcher) {
   return new DataLoader<ID, IUser>(async ids => {
-    const rows = await userService.getByIds(ids);
+    const rows = await userFetcher.getByIds(ids);
     return mapRowsToIds(rows, ids);
   });
 }
 
-function makeIconLoader(iconService: IconService) {
+function makeIconLoader(iconFetcher: IconFetcher) {
   return new DataLoader<ID, IIcon>(async ids => {
-    const rows = await iconService.getByIds(ids);
+    const rows = await iconFetcher.getByIds(ids);
     return mapRowsToIds(rows, ids);
   });
 }
 
-function makeTrackableLoader(trackableService: TrackableService) {
+function makeTrackableLoader(trackableFetcher: TrackableFetcher) {
   return new DataLoader<ID, ITrackable>(async ids => {
-    const rows = await trackableService.getByIds(ids);
+    const rows = await trackableFetcher.getByIds(ids);
     return mapRowsToIds(rows, ids);
   });
 }
 
-function makeAssetLoader(assetService: AssetService) {
+function makeAssetLoader(assetFetcher: AssetFetcher) {
   return new DataLoader<ID, IAsset>(async ids => {
-    const rows = await assetService.getByIds(ids);
+    const rows = await assetFetcher.getByIds(ids);
     return mapRowsToIds(rows, ids);
   });
 }

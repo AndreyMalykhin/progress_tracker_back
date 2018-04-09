@@ -19,8 +19,12 @@ interface IValidateLengthConfig extends IValidateConfig {
   max: number;
 }
 
+interface IValidateEnumConfig<T> extends IValidateConfig {
+  values: T[];
+}
+
 interface IValidateListConfig<T> extends IValidateConfig {
-  validateItem: (item: T) => IValidationErrors;
+  validateItem: (item: T, index: number) => IValidationErrors;
 }
 
 const baseDefaultConfig: IValidateConfig = { isOptional: false };
@@ -51,6 +55,17 @@ function validateRange(
   );
 }
 
+function validateEnum<T>(value: T | undefined, config: IValidateEnumConfig<T>) {
+  return validate(
+    value,
+    (newValue, newConfig) => {
+      const { values } = newConfig;
+      return values.indexOf(newValue) === -1 ? `Invalid value` : undefined;
+    },
+    config
+  );
+}
+
 function validateLength(
   value: string | undefined,
   config: IValidateLengthConfig
@@ -59,16 +74,21 @@ function validateLength(
     value,
     (newValue, newConfig) => {
       const { max } = newConfig;
-      return !isLength(newValue, { min: 1, max })
-        ? `Should be shorter than ${max + 1} symbols`
+      const min = 1;
+      return !isLength(newValue, { min, max })
+        ? `Should be between ${min} and ${max} symbols`
         : undefined;
     },
     config
   );
 }
 
-function validatePresense(value: any, config?: IValidateConfig) {
-  return validate(value, () => undefined, config);
+function validateReference(value: ID | number, config?: IValidateConfig) {
+  return validate(
+    value,
+    newValue => (!newValue ? "Not found" : undefined),
+    config
+  );
 }
 
 function validateList<T>(
@@ -82,17 +102,19 @@ function validateList<T>(
         return newConfig.isOptional ? undefined : "Should not be empty";
       }
 
-      const allErrors: IValidationErrors[] = [];
+      const allErrors: IValidationErrors = {};
+      let hasErrors = false;
 
-      for (const item of newValue) {
-        const itemErrors = config.validateItem(item);
+      for (let i = 0; i < newValue.length; ++i) {
+        const itemErrors = config.validateItem(newValue[i], i);
 
         if (!isEmpty(itemErrors)) {
-          allErrors.push(itemErrors);
+          allErrors[i] = itemErrors;
+          hasErrors = true;
         }
       }
 
-      return allErrors.length ? allErrors : undefined;
+      return hasErrors ? allErrors : undefined;
     },
     config
   );
@@ -115,7 +137,8 @@ function validate<TValue, TConfig extends IValidateConfig>(
 export {
   validateUUID,
   validateRange,
-  validatePresense,
+  validateReference,
   validateLength,
-  validateList
+  validateList,
+  validateEnum
 };

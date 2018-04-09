@@ -2,7 +2,7 @@ interface IValidationResult {
   errors: IValidationErrors;
 }
 
-type IValidationError = string | IValidationErrors[];
+type IValidationError = string | IValidationErrors;
 
 interface IValidationErrors {
   [field: string]: IValidationError;

@@ -7,7 +7,7 @@ import { IResolvers, makeExecutableSchema } from "graphql-tools";
 import { makeAuthMiddleware } from "utils/auth-middleware";
 import ConstraintViolationError from "utils/constraint-violation-error";
 import DIContainer from "utils/di-container";
-import IGraphqlContext from "utils/graphql-context";
+import IGqlContext from "utils/gql-context";
 import handleError from "utils/handle-error";
 import { makeLog } from "utils/log";
 
@@ -31,7 +31,7 @@ function makeGqlRouter(diContainer: DIContainer) {
           diContainer,
           loaderMap: diContainer.loaderMapFactory(),
           session: res!.locals.session
-        } as IGraphqlContext,
+        } as IGqlContext,
         debug: isDevEnv,
         formatError: (error: any) => handleError(error, res!),
         schema,

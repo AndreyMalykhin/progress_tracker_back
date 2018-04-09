@@ -527,8 +527,8 @@ async function createReviews(knex: Knex) {
   });
 }
 
-async function createReportedUsers(knex: Knex) {
-  await knex.schema.createTable("reportedUsers", table => {
+async function createUserReports(knex: Knex) {
+  await knex.schema.createTable("userReports", table => {
     table
       .timestamp("date")
       .notNullable()
@@ -555,8 +555,8 @@ async function createReportedUsers(knex: Knex) {
   });
 }
 
-async function createMutedUsers(knex: Knex) {
-  await knex.schema.createTable("mutedUsers", table => {
+async function createMutes(knex: Knex) {
+  await knex.schema.createTable("mutes", table => {
     table
       .timestamp("date")
       .notNullable()
@@ -577,8 +577,8 @@ async function createMutedUsers(knex: Knex) {
   });
 }
 
-async function createFriends(knex: Knex) {
-  await knex.schema.createTable("friends", table => {
+async function createFriendships(knex: Knex) {
+  await knex.schema.createTable("friendships", table => {
     table
       .timestamp("date")
       .notNullable()
@@ -616,16 +616,16 @@ exports.up = async (knex: Knex) => {
   await createGymExerciseEntries(knex);
   await createActivities(knex);
   await createReviews(knex);
-  await createReportedUsers(knex);
-  await createMutedUsers(knex);
-  await createFriends(knex);
+  await createUserReports(knex);
+  await createMutes(knex);
+  await createFriendships(knex);
 };
 
 exports.down = async (knex: Knex) => {
   const tables = [
-    "friends",
-    "mutedUsers",
-    "reportedUsers",
+    "friendships",
+    "mutes",
+    "userReports",
     "reviews",
     "activities",
     "gymExerciseEntries",

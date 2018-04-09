@@ -1,7 +1,7 @@
 import { IGoal } from "models/goal";
 import { ITrackable } from "models/trackable";
+import IGqlContext from "utils/gql-context";
 import { makeRedirectResolver } from "utils/gql-resolver-utils";
-import IGraphqlContext from "utils/graphql-context";
 
 const goalResolver = {
   myReviewStatus,
@@ -12,13 +12,13 @@ const goalResolver = {
 async function myReviewStatus(
   trackable: ITrackable,
   args: object,
-  context: IGraphqlContext
+  context: IGqlContext
 ) {
   if (!context.session) {
     return null;
   }
 
-  const review = await context.diContainer.trackableService.getReview(
+  const review = await context.diContainer.reviewFetcher.get(
     trackable.id,
     context.session.userId
   );
@@ -28,7 +28,7 @@ async function myReviewStatus(
 async function proofPhotoUrlMedium(
   trackable: IGoal,
   args: object,
-  context: IGraphqlContext
+  context: IGqlContext
 ) {
   if (!trackable.proofPhotoId) {
     return null;

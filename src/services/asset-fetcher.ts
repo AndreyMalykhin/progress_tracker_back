@@ -2,14 +2,14 @@ import Knex from "knex";
 import { IAsset } from "models/asset";
 import ID from "utils/id";
 
-class AssetService {
+class AssetFetcher {
   private db: Knex;
 
   public constructor(db: Knex) {
     this.db = db;
   }
 
-  public async getById(id: ID): Promise<IAsset | undefined> {
+  public async get(id: ID): Promise<IAsset | undefined> {
     return await this.db("assets")
       .where("id", id)
       .first();
@@ -20,4 +20,4 @@ class AssetService {
   }
 }
 
-export default AssetService;
+export default AssetFetcher;

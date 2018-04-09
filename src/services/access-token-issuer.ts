@@ -3,7 +3,7 @@ import { IEnvConfig } from "utils/env-config";
 import ID from "utils/id";
 import { ISession } from "utils/session";
 
-class AccessTokenService {
+class AccessTokenIssuer {
   private envConfig: IEnvConfig;
 
   public constructor(envConfig: IEnvConfig) {
@@ -45,4 +45,4 @@ class AccessTokenService {
   }
 }
 
-export default AccessTokenService;
+export default AccessTokenIssuer;

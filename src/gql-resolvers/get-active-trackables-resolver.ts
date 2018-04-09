@@ -1,8 +1,8 @@
 import { combineResolvers } from "graphql-resolvers";
 import { TrackableStatus } from "models/trackable-status";
 import { makeConnection } from "utils/connection";
+import IGqlContext from "utils/gql-context";
 import { makeCheckAuthResolver } from "utils/gql-resolver-utils";
-import IGraphqlContext from "utils/graphql-context";
 import ID from "utils/id";
 
 interface IArgs {
@@ -13,12 +13,12 @@ interface IArgs {
 async function getActiveTrackablesResolver(
   parentValue: any,
   args: IArgs,
-  context: IGraphqlContext
+  context: IGqlContext
 ) {
-  const { trackableService } = context.diContainer;
+  const { trackableFetcher } = context.diContainer;
   const viewerId = context.session && context.session.userId;
   const ownerId = args.userId || viewerId;
-  const trackables = await trackableService.getActive(
+  const trackables = await trackableFetcher.getActive(
     ownerId!,
     args.after,
     viewerId
@@ -28,7 +28,7 @@ async function getActiveTrackablesResolver(
     trackable => trackable.order,
     endCursor => {
       const limit = 1;
-      return trackableService.getActive(ownerId!, endCursor, viewerId, limit);
+      return trackableFetcher.getActive(ownerId!, endCursor, viewerId, limit);
     }
   );
 }

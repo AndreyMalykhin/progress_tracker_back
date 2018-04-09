@@ -3,10 +3,10 @@ import DIContainer from "utils/di-container";
 import { ILoaderMap } from "utils/loader-map";
 import { ISession } from "utils/session";
 
-interface IGraphqlContext {
+interface IGqlContext {
   diContainer: DIContainer;
   loaderMap: ILoaderMap;
   session?: ISession;
 }
 
-export default IGraphqlContext;
+export default IGqlContext;

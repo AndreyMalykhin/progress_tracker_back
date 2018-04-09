@@ -10,4 +10,6 @@ interface IUser {
   rewardableReviewsLeft: number;
 }
 
-export { IUser };
+const rewardableReviewsPerDay = 4;
+
+export { IUser, rewardableReviewsPerDay };

@@ -1,6 +1,6 @@
 import { ITrackable, TrackableType } from "models/trackable";
+import IGqlContext from "utils/gql-context";
 import { makeRedirectResolver } from "utils/gql-resolver-utils";
-import IGraphqlContext from "utils/graphql-context";
 
 const trackableResolver = {
   __resolveType,
@@ -25,7 +25,7 @@ function __resolveType(trackable: ITrackable) {
   return null;
 }
 
-function user(trackable: ITrackable, args: object, context: IGraphqlContext) {
+function user(trackable: ITrackable, args: object, context: IGqlContext) {
   return context.loaderMap.user.load(trackable.userId);
 }
 

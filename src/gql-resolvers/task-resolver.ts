@@ -1,11 +1,11 @@
 import { ITask } from "models/task";
-import IGraphqlContext from "utils/graphql-context";
+import IGqlContext from "utils/gql-context";
 
 const taskResolver = {
   goal
 };
 
-function goal(task: ITask, args: object, context: IGraphqlContext) {
+function goal(task: ITask, args: object, context: IGqlContext) {
   return context.loaderMap.trackable.load(task.goalId);
 }
 

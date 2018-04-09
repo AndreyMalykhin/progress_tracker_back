@@ -21,7 +21,7 @@ function makeAuthMiddleware(
 
     if (accessToken) {
       try {
-        res.locals.session = await diContainer.accessTokenService.verify(
+        res.locals.session = await diContainer.accessTokenIssuer.verify(
           accessToken
         );
         isSuccess = true;

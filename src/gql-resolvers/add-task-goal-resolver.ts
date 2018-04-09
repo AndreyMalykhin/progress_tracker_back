@@ -1,11 +1,14 @@
+import { IAddTaskGoalCmdInput } from "commands/add-task-goal-cmd";
+import { makeAddTrackableResolver } from "gql-resolvers/add-trackable-resolver";
 import { combineResolvers } from "graphql-resolvers";
+import Knex from "knex";
 import Difficulty from "models/difficulty";
 import ProgressDisplayMode from "models/progress-display-mode";
 import ConstraintViolationError from "utils/constraint-violation-error";
+import IGqlContext from "utils/gql-context";
 import { makeCheckAuthResolver } from "utils/gql-resolver-utils";
-import IGraphqlContext from "utils/graphql-context";
 import ID from "utils/id";
-import { mapErrors } from "utils/validation-result";
+import { IValidationResult, mapErrors } from "utils/validation-result";
 
 interface IArgs {
   goal: {
@@ -23,47 +26,44 @@ interface IArgs {
   };
 }
 
-async function addTaskGoalResolver(
-  parentResult: any,
-  args: IArgs,
-  context: IGraphqlContext
+const addTaskGoalResolver = makeAddTrackableResolver(
+  argsToInput,
+  addTaskGoal,
+  mapValidationErrors
+);
+
+function addTaskGoal(
+  input: IAddTaskGoalCmdInput,
+  transaction: Knex.Transaction,
+  context: IGqlContext
 ) {
-  const { db, trackableService, iconService } = context.diContainer;
-  const input = args.goal;
-  const icon = await iconService.getByName(input.iconName);
-  const goal = {
-    clientId: input.id,
-    deadlineDate: input.deadlineDate,
-    difficulty: input.difficulty,
+  return context.diContainer.addTaskGoalCmd(input, transaction);
+}
+
+function mapValidationErrors(validationResult: IValidationResult) {
+  mapErrors(validationResult, {
+    clientId: { field: "id" },
+    iconId: { field: "iconName" },
+    progressDisplayModeId: { field: "progressDisplayMode" }
+  });
+}
+
+async function argsToInput(args: IArgs, context: IGqlContext) {
+  const { goal } = args;
+  const icon = await context.diContainer.iconFetcher.getByName(goal.iconName);
+  return {
+    clientId: goal.id,
+    deadlineDate: goal.deadlineDate,
+    difficulty: goal.difficulty,
     iconId: icon ? icon.id : "",
-    isPublic: input.isPublic,
-    progressDisplayModeId: input.progressDisplayMode,
-    tasks: input.tasks.map(task => {
+    isPublic: goal.isPublic,
+    progressDisplayModeId: goal.progressDisplayMode,
+    tasks: goal.tasks.map(task => {
       return { clientId: task.id, title: task.title };
     }),
-    title: input.title,
+    title: goal.title,
     userId: context.session!.userId
-  };
-  let output;
-  await db.transaction(async transaction => {
-    try {
-      output = await trackableService.addTaskGoal(goal, transaction);
-    } catch (e) {
-      if (e instanceof ConstraintViolationError) {
-        mapErrors(e.validationResult, {
-          clientId: { field: "id" },
-          difficulty: { error: "Invalid value" },
-          iconId: { field: "iconName" },
-          progressDisplayModeId: { field: "progressDisplayMode" }
-        });
-      }
-
-      throw e;
-    }
-  });
-  return {
-    trackable: output
   };
 }
 
-export default combineResolvers(makeCheckAuthResolver(), addTaskGoalResolver);
+export default addTaskGoalResolver;

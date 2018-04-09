@@ -1,5 +1,5 @@
 import { Unauthorized } from "http-errors";
-import IGraphqlContext from "utils/graphql-context";
+import IGqlContext from "utils/gql-context";
 
 type IParentValue<T> = T & {
   [field: string]: Date;
@@ -15,10 +15,10 @@ function makeCheckAuthResolver<TParentValue, TArgs>(
   condition?: (
     parentValue: TParentValue,
     args: TArgs,
-    context: IGraphqlContext
+    context: IGqlContext
   ) => boolean
 ) {
-  return (parentValue: TParentValue, args: TArgs, context: IGraphqlContext) => {
+  return (parentValue: TParentValue, args: TArgs, context: IGqlContext) => {
     if (
       !context.session &&
       (!condition || condition(parentValue, args, context))

@@ -4,6 +4,7 @@ input AddAggregateChildInput {
 
 input AddAggregateInput {
   id: ID
+  title: String!
   children: [AddAggregateChildInput!]!
 }
 

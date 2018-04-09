@@ -44,7 +44,7 @@ interface IFacebookTokenInfo {
 
 const apiUrl = "https://graph.facebook.com/v2.12/";
 
-class FacebookService {
+class Facebook {
   private fetcher: IFetcher;
   private envConfig: IEnvConfig;
 
@@ -141,4 +141,4 @@ export {
   IFacebookUser,
   IFacebookTokenInfo
 };
-export default FacebookService;
+export default Facebook;

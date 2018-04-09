@@ -1,5 +1,5 @@
 import { IPrimitiveTrackable } from "models/primitive-trackable";
-import IGraphqlContext from "utils/graphql-context";
+import IGqlContext from "utils/gql-context";
 
 const primitiveTrackableResolver = {
   iconName
@@ -8,7 +8,7 @@ const primitiveTrackableResolver = {
 async function iconName(
   trackable: IPrimitiveTrackable,
   args: object,
-  context: IGraphqlContext
+  context: IGqlContext
 ) {
   const icon = await context.loaderMap.icon.load(trackable.iconId);
   return icon.name;

@@ -1,14 +1,27 @@
 import Bottle from "bottlejs";
+import { IAddAvatarCmd, makeAddAvatarCmd } from "commands/add-avatar-cmd";
+import {
+  IAddNumericalGoalCmd,
+  makeAddNumericalGoalCmd
+} from "commands/add-numerical-goal-cmd";
+import {
+  IAddTaskGoalCmd,
+  makeAddTaskGoalCmd
+} from "commands/add-task-goal-cmd";
+import { ILoginCmd, makeLoginCmd } from "commands/login-cmd";
+import { ISyncFriendsCmd, makeSyncFriendsCmd } from "commands/sync-friends-cmd";
 import Knex from "knex";
-import AccessTokenService from "services/access-token-service";
-import ActivityService from "services/activity-service";
-import AssetService from "services/asset-service";
-import AvatarService from "services/avatar-service";
-import FacebookService from "services/facebook-service";
-import FriendSynchronizer from "services/friend-synchronizer";
-import IconService from "services/icon-service";
-import TrackableService from "services/trackable-service";
-import UserService from "services/user-service";
+import AccessTokenIssuer from "services/access-token-issuer";
+import AssetFetcher from "services/asset-fetcher";
+import AvatarFetcher from "services/avatar-fetcher";
+import Facebook from "services/facebook";
+import IconFetcher from "services/icon-fetcher";
+import MuteFetcher from "services/mute-fetcher";
+import ReviewFetcher from "services/review-fetcher";
+import TaskFetcher from "services/task-fetcher";
+import TrackableFetcher from "services/trackable-fetcher";
+import UserFetcher from "services/user-fetcher";
+import UserReportFetcher from "services/user-report-fetcher";
 import { IEnvConfig, makeEnvConfig } from "utils/env-config";
 import { IFetcher, makeFetcher } from "utils/fetcher";
 import { ILoaderMapFactory, makeLoaderMapFactory } from "utils/loader-map";
@@ -29,40 +42,48 @@ class DIContainer {
     return this.impl.db;
   }
 
-  public get facebookService(): FacebookService {
-    return this.impl.facebookService;
+  public get facebook(): Facebook {
+    return this.impl.facebook;
   }
 
-  public get userService(): UserService {
-    return this.impl.userService;
+  public get userFetcher(): UserFetcher {
+    return this.impl.userFetcher;
   }
 
-  public get avatarService(): AvatarService {
-    return this.impl.avatarService;
+  public get userReportFetcher(): UserReportFetcher {
+    return this.impl.userReportFetcher;
   }
 
-  public get activityService(): ActivityService {
-    return this.impl.activityService;
+  public get muteFetcher(): MuteFetcher {
+    return this.impl.muteFetcher;
   }
 
-  public get trackableService(): TrackableService {
-    return this.impl.trackableService;
+  public get avatarFetcher(): AvatarFetcher {
+    return this.impl.avatarFetcher;
   }
 
-  public get iconService(): IconService {
-    return this.impl.iconService;
+  public get reviewFetcher(): ReviewFetcher {
+    return this.impl.reviewFetcher;
   }
 
-  public get assetService(): AssetService {
-    return this.impl.assetService;
+  public get trackableFetcher(): TrackableFetcher {
+    return this.impl.trackableFetcher;
   }
 
-  public get accessTokenService(): AccessTokenService {
-    return this.impl.accessTokenService;
+  public get iconFetcher(): IconFetcher {
+    return this.impl.iconFetcher;
   }
 
-  public get friendSynchronizer(): FriendSynchronizer {
-    return this.impl.friendSynchronizer;
+  public get taskFetcher(): TaskFetcher {
+    return this.impl.taskFetcher;
+  }
+
+  public get assetFetcher(): AssetFetcher {
+    return this.impl.assetFetcher;
+  }
+
+  public get accessTokenIssuer(): AccessTokenIssuer {
+    return this.impl.accessTokenIssuer;
   }
 
   public get fetcher(): IFetcher {
@@ -71,6 +92,26 @@ class DIContainer {
 
   public get loaderMapFactory(): ILoaderMapFactory {
     return this.impl.loaderMapFactory;
+  }
+
+  public get loginCmd(): ILoginCmd {
+    return this.impl.loginCmd;
+  }
+
+  public get syncFriendsCmd(): ISyncFriendsCmd {
+    return this.impl.syncFriendsCmd;
+  }
+
+  public get addAvatarCmd(): IAddAvatarCmd {
+    return this.impl.addAvatarCmd;
+  }
+
+  public get addTaskGoalCmd(): IAddTaskGoalCmd {
+    return this.impl.addTaskGoalCmd;
+  }
+
+  public get addNumericalGoalCmd(): IAddNumericalGoalCmd {
+    return this.impl.addNumericalGoalCmd;
   }
 }
 
@@ -81,27 +122,44 @@ function makeDIContainer() {
   di.serviceFactory(
     "loaderMapFactory",
     makeLoaderMapFactory,
-    "avatarService",
-    "userService",
-    "iconService",
-    "trackableService",
-    "assetService"
+    "avatarFetcher",
+    "userFetcher",
+    "iconFetcher",
+    "trackableFetcher",
+    "assetFetcher"
   );
+  di.serviceFactory(
+    "loginCmd",
+    makeLoginCmd,
+    "facebook",
+    "userFetcher",
+    "accessTokenIssuer",
+    "db",
+    "syncFriendsCmd",
+    "addAvatarCmd"
+  );
+  di.serviceFactory(
+    "syncFriendsCmd",
+    makeSyncFriendsCmd,
+    "userFetcher",
+    "facebook",
+    "db"
+  );
+  di.serviceFactory("addAvatarCmd", makeAddAvatarCmd, "db");
+  di.serviceFactory("addTaskGoalCmd", makeAddTaskGoalCmd, "db");
+  di.serviceFactory("addNumericalGoalCmd", makeAddNumericalGoalCmd, "db");
   di.service("fetcher", makeFetcher);
-  di.service("avatarService", AvatarService, "db");
-  di.service("assetService", AssetService, "db");
-  di.service("activityService", ActivityService, "db");
-  di.service("accessTokenService", AccessTokenService, "envConfig");
-  di.service("facebookService", FacebookService, "fetcher", "envConfig");
-  di.service("userService", UserService, "db");
-  di.service("trackableService", TrackableService, "db", "activityService");
-  di.service("iconService", IconService, "db");
-  di.service(
-    "friendSynchronizer",
-    FriendSynchronizer,
-    "userService",
-    "facebookService"
-  );
+  di.service("avatarFetcher", AvatarFetcher, "db");
+  di.service("reviewFetcher", ReviewFetcher, "db");
+  di.service("assetFetcher", AssetFetcher, "db");
+  di.service("taskFetcher", TaskFetcher, "db");
+  di.service("accessTokenIssuer", AccessTokenIssuer, "envConfig");
+  di.service("facebook", Facebook, "fetcher", "envConfig");
+  di.service("userFetcher", UserFetcher, "db");
+  di.service("muteFetcher", MuteFetcher, "db");
+  di.service("userReportFetcher", UserReportFetcher, "db");
+  di.service("trackableFetcher", TrackableFetcher, "db");
+  di.service("iconFetcher", IconFetcher, "db");
   return new DIContainer(di.container);
 }
 
