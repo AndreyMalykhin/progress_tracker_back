@@ -7,6 +7,14 @@ import { ITask } from "models/task";
 import { ITaskGoal } from "models/task-goal";
 import { ITrackable, TrackableType } from "models/trackable";
 import { TrackableStatus } from "models/trackable-status";
+import {
+  validateEnum,
+  validateLength,
+  validateList,
+  validateRange,
+  validateReference,
+  validateUUID
+} from "utils/common-validators";
 import ConstraintViolationError from "utils/constraint-violation-error";
 import DbTable from "utils/db-table";
 import ID from "utils/id";
@@ -16,14 +24,6 @@ import {
   IValidationErrors,
   setError
 } from "utils/validation-result";
-import {
-  validateEnum,
-  validateLength,
-  validateList,
-  validateRange,
-  validateReference,
-  validateUUID
-} from "utils/validators";
 
 class TrackableFetcher {
   private db: Knex;
@@ -60,6 +60,32 @@ class TrackableFetcher {
 
   public async getByIds(ids: ID[]): Promise<ITrackable[]> {
     return await this.db(DbTable.Trackables).whereIn("id", ids);
+  }
+
+  public async getByIdsOrClientIds(
+    ids: ID[],
+    clientIds: ID[],
+    userId?: ID
+  ): Promise<ITrackable[]> {
+    const query = this.db(DbTable.Trackables).where(q => {
+      q.whereIn("id", ids);
+
+      if (clientIds.length) {
+        q.orWhereIn("clientId", clientIds);
+      }
+    });
+
+    if (userId) {
+      query.andWhere("userId", userId);
+    }
+
+    return await query;
+  }
+
+  public async getByParentId(parentId: ID): Promise<ITrackable[]> {
+    return this.db(DbTable.Trackables)
+      .where("parentId", parentId)
+      .orderBy("order", "desc");
   }
 }
 

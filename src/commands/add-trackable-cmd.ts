@@ -2,15 +2,16 @@ import Knex from "knex";
 import { ActivityType } from "models/activity";
 import { ITrackable } from "models/trackable";
 import { ITrackableAddedActivity } from "models/trackable-added-activity";
-import ConstraintViolationError from "utils/constraint-violation-error";
-import DbTable from "utils/db-table";
-import ID from "utils/id";
-import { isEmpty, IValidationErrors, setError } from "utils/validation-result";
 import {
   validateLength,
   validateReference,
   validateUUID
-} from "utils/validators";
+} from "utils/common-validators";
+import ConstraintViolationError from "utils/constraint-violation-error";
+import DbTable from "utils/db-table";
+import IGqlContext from "utils/gql-context";
+import ID from "utils/id";
+import { isEmpty, IValidationErrors, setError } from "utils/validation-result";
 
 type IAddTrackableCmd<
   TTrackable extends ITrackable,
@@ -28,8 +29,8 @@ function makeAddTrackableCmd<
   TTrackable extends ITrackable
 >(
   db: Knex,
-  validateInput: (input: TInput, errors: IValidationErrors) => void,
-  inputToTrackable: (input: TInput) => Partial<TTrackable>,
+  validateInput: (input: TInput, errors: IValidationErrors) => Promise<void>,
+  inputToTrackable: (input: TInput) => Promise<Partial<TTrackable>>,
   afterAdd?: (
     input: TInput,
     trackable: TTrackable,
@@ -39,8 +40,8 @@ function makeAddTrackableCmd<
   dontAddActivity = false
 ): IAddTrackableCmd<TTrackable, TInput> {
   return async (input, transaction) => {
-    validate(input, validateInput);
-    const inputTrackable = inputToTrackable(input);
+    await validate(input, validateInput);
+    const inputTrackable = await inputToTrackable(input);
     const rows = await db(DbTable.Trackables)
       .transacting(transaction)
       .insert(inputTrackable, "*");
@@ -63,16 +64,16 @@ function makeAddTrackableCmd<
   };
 }
 
-function validate<TInput extends IAddTrackableCmdInput>(
+async function validate<TInput extends IAddTrackableCmdInput>(
   input: TInput,
-  doValidate: (input: TInput, errors: IValidationErrors) => void
+  doValidate: (input: TInput, errors: IValidationErrors) => Promise<void>
 ) {
   const { clientId, userId, title } = input;
   const errors: IValidationErrors = {};
   setError(errors, "clientId", validateUUID(clientId, { isOptional: true }));
   setError(errors, "userId", validateReference(userId));
   setError(errors, "title", validateLength(title, { max: 255 }));
-  doValidate(input, errors);
+  await doValidate(input, errors);
 
   if (!isEmpty(errors)) {
     throw new ConstraintViolationError("Invalid trackable", { errors });

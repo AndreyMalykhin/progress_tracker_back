@@ -3,13 +3,13 @@ import {
   IAddTrackableCmdInput,
   makeAddTrackableCmd
 } from "commands/add-trackable-cmd";
-import { validateIcon } from "commands/trackable-cmd-helpers";
 import Knex from "knex";
 import { IGymExercise } from "models/gym-exercise";
 import { TrackableType } from "models/trackable";
 import { TrackableStatus } from "models/trackable-status";
+import { validateReference } from "utils/common-validators";
 import ID from "utils/id";
-import { IValidationErrors } from "utils/validation-result";
+import { IValidationErrors, setError } from "utils/validation-result";
 
 type IAddGymExerciseCmd = IAddTrackableCmd<
   IGymExercise,
@@ -25,9 +25,9 @@ function makeAddGymExerciseCmd(db: Knex): IAddGymExerciseCmd {
   return makeAddTrackableCmd(db, validateInput, inputToTrackable);
 }
 
-function inputToTrackable(
+async function inputToTrackable(
   input: IAddGymExerciseCmdInput
-): Partial<IGymExercise> {
+): Promise<Partial<IGymExercise>> {
   const { clientId, userId, iconId, isPublic, title } = input;
   return {
     clientId,
@@ -41,11 +41,11 @@ function inputToTrackable(
   };
 }
 
-function validateInput(
+async function validateInput(
   input: IAddGymExerciseCmdInput,
   errors: IValidationErrors
 ) {
-  validateIcon(input.iconId, errors);
+  setError(errors, "iconId", validateReference(input.iconId));
 }
 
 export { makeAddGymExerciseCmd, IAddGymExerciseCmdInput, IAddGymExerciseCmd };

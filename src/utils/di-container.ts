@@ -1,4 +1,8 @@
 import Bottle from "bottlejs";
+import {
+  IAddAggregateCmd,
+  makeAddAggregateCmd
+} from "commands/add-aggregate-cmd";
 import { IAddAvatarCmd, makeAddAvatarCmd } from "commands/add-avatar-cmd";
 import { IAddCounterCmd, makeAddCounterCmd } from "commands/add-counter-cmd";
 import {
@@ -131,6 +135,10 @@ class DIContainer {
   public get addGymExerciseCmd(): IAddGymExerciseCmd {
     return this.impl.addGymExerciseCmd;
   }
+
+  public get addAggregateCmd(): IAddAggregateCmd {
+    return this.impl.addAggregateCmd;
+  }
 }
 
 function makeDIContainer() {
@@ -168,6 +176,12 @@ function makeDIContainer() {
   di.serviceFactory("addNumericalGoalCmd", makeAddNumericalGoalCmd, "db");
   di.serviceFactory("addCounterCmd", makeAddCounterCmd, "db");
   di.serviceFactory("addGymExerciseCmd", makeAddGymExerciseCmd, "db");
+  di.serviceFactory(
+    "addAggregateCmd",
+    makeAddAggregateCmd,
+    "db",
+    "trackableFetcher"
+  );
   di.service("fetcher", makeFetcher);
   di.service("avatarFetcher", AvatarFetcher, "db");
   di.service("reviewFetcher", ReviewFetcher, "db");

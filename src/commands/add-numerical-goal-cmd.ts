@@ -4,11 +4,6 @@ import {
   IAddTrackableCmdInput,
   makeAddTrackableCmd
 } from "commands/add-trackable-cmd";
-import {
-  validateDifficulty,
-  validateIcon,
-  validateProgressDisplayMode
-} from "commands/trackable-cmd-helpers";
 import Knex from "knex";
 import { ActivityType } from "models/activity";
 import Difficulty from "models/difficulty";
@@ -18,17 +13,17 @@ import { ITaskGoal } from "models/task-goal";
 import { TrackableType } from "models/trackable";
 import { ITrackableAddedActivity } from "models/trackable-added-activity";
 import { TrackableStatus } from "models/trackable-status";
-import ConstraintViolationError from "utils/constraint-violation-error";
-import DbTable from "utils/db-table";
-import ID from "utils/id";
-import { isEmpty, IValidationErrors, setError } from "utils/validation-result";
 import {
   validateEnum,
   validateLength,
   validateRange,
   validateReference,
   validateUUID
-} from "utils/validators";
+} from "utils/common-validators";
+import ConstraintViolationError from "utils/constraint-violation-error";
+import DbTable from "utils/db-table";
+import ID from "utils/id";
+import { isEmpty, IValidationErrors, setError } from "utils/validation-result";
 
 type IAddNumericalGoalCmd = IAddTrackableCmd<
   INumericalGoal,
@@ -48,9 +43,9 @@ function makeAddNumericalGoalCmd(db: Knex) {
   return makeAddTrackableCmd(db, validateInput, inputToTrackable);
 }
 
-function inputToTrackable(
+async function inputToTrackable(
   input: IAddNumericalGoalCmdInput
-): Partial<INumericalGoal> {
+): Promise<Partial<INumericalGoal>> {
   const {
     clientId,
     deadlineDate,
@@ -79,14 +74,29 @@ function inputToTrackable(
   };
 }
 
-function validateInput(
+async function validateInput(
   input: IAddNumericalGoalCmdInput,
   errors: IValidationErrors
 ) {
   const { difficulty, progressDisplayModeId, iconId, maxProgress } = input;
-  validateDifficulty(difficulty, errors);
-  validateProgressDisplayMode(progressDisplayModeId, errors);
-  validateIcon(iconId, errors);
+  setError(
+    errors,
+    "difficulty",
+    validateEnum(difficulty, {
+      values: [
+        Difficulty.Easy,
+        Difficulty.Medium,
+        Difficulty.Hard,
+        Difficulty.Impossible
+      ]
+    })
+  );
+  setError(
+    errors,
+    "progressDisplayModeId",
+    validateReference(progressDisplayModeId)
+  );
+  setError(errors, "iconId", validateReference(iconId));
   setError(
     errors,
     "maxProgress",

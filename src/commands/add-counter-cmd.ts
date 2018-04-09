@@ -3,13 +3,13 @@ import {
   IAddTrackableCmdInput,
   makeAddTrackableCmd
 } from "commands/add-trackable-cmd";
-import { validateIcon } from "commands/trackable-cmd-helpers";
 import Knex from "knex";
 import { ICounter } from "models/counter";
 import { TrackableType } from "models/trackable";
 import { TrackableStatus } from "models/trackable-status";
+import { validateReference } from "utils/common-validators";
 import ID from "utils/id";
-import { IValidationErrors } from "utils/validation-result";
+import { IValidationErrors, setError } from "utils/validation-result";
 
 type IAddCounterCmd = IAddTrackableCmd<ICounter, IAddCounterCmdInput>;
 
@@ -22,7 +22,9 @@ function makeAddCounterCmd(db: Knex): IAddCounterCmd {
   return makeAddTrackableCmd(db, validateInput, inputToTrackable);
 }
 
-function inputToTrackable(input: IAddCounterCmdInput): Partial<ICounter> {
+async function inputToTrackable(
+  input: IAddCounterCmdInput
+): Promise<Partial<ICounter>> {
   const { clientId, userId, iconId, isPublic, title } = input;
   return {
     clientId,
@@ -37,8 +39,11 @@ function inputToTrackable(input: IAddCounterCmdInput): Partial<ICounter> {
   };
 }
 
-function validateInput(input: IAddCounterCmdInput, errors: IValidationErrors) {
-  validateIcon(input.iconId, errors);
+async function validateInput(
+  input: IAddCounterCmdInput,
+  errors: IValidationErrors
+) {
+  setError(errors, "iconId", validateReference(input.iconId));
 }
 
 export { makeAddCounterCmd, IAddCounterCmdInput, IAddCounterCmd };
