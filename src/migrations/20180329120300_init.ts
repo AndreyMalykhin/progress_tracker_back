@@ -391,13 +391,9 @@ function createTrackables(knex: Knex) {
     table
       .integer("progressDisplayModeId")
       .unsigned()
-      .notNullable()
       .references("id")
       .inTable("progressDisplayModes");
-    table
-      .integer("difficulty")
-      .unsigned()
-      .notNullable();
+    table.integer("difficulty").unsigned();
     table.integer("estimatedDifficulty").unsigned();
     table
       .integer("proofPhotoId")

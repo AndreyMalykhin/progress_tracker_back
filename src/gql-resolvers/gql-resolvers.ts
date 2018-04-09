@@ -1,4 +1,5 @@
 import aggregatableResolver from "gql-resolvers/aggregatable-resolver";
+import counterResolver from "gql-resolvers/counter-resolver";
 import difficultyResolver from "gql-resolvers/difficulty-resolver";
 import goalResolver from "gql-resolvers/goal-resolver";
 import gqlMutations from "gql-resolvers/gql-mutations";
@@ -15,6 +16,7 @@ import userResolver from "gql-resolvers/user-resolver";
 import { IResolvers } from "graphql-tools";
 
 const gqlResolvers = {
+  Counter: counterResolver,
   Difficulty: difficultyResolver,
   IAggregatable: aggregatableResolver,
   IGoal: goalResolver,
