@@ -35,7 +35,8 @@ function makeAddToAggregateCmd(
 
     const aggregate = await trackableFetcher.getByIdOrClientId(
       inputAggregate.id,
-      inputAggregate.clientId
+      inputAggregate.clientId,
+      userId
     );
     const oldChildren = aggregate
       ? await trackableFetcher.getByParentId(aggregate.id)
