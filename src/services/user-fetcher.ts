@@ -24,8 +24,12 @@ class UserFetcher {
       .where("f.srcId", userId);
   }
 
-  public async getByFacebookId(facebookId: ID): Promise<IUser | undefined> {
+  public async getByFacebookId(
+    facebookId: ID,
+    transaction?: Knex.Transaction
+  ): Promise<IUser | undefined> {
     return await this.db(DbTable.Users)
+      .transacting(transaction)
       .where("facebookId", facebookId)
       .first();
   }

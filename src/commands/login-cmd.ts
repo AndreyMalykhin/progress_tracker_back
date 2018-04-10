@@ -30,7 +30,7 @@ function makeLoginCmd(
 ) {
   return async (facebookAccessToken: string, transaction: Knex.Transaction) => {
     const facebookUser = await facebook.getUser(facebookAccessToken);
-    let user = await userFetcher.getByFacebookId(facebookUser.id);
+    let user = await userFetcher.getByFacebookId(facebookUser.id, transaction);
     const isNewUser = !user;
 
     if (user) {

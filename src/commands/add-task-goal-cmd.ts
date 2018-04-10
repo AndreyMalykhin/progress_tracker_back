@@ -13,11 +13,11 @@ import { ITrackableAddedActivity } from "models/trackable-added-activity";
 import { TrackableStatus } from "models/trackable-status";
 import IconFetcher from "services/icon-fetcher";
 import {
+  validateClientId,
   validateEnum,
   validateLength,
   validateList,
-  validateReference,
-  validateUUID
+  validateReference
 } from "utils/common-validators";
 import ConstraintViolationError from "utils/constraint-violation-error";
 import DbTable from "utils/db-table";
@@ -120,7 +120,7 @@ async function validateInput(
       setError(
         taskErrors,
         "clientId",
-        validateUUID(task.clientId, { isOptional: true })
+        validateClientId(task.clientId, { isOptional: true })
       );
       setError(taskErrors, "title", validateLength(task.title, { max: 255 }));
       return taskErrors;

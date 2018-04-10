@@ -36,19 +36,21 @@ function makeAddToAggregateCmd(
     const aggregate = await trackableFetcher.getByIdOrClientId(
       inputAggregate.id,
       inputAggregate.clientId,
-      userId
+      userId,
+      transaction
     );
-    const oldChildren = aggregate
+    const oldChildren: IAggregateChildren = aggregate
       ? await trackableFetcher.getByParentId(aggregate.id)
       : [];
     const childrenToAdd = await trackableFetcher.getByIdsOrClientIds(
       inputChildIds,
       inputChildClientIds,
-      userId
+      userId,
+      transaction
     );
-    validateInput(childrenToAdd, oldChildren as IAggregateChildren, aggregate);
+    validateInput(childrenToAdd, oldChildren, aggregate);
     await updateChildren(childrenToAdd, aggregate!.id, transaction, db);
-    const newChildren = oldChildren.concat(childrenToAdd);
+    const newChildren = oldChildren.concat(childrenToAdd as IAggregateChildren);
     return await updateAggregate(
       aggregate!.id,
       newChildren as IAggregateChildren,

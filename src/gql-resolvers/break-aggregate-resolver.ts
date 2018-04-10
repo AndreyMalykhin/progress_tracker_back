@@ -3,8 +3,8 @@ import ConstraintViolationError from "utils/constraint-violation-error";
 import IGqlContext from "utils/gql-context";
 import { makeCheckAuthResolver } from "utils/gql-resolver-utils";
 import ID from "utils/id";
+import isClientId from "utils/is-client-id";
 import { mapErrors } from "utils/validation-result";
-import { isUUID } from "validator";
 
 interface IArgs {
   id: ID;
@@ -16,7 +16,7 @@ async function breakAggregateResolver(
   context: IGqlContext
 ) {
   const { id } = args;
-  const aggregate = isUUID(id) ? { clientId: id } : { id };
+  const aggregate = isClientId(id) ? { clientId: id } : { id };
   const trackables = await context.diContainer.db.transaction(
     async transaction => {
       try {

@@ -50,7 +50,8 @@ function makeAddAggregateCmd(
         children = await trackableFetcher.getByIdsOrClientIds(
           childIds,
           childClientIds,
-          input2.userId
+          input2.userId,
+          transaction
         );
         await validateInput(input2, errors, children);
       },

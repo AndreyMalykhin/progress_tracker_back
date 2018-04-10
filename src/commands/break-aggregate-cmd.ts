@@ -22,7 +22,8 @@ function makeBreakAggregateCmd(
     const aggregate = await trackableFetcher.getByIdOrClientId(
       inputAggregate.id,
       inputAggregate.clientId,
-      userId
+      userId,
+      transaction
     );
     validateInput(aggregate);
     const children = await updateChildren(
@@ -53,7 +54,10 @@ async function updateChildren(
 ) {
   const result: ITrackable[] = [];
   let order = Date.now();
-  const children = await trackableFetcher.getByParentId(aggregateId);
+  const children = await trackableFetcher.getByParentId(
+    aggregateId,
+    transaction
+  );
 
   for (const child of children) {
     const rows = await db(DbTable.Trackables)

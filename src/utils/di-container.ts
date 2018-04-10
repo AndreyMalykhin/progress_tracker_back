@@ -27,6 +27,10 @@ import {
 } from "commands/break-aggregate-cmd";
 import { ILoginCmd, makeLoginCmd } from "commands/login-cmd";
 import { ISyncFriendsCmd, makeSyncFriendsCmd } from "commands/sync-friends-cmd";
+import {
+  IUnaggregateTrackableCmd,
+  makeUnaggregateTrackableCmd
+} from "commands/unaggregate-trackable-cmd";
 import Knex from "knex";
 import AccessTokenIssuer from "services/access-token-issuer";
 import AssetFetcher from "services/asset-fetcher";
@@ -155,6 +159,10 @@ class DIContainer {
   public get breakAggregateCmd(): IBreakAggregateCmd {
     return this.impl.breakAggregateCmd;
   }
+
+  public get unaggregateTrackableCmd(): IUnaggregateTrackableCmd {
+    return this.impl.unaggregateTrackableCmd;
+  }
 }
 
 function makeDIContainer() {
@@ -207,6 +215,12 @@ function makeDIContainer() {
   di.serviceFactory(
     "breakAggregateCmd",
     makeBreakAggregateCmd,
+    "db",
+    "trackableFetcher"
+  );
+  di.serviceFactory(
+    "unaggregateTrackableCmd",
+    makeUnaggregateTrackableCmd,
     "db",
     "trackableFetcher"
   );

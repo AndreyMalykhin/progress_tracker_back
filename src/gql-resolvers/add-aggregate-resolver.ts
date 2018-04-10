@@ -3,8 +3,8 @@ import { makeAddTrackableResolver } from "gql-resolvers/add-trackable-resolver";
 import Knex from "knex";
 import IGqlContext from "utils/gql-context";
 import ID from "utils/id";
+import isClientId from "utils/is-client-id";
 import { IValidationResult, mapErrors } from "utils/validation-result";
-import { isUUID } from "validator";
 
 interface IArgs {
   aggregate: {
@@ -39,7 +39,7 @@ async function argsToInput(args: IArgs, context: IGqlContext) {
   const children = [];
 
   for (const child of aggregate.children) {
-    if (isUUID(child.id)) {
+    if (isClientId(child.id)) {
       children.push({ clientId: child.id });
     } else {
       children.push({ id: child.id });

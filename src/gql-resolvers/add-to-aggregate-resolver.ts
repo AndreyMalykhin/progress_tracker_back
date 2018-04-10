@@ -3,8 +3,8 @@ import ConstraintViolationError from "utils/constraint-violation-error";
 import IGqlContext from "utils/gql-context";
 import { makeCheckAuthResolver } from "utils/gql-resolver-utils";
 import ID from "utils/id";
+import isClientId from "utils/is-client-id";
 import { mapErrors } from "utils/validation-result";
-import { isUUID } from "validator";
 
 interface IArgs {
   ids: ID[];
@@ -20,7 +20,7 @@ async function addToAggregateResolver(
   const children: Array<{ id?: ID; clientId?: ID }> = [];
 
   for (const id of ids) {
-    if (isUUID(id)) {
+    if (isClientId(id)) {
       children.push({ clientId: id });
     } else {
       children.push({ id });
@@ -29,7 +29,7 @@ async function addToAggregateResolver(
 
   let aggregate: { id?: ID; clientId?: ID };
 
-  if (isUUID(aggregateId)) {
+  if (isClientId(aggregateId)) {
     aggregate = { clientId: aggregateId };
   } else {
     aggregate = { id: aggregateId };

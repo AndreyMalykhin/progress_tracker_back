@@ -1,10 +1,11 @@
 import ID from "utils/id";
+import isClientId from "utils/is-client-id";
 import {
   isEmpty,
   IValidationError,
   IValidationErrors
 } from "utils/validation-result";
-import { isLength, isUUID } from "validator";
+import { isLength } from "validator";
 
 interface IValidateConfig {
   isOptional?: boolean;
@@ -29,11 +30,11 @@ interface IValidateListConfig<T> extends IValidateConfig {
 
 const baseDefaultConfig: IValidateConfig = { isOptional: false };
 
-function validateUUID(value: string | undefined, config?: IValidateConfig) {
+function validateClientId(value: string | undefined, config?: IValidateConfig) {
   return validate(
     value,
     newValue => {
-      return !isUUID(newValue) ? "Invalid UUID" : undefined;
+      return !isClientId(newValue) ? "Invalid UUID" : undefined;
     },
     config
   );
@@ -87,11 +88,13 @@ function validateReference(
   value: ID | number | undefined,
   config?: IValidateConfig
 ) {
-  return validate(
+  const msg = "Not found";
+  const error = validate(
     value,
-    newValue => (!newValue ? "Not found" : undefined),
+    newValue => (!newValue ? msg : undefined),
     config
   );
+  return error ? msg : undefined;
 }
 
 function validateList<T>(
@@ -138,7 +141,7 @@ function validate<TValue, TConfig extends IValidateConfig>(
 }
 
 export {
-  validateUUID,
+  validateClientId,
   validateRange,
   validateReference,
   validateLength,

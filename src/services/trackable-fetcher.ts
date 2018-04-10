@@ -1,4 +1,5 @@
 import Knex from "knex";
+import { IAggregateChildren } from "models/aggregate";
 import Difficulty from "models/difficulty";
 import { INumericalGoal } from "models/numerical-goal";
 import ProgressDisplayMode from "models/progress-display-mode";
@@ -8,12 +9,12 @@ import { ITaskGoal } from "models/task-goal";
 import { ITrackable, TrackableType } from "models/trackable";
 import { TrackableStatus } from "models/trackable-status";
 import {
+  validateClientId,
   validateEnum,
   validateLength,
   validateList,
   validateRange,
-  validateReference,
-  validateUUID
+  validateReference
 } from "utils/common-validators";
 import ConstraintViolationError from "utils/constraint-violation-error";
 import DbTable from "utils/db-table";
@@ -65,21 +66,24 @@ class TrackableFetcher {
   public async getByIdsOrClientIds(
     ids: ID[],
     clientIds: ID[],
-    userId?: ID
+    userId?: ID,
+    transaction?: Knex.Transaction
   ): Promise<ITrackable[]> {
     if (!ids.length && !clientIds.length) {
       return [];
     }
 
-    const query = this.db(DbTable.Trackables).where(q => {
-      if (ids.length) {
-        q.whereIn("id", ids);
-      }
+    const query = this.db(DbTable.Trackables)
+      .transacting(transaction)
+      .where(q => {
+        if (ids.length) {
+          q.whereIn("id", ids);
+        }
 
-      if (clientIds.length) {
-        q.orWhereIn("clientId", clientIds);
-      }
-    });
+        if (clientIds.length) {
+          q.orWhereIn("clientId", clientIds);
+        }
+      });
 
     if (userId) {
       query.andWhere("userId", userId);
@@ -91,18 +95,24 @@ class TrackableFetcher {
   public async getByIdOrClientId(
     id?: ID,
     clientId?: ID,
-    userId?: ID
+    userId?: ID,
+    transaction?: Knex.Transaction
   ): Promise<ITrackable | undefined> {
     const rows = await this.getByIdsOrClientIds(
       id ? [id] : [],
       clientId ? [clientId] : [],
-      userId
+      userId,
+      transaction
     );
     return rows[0];
   }
 
-  public async getByParentId(parentId: ID): Promise<ITrackable[]> {
+  public async getByParentId(
+    parentId: ID,
+    transaction?: Knex.Transaction
+  ): Promise<IAggregateChildren> {
     return this.db(DbTable.Trackables)
+      .transacting(transaction)
       .where("parentId", parentId)
       .orderBy("order", "desc");
   }

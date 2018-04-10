@@ -3,9 +3,9 @@ import { ActivityType } from "models/activity";
 import { ITrackable } from "models/trackable";
 import { ITrackableAddedActivity } from "models/trackable-added-activity";
 import {
+  validateClientId,
   validateLength,
-  validateReference,
-  validateUUID
+  validateReference
 } from "utils/common-validators";
 import ConstraintViolationError from "utils/constraint-violation-error";
 import DbTable from "utils/db-table";
@@ -70,7 +70,11 @@ async function validate<TInput extends IAddTrackableCmdInput>(
 ) {
   const { clientId, userId, title } = input;
   const errors: IValidationErrors = {};
-  setError(errors, "clientId", validateUUID(clientId, { isOptional: true }));
+  setError(
+    errors,
+    "clientId",
+    validateClientId(clientId, { isOptional: true })
+  );
   setError(errors, "userId", validateReference(userId));
   setError(errors, "title", validateLength(title, { max: 255 }));
   await doValidate(input, errors);

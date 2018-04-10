@@ -14,11 +14,11 @@ import { TrackableType } from "models/trackable";
 import { ITrackableAddedActivity } from "models/trackable-added-activity";
 import { TrackableStatus } from "models/trackable-status";
 import {
+  validateClientId,
   validateEnum,
   validateLength,
   validateRange,
-  validateReference,
-  validateUUID
+  validateReference
 } from "utils/common-validators";
 import ConstraintViolationError from "utils/constraint-violation-error";
 import DbTable from "utils/db-table";
