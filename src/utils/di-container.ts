@@ -17,6 +17,10 @@ import {
   IAddTaskGoalCmd,
   makeAddTaskGoalCmd
 } from "commands/add-task-goal-cmd";
+import {
+  IAddToAggregateCmd,
+  makeAddToAggregateCmd
+} from "commands/add-to-aggregate-cmd";
 import { ILoginCmd, makeLoginCmd } from "commands/login-cmd";
 import { ISyncFriendsCmd, makeSyncFriendsCmd } from "commands/sync-friends-cmd";
 import Knex from "knex";
@@ -139,6 +143,10 @@ class DIContainer {
   public get addAggregateCmd(): IAddAggregateCmd {
     return this.impl.addAggregateCmd;
   }
+
+  public get addToAggregateCmd(): IAddToAggregateCmd {
+    return this.impl.addToAggregateCmd;
+  }
 }
 
 function makeDIContainer() {
@@ -179,6 +187,12 @@ function makeDIContainer() {
   di.serviceFactory(
     "addAggregateCmd",
     makeAddAggregateCmd,
+    "db",
+    "trackableFetcher"
+  );
+  di.serviceFactory(
+    "addToAggregateCmd",
+    makeAddToAggregateCmd,
     "db",
     "trackableFetcher"
   );

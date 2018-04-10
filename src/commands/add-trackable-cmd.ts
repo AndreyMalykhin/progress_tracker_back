@@ -76,7 +76,7 @@ async function validate<TInput extends IAddTrackableCmdInput>(
   await doValidate(input, errors);
 
   if (!isEmpty(errors)) {
-    throw new ConstraintViolationError("Invalid trackable", { errors });
+    throw new ConstraintViolationError("Invalid input", { errors });
   }
 }
 

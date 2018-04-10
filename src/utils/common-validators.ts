@@ -83,7 +83,10 @@ function validateLength(
   );
 }
 
-function validateReference(value: ID | number, config?: IValidateConfig) {
+function validateReference(
+  value: ID | number | undefined,
+  config?: IValidateConfig
+) {
   return validate(
     value,
     newValue => (!newValue ? "Not found" : undefined),

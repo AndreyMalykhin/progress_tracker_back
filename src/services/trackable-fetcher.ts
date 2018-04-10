@@ -67,8 +67,14 @@ class TrackableFetcher {
     clientIds: ID[],
     userId?: ID
   ): Promise<ITrackable[]> {
+    if (!ids.length && !clientIds.length) {
+      return [];
+    }
+
     const query = this.db(DbTable.Trackables).where(q => {
-      q.whereIn("id", ids);
+      if (ids.length) {
+        q.whereIn("id", ids);
+      }
 
       if (clientIds.length) {
         q.orWhereIn("clientId", clientIds);
@@ -80,6 +86,19 @@ class TrackableFetcher {
     }
 
     return await query;
+  }
+
+  public async getByIdOrClientId(
+    id?: ID,
+    clientId?: ID,
+    userId?: ID
+  ): Promise<ITrackable | undefined> {
+    const rows = await this.getByIdsOrClientIds(
+      id ? [id] : [],
+      clientId ? [clientId] : [],
+      userId
+    );
+    return rows[0];
   }
 
   public async getByParentId(parentId: ID): Promise<ITrackable[]> {

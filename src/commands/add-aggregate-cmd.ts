@@ -13,6 +13,7 @@ import { ITrackable, TrackableType } from "models/trackable";
 import { TrackableStatus } from "models/trackable-status";
 import aggregateProgress from "services/aggregate-progress";
 import TrackableFetcher from "services/trackable-fetcher";
+import validateAggregateChildren from "services/validate-aggregate-children";
 import { validateList } from "utils/common-validators";
 import DbTable from "utils/db-table";
 import IGqlContext from "utils/gql-context";
@@ -123,51 +124,14 @@ async function inputToTrackable(
 async function validateInput(
   input: IAddAggregateCmdInput,
   errors: IValidationErrors,
-  children: Array<ITrackable & IAggregatable>
+  childrenToAdd: Array<ITrackable & IAggregatable>
 ) {
-  let childrenError;
-
-  if (children.length) {
-    const { isPublic, typeId } = children[0];
-    const typeError = "Should have only counters or numerical / task goals";
-
-    for (const child of children) {
-      if (child.parentId) {
-        childrenError = "Should not be already aggregated";
-        break;
-      }
-
-      if (child.isPublic !== isPublic) {
-        childrenError = "Should not have mixed public / private children";
-        break;
-      }
-
-      switch (child.typeId) {
-        case TrackableType.Counter:
-          childrenError =
-            typeId === TrackableType.Counter ? undefined : typeError;
-          break;
-        case TrackableType.NumericalGoal:
-        case TrackableType.TaskGoal:
-          childrenError =
-            typeId === TrackableType.NumericalGoal ||
-            typeId === TrackableType.TaskGoal
-              ? undefined
-              : typeError;
-          break;
-        default:
-          childrenError = typeError;
-      }
-
-      if (childrenError) {
-        break;
-      }
-    }
-  } else {
-    childrenError = "Should not be empty";
-  }
-
-  setError(errors, "children", childrenError);
+  const oldChildren: IAggregateChildren = [];
+  setError(
+    errors,
+    "children",
+    validateAggregateChildren(childrenToAdd, oldChildren)
+  );
 }
 
 export { makeAddAggregateCmd, IAddAggregateCmdInput, IAddAggregateCmd };
