@@ -11,14 +11,17 @@ import { TrackableStatus } from "models/trackable-status";
 import {
   validateClientId,
   validateEnum,
+  validateId,
   validateLength,
   validateList,
-  validateRange,
-  validateReference
+  validateRange
 } from "utils/common-validators";
 import ConstraintViolationError from "utils/constraint-violation-error";
 import DbTable from "utils/db-table";
 import ID from "utils/id";
+import safeId from "utils/safe-id";
+import safeUUID from "utils/safe-uuid";
+import UUID from "utils/uuid";
 import {
   hasErrors,
   isEmpty,
@@ -41,11 +44,11 @@ class TrackableFetcher {
   ): Promise<ITrackable | undefined> {
     const query = this.db(DbTable.Trackables)
       .transacting(transaction)
-      .where("id", id)
+      .where("id", safeId(id))
       .first();
 
     if (userId) {
-      query.andWhere("userId", userId);
+      query.andWhere("userId", safeId(userId));
     }
 
     if (typeId) {
@@ -66,7 +69,7 @@ class TrackableFetcher {
         TrackableStatus.Active,
         TrackableStatus.PendingProof
       ])
-      .andWhere("userId", ownerId)
+      .andWhere("userId", safeId(ownerId))
       .orderBy("order", "desc")
       .limit(limit);
 
@@ -82,12 +85,13 @@ class TrackableFetcher {
   }
 
   public async getByIds(ids: ID[]): Promise<ITrackable[]> {
-    return await this.db(DbTable.Trackables).whereIn("id", ids);
+    return await this.db(DbTable.Trackables).whereIn("id", ids.map(safeId));
   }
 
   public async getByIdsOrClientIds(
     ids: ID[],
-    clientIds: ID[],
+    clientIds: UUID[],
+    typeId?: TrackableType,
     userId?: ID,
     transaction?: Knex.Transaction
   ): Promise<ITrackable[]> {
@@ -99,16 +103,20 @@ class TrackableFetcher {
       .transacting(transaction)
       .where(q => {
         if (ids.length) {
-          q.whereIn("id", ids);
+          q.whereIn("id", ids.map(safeId));
         }
 
         if (clientIds.length) {
-          q.orWhereIn("clientId", clientIds);
+          q.orWhereIn("clientId", clientIds.map(safeUUID));
         }
       });
 
     if (userId) {
-      query.andWhere("userId", userId);
+      query.andWhere("userId", safeId(userId));
+    }
+
+    if (typeId) {
+      query.andWhere("typeId", typeId);
     }
 
     return await query;
@@ -116,13 +124,15 @@ class TrackableFetcher {
 
   public async getByIdOrClientId(
     id?: ID,
-    clientId?: ID,
+    clientId?: UUID,
+    typeId?: TrackableType,
     userId?: ID,
     transaction?: Knex.Transaction
   ): Promise<ITrackable | undefined> {
     const rows = await this.getByIdsOrClientIds(
       id ? [id] : [],
       clientId ? [clientId] : [],
+      typeId,
       userId,
       transaction
     );
@@ -135,7 +145,7 @@ class TrackableFetcher {
   ): Promise<IAggregateChildren> {
     return this.db(DbTable.Trackables)
       .transacting(transaction)
-      .where("parentId", parentId)
+      .where("parentId", safeId(parentId))
       .orderBy("order", "desc");
   }
 }

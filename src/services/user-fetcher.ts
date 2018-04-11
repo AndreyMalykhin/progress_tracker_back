@@ -5,6 +5,7 @@ import { IUserReport } from "models/user-report";
 import { IFacebookUser } from "services/facebook";
 import DbTable from "utils/db-table";
 import ID from "utils/id";
+import safeId from "utils/safe-id";
 
 class UserFetcher {
   private db: Knex;
@@ -14,18 +15,18 @@ class UserFetcher {
   }
 
   public async getByIds(ids: ID[]): Promise<IUser[]> {
-    return await this.db(DbTable.Users).whereIn("id", ids);
+    return await this.db(DbTable.Users).whereIn("id", ids.map(safeId));
   }
 
   public async getFriends(userId: ID): Promise<IUser[]> {
     return await this.db(DbTable.Users + " as u")
       .select("u.*")
       .innerJoin(DbTable.Friendships + " as f", "f.targetId", "u.id")
-      .where("f.srcId", userId);
+      .where("f.srcId", safeId(userId));
   }
 
   public async getByFacebookId(
-    facebookId: ID,
+    facebookId: string,
     transaction?: Knex.Transaction
   ): Promise<IUser | undefined> {
     return await this.db(DbTable.Users)

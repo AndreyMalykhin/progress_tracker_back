@@ -13,18 +13,19 @@ import { ITrackable, TrackableType } from "models/trackable";
 import { TrackableStatus } from "models/trackable-status";
 import aggregateProgress from "services/aggregate-progress";
 import TrackableFetcher from "services/trackable-fetcher";
-import validateAggregateChildren from "services/validate-aggregate-children";
+import { validateChildren } from "services/trackable-validators";
 import { validateList } from "utils/common-validators";
 import DbTable from "utils/db-table";
 import IGqlContext from "utils/gql-context";
 import ID from "utils/id";
 import { makeLoaderMapFactory } from "utils/loader-map";
+import UUID from "utils/uuid";
 import { IValidationErrors, setError } from "utils/validation-result";
 
 type IAddAggregateCmd = IAddTrackableCmd<IAggregate, IAddAggregateCmdInput>;
 
 interface IAddAggregateCmdInput extends IAddTrackableCmdInput {
-  children: Array<{ id?: ID; clientId?: ID }>;
+  children: Array<{ id?: ID; clientId?: UUID }>;
 }
 
 function makeAddAggregateCmd(
@@ -34,7 +35,7 @@ function makeAddAggregateCmd(
   return (input, transaction) => {
     let children: ITrackable[];
     const childIds: ID[] = [];
-    const childClientIds: ID[] = [];
+    const childClientIds: UUID[] = [];
     const dontAddActivity = true;
     const cmd = makeAddTrackableCmd<IAddAggregateCmdInput, IAggregate>(
       db,
@@ -47,13 +48,15 @@ function makeAddAggregateCmd(
           }
         }
 
+        const trackableType = undefined;
         children = await trackableFetcher.getByIdsOrClientIds(
           childIds,
           childClientIds,
+          trackableType,
           input2.userId,
           transaction
         );
-        await validateInput(input2, errors, children);
+        await validateInput(children, errors);
       },
       input2 => inputToTrackable(input2, children as IAggregateChildren),
       (input2, aggregate, transaction2) =>
@@ -77,7 +80,7 @@ async function updateChildren(
   transaction: Knex.Transaction,
   db: Knex,
   childIds: ID[],
-  childClientIds: ID[]
+  childClientIds: UUID[]
 ) {
   await db(DbTable.Trackables)
     .transacting(transaction)
@@ -123,15 +126,14 @@ async function inputToTrackable(
 }
 
 async function validateInput(
-  input: IAddAggregateCmdInput,
-  errors: IValidationErrors,
-  childrenToAdd: Array<ITrackable & IAggregatable>
+  childrenToAdd: Array<ITrackable & IAggregatable>,
+  errors: IValidationErrors
 ) {
-  const oldChildren: IAggregateChildren = [];
+  const currentChildren: IAggregateChildren = [];
   setError(
     errors,
     "children",
-    validateAggregateChildren(childrenToAdd, oldChildren)
+    validateChildren(childrenToAdd, currentChildren)
   );
 }
 

@@ -4,6 +4,7 @@ import IGqlContext from "utils/gql-context";
 import { makeCheckAuthResolver } from "utils/gql-resolver-utils";
 import ID from "utils/id";
 import isClientId from "utils/is-client-id";
+import UUID from "utils/uuid";
 import { mapErrors } from "utils/validation-result";
 
 interface IArgs {
@@ -17,7 +18,7 @@ async function addToAggregateResolver(
   context: IGqlContext
 ) {
   const { ids, aggregateId } = args;
-  const children: Array<{ id?: ID; clientId?: ID }> = [];
+  const children: Array<{ id?: ID; clientId?: UUID }> = [];
 
   for (const id of ids) {
     if (isClientId(id)) {
@@ -27,7 +28,7 @@ async function addToAggregateResolver(
     }
   }
 
-  let aggregate: { id?: ID; clientId?: ID };
+  let aggregate: { id?: ID; clientId?: UUID };
 
   if (isClientId(aggregateId)) {
     aggregate = { clientId: aggregateId };

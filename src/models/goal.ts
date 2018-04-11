@@ -12,7 +12,7 @@ interface IGoal {
   progressDisplayModeId: ProgressDisplayMode;
   progress: number;
   maxProgress: number;
-  deadlineDate?: Date;
+  deadlineDate?: Date | null;
   achievementDate?: Date;
 }
 

@@ -34,7 +34,7 @@ interface IFacebookPicture {
 }
 
 interface IFacebookUser {
-  id: ID;
+  id: string;
   name: string;
 }
 

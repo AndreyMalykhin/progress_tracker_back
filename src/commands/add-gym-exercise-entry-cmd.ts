@@ -1,15 +1,17 @@
 import Knex from "knex";
+import { IGymExercise } from "models/gym-exercise";
 import { IGymExerciseEntry } from "models/gym-exercise-entry";
 import { TrackableType } from "models/trackable";
 import TrackableFetcher from "services/trackable-fetcher";
 import {
   validateClientId,
-  validateRange,
-  validateReference
+  validateId,
+  validateRange
 } from "utils/common-validators";
 import ConstraintViolationError from "utils/constraint-violation-error";
 import DbTable from "utils/db-table";
 import ID from "utils/id";
+import UUID from "utils/uuid";
 import { isEmpty, IValidationErrors, setError } from "utils/validation-result";
 
 type IAddGymExerciseEntryCmd = (
@@ -18,8 +20,8 @@ type IAddGymExerciseEntryCmd = (
 ) => Promise<IGymExerciseEntry>;
 
 interface IAddGymExerciseEntryCmdInput {
-  clientId?: ID;
-  gymExerciseId: ID;
+  clientId?: UUID;
+  gymExercise: { id?: ID; clientId?: UUID };
   userId: ID;
   repetitionCount: number;
   setCount: number;
@@ -31,10 +33,17 @@ function makeAddGymExerciseEntryCmd(
   trackableFetcher: TrackableFetcher
 ): IAddGymExerciseEntryCmd {
   return async (input, transaction) => {
-    await validateInput(input, trackableFetcher, transaction);
+    const gymExercise = await trackableFetcher.getByIdOrClientId(
+      input.gymExercise.id,
+      input.gymExercise.clientId,
+      TrackableType.GymExercise,
+      input.userId,
+      transaction
+    );
+    await validateInput(input, gymExercise as IGymExercise);
     const entry: Partial<IGymExerciseEntry> = {
       clientId: input.clientId,
-      gymExerciseId: input.gymExerciseId,
+      gymExerciseId: gymExercise!.id,
       repetitionCount: input.repetitionCount,
       setCount: input.setCount,
       weight: input.weight
@@ -48,21 +57,10 @@ function makeAddGymExerciseEntryCmd(
 
 async function validateInput(
   input: IAddGymExerciseEntryCmdInput,
-  trackableFetcher: TrackableFetcher,
-  transaction: Knex.Transaction
+  gymExercise?: IGymExercise
 ) {
   const errors: IValidationErrors = {};
-  const gymExercise = await trackableFetcher.get(
-    input.gymExerciseId,
-    TrackableType.GymExercise,
-    input.userId,
-    transaction
-  );
-  setError(
-    errors,
-    "gymExerciseId",
-    validateReference(gymExercise && gymExercise.id)
-  );
+  setError(errors, "gymExerciseId", validateId(gymExercise && gymExercise.id));
   setError(
     errors,
     "clientId",

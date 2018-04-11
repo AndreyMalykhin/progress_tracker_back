@@ -1,17 +1,18 @@
 import Knex from "knex";
 import { IAggregatable } from "models/aggregatable";
 import { IAggregate } from "models/aggregate";
-import { ITrackable } from "models/trackable";
+import { ITrackable, TrackableType } from "models/trackable";
 import aggregateProgress from "services/aggregate-progress";
 import TrackableFetcher from "services/trackable-fetcher";
-import { validateReference } from "utils/common-validators";
+import { validateId } from "utils/common-validators";
 import ConstraintViolationError from "utils/constraint-violation-error";
 import DbTable from "utils/db-table";
 import ID from "utils/id";
+import UUID from "utils/uuid";
 import { isEmpty, IValidationErrors, setError } from "utils/validation-result";
 
 type IUnaggregateTrackableCmd = (
-  trackable: { id?: ID; clientId?: ID },
+  trackable: { id?: ID; clientId?: UUID },
   userId: ID,
   transaction: Knex.Transaction
 ) => Promise<{
@@ -24,10 +25,12 @@ function makeUnaggregateTrackableCmd(
   db: Knex,
   trackableFetcher: TrackableFetcher
 ): IUnaggregateTrackableCmd {
+  const trackableType = undefined;
   return async (inputTrackable, userId, transaction) => {
     let trackable = await trackableFetcher.getByIdOrClientId(
       inputTrackable.id,
       inputTrackable.clientId,
+      trackableType,
       userId,
       transaction
     );
@@ -46,7 +49,7 @@ function makeUnaggregateTrackableCmd(
 
 function validateInput(trackable?: ITrackable & IAggregatable) {
   const errors: IValidationErrors = {};
-  let trackableError = validateReference(trackable && trackable.id);
+  let trackableError = validateId(trackable && trackable.id);
 
   if (trackable && !trackable.parentId) {
     trackableError = "Should be aggregated";

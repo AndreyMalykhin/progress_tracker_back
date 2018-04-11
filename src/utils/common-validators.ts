@@ -1,5 +1,7 @@
 import ID from "utils/id";
 import isClientId from "utils/is-client-id";
+import nonexistentId from "utils/nonexistent-id";
+import safeId from "utils/safe-id";
 import {
   isEmpty,
   IValidationError,
@@ -97,21 +99,27 @@ function validateLength(
       const { max } = newConfig;
       const min = 1;
       return !isLength(newValue, { min, max })
-        ? `Should be between ${min} and ${max} symbols`
+        ? `Length should be between ${min} and ${max}`
         : undefined;
     },
     config
   );
 }
 
-function validateReference(
-  value: ID | number | undefined,
+function validateId(
+  value: string | number | undefined,
   config?: IValidateConfig
 ) {
   const msg = "Not found";
   const error = validate(
     value,
-    newValue => (!newValue ? msg : undefined),
+    newValue => {
+      if (!newValue) {
+        return msg;
+      }
+
+      return safeId(newValue) === nonexistentId ? msg : undefined;
+    },
     config
   );
   return error ? msg : undefined;
@@ -163,7 +171,7 @@ function validate<TValue, TConfig extends IValidateConfig>(
 export {
   validateClientId,
   validateRange,
-  validateReference,
+  validateId,
   validateLength,
   validateList,
   validateEnum,

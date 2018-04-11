@@ -1,9 +1,10 @@
 import { TrackableStatus } from "models/trackable-status";
 import ID from "utils/id";
+import UUID from "utils/uuid";
 
 interface ITrackable {
   id: ID;
-  clientId?: ID;
+  clientId?: UUID;
   typeId: TrackableType;
   isPublic: boolean;
   title: string;

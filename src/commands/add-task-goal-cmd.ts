@@ -13,15 +13,22 @@ import { ITrackableAddedActivity } from "models/trackable-added-activity";
 import { TrackableStatus } from "models/trackable-status";
 import IconFetcher from "services/icon-fetcher";
 import {
+  validateDifficulty,
+  validateIconId,
+  validateProgressDisplayModeId,
+  validateTitle
+} from "services/trackable-validators";
+import {
   validateClientId,
   validateEnum,
+  validateId,
   validateLength,
-  validateList,
-  validateReference
+  validateList
 } from "utils/common-validators";
 import ConstraintViolationError from "utils/constraint-violation-error";
 import DbTable from "utils/db-table";
 import ID from "utils/id";
+import UUID from "utils/uuid";
 import { isEmpty, IValidationErrors, setError } from "utils/validation-result";
 
 type IAddTaskGoalCmd = IAddTrackableCmd<ITaskGoal, IAddTaskGoalCmdInput>;
@@ -33,7 +40,7 @@ interface IAddTaskGoalCmdInput extends IAddTrackableCmdInput {
   isPublic: boolean;
   progressDisplayModeId: ProgressDisplayMode;
   tasks: Array<{
-    clientId?: ID;
+    clientId?: UUID;
     title: string;
   }>;
 }
@@ -96,24 +103,13 @@ async function validateInput(
   errors: IValidationErrors
 ) {
   const { difficulty, progressDisplayModeId, iconId, tasks } = input;
-  setError(
-    errors,
-    "difficulty",
-    validateEnum(difficulty, {
-      values: [
-        Difficulty.Easy,
-        Difficulty.Medium,
-        Difficulty.Hard,
-        Difficulty.Impossible
-      ]
-    })
-  );
+  setError(errors, "difficulty", validateDifficulty(difficulty));
   setError(
     errors,
     "progressDisplayModeId",
-    validateReference(progressDisplayModeId)
+    validateProgressDisplayModeId(progressDisplayModeId)
   );
-  setError(errors, "iconId", validateReference(iconId));
+  setError(errors, "iconId", validateIconId(iconId));
   const tasksError = validateList(tasks, {
     validateItem: task => {
       const taskErrors: IValidationErrors = {};
@@ -122,7 +118,7 @@ async function validateInput(
         "clientId",
         validateClientId(task.clientId, { isOptional: true })
       );
-      setError(taskErrors, "title", validateLength(task.title, { max: 255 }));
+      setError(taskErrors, "title", validateTitle(task.title));
       return taskErrors;
     }
   });

@@ -14,11 +14,16 @@ import { TrackableType } from "models/trackable";
 import { ITrackableAddedActivity } from "models/trackable-added-activity";
 import { TrackableStatus } from "models/trackable-status";
 import {
+  validateDifficulty,
+  validateIconId,
+  validateProgressDisplayModeId
+} from "services/trackable-validators";
+import {
   validateClientId,
   validateEnum,
+  validateId,
   validateLength,
-  validateRange,
-  validateReference
+  validateRange
 } from "utils/common-validators";
 import ConstraintViolationError from "utils/constraint-violation-error";
 import DbTable from "utils/db-table";
@@ -79,24 +84,13 @@ async function validateInput(
   errors: IValidationErrors
 ) {
   const { difficulty, progressDisplayModeId, iconId, maxProgress } = input;
-  setError(
-    errors,
-    "difficulty",
-    validateEnum(difficulty, {
-      values: [
-        Difficulty.Easy,
-        Difficulty.Medium,
-        Difficulty.Hard,
-        Difficulty.Impossible
-      ]
-    })
-  );
+  setError(errors, "difficulty", validateDifficulty(difficulty));
   setError(
     errors,
     "progressDisplayModeId",
-    validateReference(progressDisplayModeId)
+    validateProgressDisplayModeId(progressDisplayModeId)
   );
-  setError(errors, "iconId", validateReference(iconId));
+  setError(errors, "iconId", validateIconId(iconId));
   setError(
     errors,
     "maxProgress",

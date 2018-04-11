@@ -1,18 +1,19 @@
 import Knex from "knex";
 import { IAggregate, IAggregateChildren } from "models/aggregate";
-import { ITrackable } from "models/trackable";
+import { ITrackable, TrackableType } from "models/trackable";
 import aggregateProgress from "services/aggregate-progress";
 import TrackableFetcher from "services/trackable-fetcher";
-import validateAggregateChildren from "services/validate-aggregate-children";
-import { validateReference } from "utils/common-validators";
+import { validateChildren } from "services/trackable-validators";
+import { validateId } from "utils/common-validators";
 import ConstraintViolationError from "utils/constraint-violation-error";
 import DbTable from "utils/db-table";
 import ID from "utils/id";
+import UUID from "utils/uuid";
 import { isEmpty, IValidationErrors, setError } from "utils/validation-result";
 
 type IAddToAggregateCmd = (
-  children: Array<{ id?: ID; clientId?: ID }>,
-  aggregate: { id?: ID; clientId?: ID },
+  children: Array<{ id?: ID; clientId?: UUID }>,
+  aggregate: { id?: ID; clientId?: UUID },
   userId: ID,
   transaction: Knex.Transaction
 ) => Promise<IAggregate>;
@@ -36,15 +37,18 @@ function makeAddToAggregateCmd(
     const aggregate = await trackableFetcher.getByIdOrClientId(
       inputAggregate.id,
       inputAggregate.clientId,
+      TrackableType.Aggregate,
       userId,
       transaction
     );
     const oldChildren: IAggregateChildren = aggregate
       ? await trackableFetcher.getByParentId(aggregate.id)
       : [];
+    const trackableType = undefined;
     const childrenToAdd = await trackableFetcher.getByIdsOrClientIds(
       inputChildIds,
       inputChildClientIds,
+      trackableType,
       userId,
       transaction
     );
@@ -97,17 +101,8 @@ function validateInput(
   aggregate?: ITrackable
 ) {
   const errors: IValidationErrors = {};
-  setError(errors, "aggregate", validateReference(aggregate && aggregate.id));
-
-  if (childrenToAdd.length) {
-    setError(
-      errors,
-      "children",
-      validateAggregateChildren(childrenToAdd, oldChildren)
-    );
-  } else {
-    setError(errors, "children", "Should not be empty");
-  }
+  setError(errors, "aggregate", validateId(aggregate && aggregate.id));
+  setError(errors, "children", validateChildren(childrenToAdd, oldChildren));
 
   if (!isEmpty(errors)) {
     throw new ConstraintViolationError("Invalid input", { errors });

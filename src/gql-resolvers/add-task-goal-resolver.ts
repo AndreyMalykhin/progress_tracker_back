@@ -8,6 +8,7 @@ import ConstraintViolationError from "utils/constraint-violation-error";
 import IGqlContext from "utils/gql-context";
 import { makeCheckAuthResolver } from "utils/gql-resolver-utils";
 import ID from "utils/id";
+import nonexistentId from "utils/nonexistent-id";
 import { IValidationResult, mapErrors } from "utils/validation-result";
 
 interface IArgs {
@@ -55,7 +56,7 @@ async function argsToInput(args: IArgs, context: IGqlContext) {
     clientId: goal.id,
     deadlineDate: goal.deadlineDate,
     difficulty: goal.difficulty,
-    iconId: icon ? icon.id : "",
+    iconId: icon ? icon.id : nonexistentId,
     isPublic: goal.isPublic,
     progressDisplayModeId: goal.progressDisplayMode,
     tasks: goal.tasks.map(task => {

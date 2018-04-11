@@ -2,6 +2,7 @@ import Knex from "knex";
 import { IIcon } from "models/icon";
 import DbTable from "utils/db-table";
 import ID from "utils/id";
+import safeId from "utils/safe-id";
 
 class IconFetcher {
   private db: Knex;
@@ -11,7 +12,7 @@ class IconFetcher {
   }
 
   public async getByIds(ids: ID[]): Promise<IIcon[]> {
-    return await this.db(DbTable.Icons).whereIn("id", ids);
+    return await this.db(DbTable.Icons).whereIn("id", ids.map(safeId));
   }
 
   public async getByName(name: string): Promise<IIcon | undefined> {

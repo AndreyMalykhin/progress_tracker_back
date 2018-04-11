@@ -3,6 +3,7 @@ import ConstraintViolationError from "utils/constraint-violation-error";
 import IGqlContext from "utils/gql-context";
 import { makeCheckAuthResolver } from "utils/gql-resolver-utils";
 import ID from "utils/id";
+import isClientId from "utils/is-client-id";
 import { mapErrors } from "utils/validation-result";
 
 interface IArgs {
@@ -27,9 +28,12 @@ async function addGymExerciseEntryResolver(
     weight,
     setCount
   } = args.entry;
+  const gymExercise = isClientId(gymExerciseId)
+    ? { clientId: gymExerciseId }
+    : { id: gymExerciseId };
   const input = {
     clientId,
-    gymExerciseId,
+    gymExercise,
     repetitionCount,
     setCount,
     userId: context.session!.userId,
@@ -44,7 +48,8 @@ async function addGymExerciseEntryResolver(
     } catch (e) {
       if (e instanceof ConstraintViolationError) {
         mapErrors(e.validationResult, {
-          clientId: { field: "id" }
+          clientId: { field: "id" },
+          gymExercise: { field: "gymExerciseId" }
         });
       }
 

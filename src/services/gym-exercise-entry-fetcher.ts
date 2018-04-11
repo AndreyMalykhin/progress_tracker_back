@@ -2,6 +2,7 @@ import Knex from "knex";
 import { IGymExercise } from "models/gym-exercise";
 import DbTable from "utils/db-table";
 import ID from "utils/id";
+import safeId from "utils/safe-id";
 
 class GymExerciseEntryFetcher {
   private db: Knex;
@@ -17,7 +18,7 @@ class GymExerciseEntryFetcher {
     const date = new Date();
     date.setUTCDate(date.getUTCDate() - dayCount);
     return await this.db(DbTable.GymExerciseEntries)
-      .where("gymExerciseId", id)
+      .where("gymExerciseId", safeId(id))
       .andWhere("date", ">", date)
       .orderBy("date", "desc");
   }

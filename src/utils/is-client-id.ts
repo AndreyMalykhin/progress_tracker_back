@@ -1,7 +1,7 @@
 import ID from "utils/id";
 import { isUUID } from "validator";
 
-function isClientId(id: ID) {
+function isClientId(id: string) {
   return isUUID(id);
 }
 

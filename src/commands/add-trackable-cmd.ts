@@ -2,15 +2,17 @@ import Knex from "knex";
 import { ActivityType } from "models/activity";
 import { ITrackable } from "models/trackable";
 import { ITrackableAddedActivity } from "models/trackable-added-activity";
+import { validateTitle, validateUserId } from "services/trackable-validators";
 import {
   validateClientId,
-  validateLength,
-  validateReference
+  validateId,
+  validateLength
 } from "utils/common-validators";
 import ConstraintViolationError from "utils/constraint-violation-error";
 import DbTable from "utils/db-table";
 import IGqlContext from "utils/gql-context";
 import ID from "utils/id";
+import UUID from "utils/uuid";
 import { isEmpty, IValidationErrors, setError } from "utils/validation-result";
 
 type IAddTrackableCmd<
@@ -19,7 +21,7 @@ type IAddTrackableCmd<
 > = (input: TInput, transaction: Knex.Transaction) => Promise<TTrackable>;
 
 interface IAddTrackableCmdInput {
-  clientId?: ID;
+  clientId?: UUID;
   title: string;
   userId: ID;
 }
@@ -75,8 +77,8 @@ async function validate<TInput extends IAddTrackableCmdInput>(
     "clientId",
     validateClientId(clientId, { isOptional: true })
   );
-  setError(errors, "userId", validateReference(userId));
-  setError(errors, "title", validateLength(title, { max: 255 }));
+  setError(errors, "userId", validateUserId(userId));
+  setError(errors, "title", validateTitle(title));
   await doValidate(input, errors);
 
   if (!isEmpty(errors)) {
