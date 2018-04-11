@@ -14,6 +14,7 @@ interface IValidateConfig {
 interface IValidateRangeConfig extends IValidateConfig {
   min: number;
   max: number;
+  isInteger?: boolean;
 }
 
 interface IValidateLengthConfig extends IValidateConfig {
@@ -47,10 +48,29 @@ function validateRange(
   return validate(
     value,
     (newValue, newConfig) => {
-      const { min, max } = newConfig;
+      const { min, max, isInteger } = newConfig;
+
+      if (isInteger) {
+        const error = validateInt(newValue);
+
+        if (error) {
+          return error;
+        }
+      }
+
       return newValue < min || newValue > max
         ? `Should be between ${min} and ${max}`
         : undefined;
+    },
+    config
+  );
+}
+
+function validateInt(value: number | undefined, config?: IValidateConfig) {
+  return validate(
+    value,
+    (newValue, newConfig) => {
+      return !Number.isInteger(newValue) ? "Should be an integer" : undefined;
     },
     config
   );
@@ -146,5 +166,6 @@ export {
   validateReference,
   validateLength,
   validateList,
-  validateEnum
+  validateEnum,
+  validateInt
 };

@@ -33,6 +33,28 @@ class TrackableFetcher {
     this.db = db;
   }
 
+  public async get(
+    id: ID,
+    typeId: TrackableType,
+    userId?: ID,
+    transaction?: Knex.Transaction
+  ): Promise<ITrackable | undefined> {
+    const query = this.db(DbTable.Trackables)
+      .transacting(transaction)
+      .where("id", id)
+      .first();
+
+    if (userId) {
+      query.andWhere("userId", userId);
+    }
+
+    if (typeId) {
+      query.andWhere("typeId", typeId);
+    }
+
+    return await query;
+  }
+
   public async getActive(
     ownerId: ID,
     afterOrder?: number,

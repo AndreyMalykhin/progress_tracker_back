@@ -443,7 +443,7 @@ function createGymExerciseEntries(knex: Knex) {
       .inTable("trackables");
     table.integer("setCount").notNullable();
     table.integer("repetitionCount").notNullable();
-    table.integer("weight").notNullable();
+    table.specificType("weight", "double precision").notNullable();
     table.index(["gymExerciseId", "date"]);
   });
 }

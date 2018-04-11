@@ -10,6 +10,10 @@ import {
   makeAddGymExerciseCmd
 } from "commands/add-gym-exercise-cmd";
 import {
+  IAddGymExerciseEntryCmd,
+  makeAddGymExerciseEntryCmd
+} from "commands/add-gym-exercise-entry-cmd";
+import {
   IAddNumericalGoalCmd,
   makeAddNumericalGoalCmd
 } from "commands/add-numerical-goal-cmd";
@@ -163,6 +167,10 @@ class DIContainer {
   public get unaggregateTrackableCmd(): IUnaggregateTrackableCmd {
     return this.impl.unaggregateTrackableCmd;
   }
+
+  public get addGymExerciseEntryCmd(): IAddGymExerciseEntryCmd {
+    return this.impl.addGymExerciseEntryCmd;
+  }
 }
 
 function makeDIContainer() {
@@ -221,6 +229,12 @@ function makeDIContainer() {
   di.serviceFactory(
     "unaggregateTrackableCmd",
     makeUnaggregateTrackableCmd,
+    "db",
+    "trackableFetcher"
+  );
+  di.serviceFactory(
+    "addGymExerciseEntryCmd",
+    makeAddGymExerciseEntryCmd,
     "db",
     "trackableFetcher"
   );

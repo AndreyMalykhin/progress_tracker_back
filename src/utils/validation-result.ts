@@ -18,7 +18,7 @@ interface IMapErrorsConfig {
 function setError(
   errors: IValidationErrors,
   field: string,
-  error?: IValidationError
+  error: IValidationError | undefined
 ) {
   if (error) {
     errors[field] = error;
