@@ -2,10 +2,12 @@ import ID from "utils/id";
 import isClientId from "utils/is-client-id";
 import nonexistentId from "utils/nonexistent-id";
 import safeId from "utils/safe-id";
+import UUID from "utils/uuid";
 import {
   isEmpty,
   IValidationError,
-  IValidationErrors
+  IValidationErrors,
+  setError
 } from "utils/validation-result";
 import { isLength } from "validator";
 
@@ -154,6 +156,25 @@ function validateList<T>(
   );
 }
 
+function validateIdAndClientId(
+  input: { id?: ID; clientId?: UUID },
+  foundEntity: { id: ID } | undefined,
+  errors: IValidationErrors
+) {
+  if (!input.id && !input.clientId) {
+    setError(errors, "id", 'Either "id" or "clientId" should not be empty');
+  } else if (input.id) {
+    setError(errors, "id", validateId(foundEntity && foundEntity.id));
+  } else if (input.clientId) {
+    setError(
+      errors,
+      "clientId",
+      validateClientId(input.clientId) ||
+        validateId(foundEntity && foundEntity.id)
+    );
+  }
+}
+
 function validate<TValue, TConfig extends IValidateConfig>(
   value: TValue | undefined,
   doValidate: (value: TValue, config: TConfig) => IValidationError | undefined,
@@ -170,6 +191,7 @@ function validate<TValue, TConfig extends IValidateConfig>(
 
 export {
   validateClientId,
+  validateIdAndClientId,
   validateRange,
   validateId,
   validateLength,

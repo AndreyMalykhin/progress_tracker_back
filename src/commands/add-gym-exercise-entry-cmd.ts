@@ -46,6 +46,7 @@ function makeAddGymExerciseEntryCmd(
       gymExerciseId: gymExercise!.id,
       repetitionCount: input.repetitionCount,
       setCount: input.setCount,
+      userId: input.userId,
       weight: input.weight
     };
     const rows = await db(DbTable.GymExerciseEntries)
@@ -60,6 +61,7 @@ async function validateInput(
   gymExercise?: IGymExercise
 ) {
   const errors: IValidationErrors = {};
+  setError(errors, "userId", validateId(input.userId));
   setError(errors, "gymExerciseId", validateId(gymExercise && gymExercise.id));
   setError(
     errors,

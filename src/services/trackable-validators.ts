@@ -13,24 +13,6 @@ import ID from "utils/id";
 import UUID from "utils/uuid";
 import { IValidationErrors, setError } from "utils/validation-result";
 
-function validateIdAndClientId(
-  input: { id?: ID; clientId?: UUID },
-  trackable: ITrackable | undefined,
-  errors: IValidationErrors
-) {
-  if (!input.id && !input.clientId) {
-    setError(errors, "id", 'Either "id" or "clientId" should not be empty');
-  } else if (input.id) {
-    setError(errors, "id", validateId(trackable && trackable.id));
-  } else if (input.clientId) {
-    setError(
-      errors,
-      "clientId",
-      validateClientId(input.clientId) || validateId(trackable && trackable.id)
-    );
-  }
-}
-
 function validateUserId(userId: ID | undefined) {
   return validateId(userId);
 }
@@ -108,7 +90,6 @@ function validateChildren(
 }
 
 export {
-  validateIdAndClientId,
   validateUserId,
   validateTitle,
   validateDifficulty,

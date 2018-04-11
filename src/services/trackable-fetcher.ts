@@ -123,8 +123,8 @@ class TrackableFetcher {
   }
 
   public async getByIdOrClientId(
-    id?: ID,
-    clientId?: UUID,
+    id: ID | undefined,
+    clientId: UUID | undefined,
     typeId?: TrackableType,
     userId?: ID,
     transaction?: Knex.Transaction

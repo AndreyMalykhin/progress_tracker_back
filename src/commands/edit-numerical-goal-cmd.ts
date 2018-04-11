@@ -11,7 +11,6 @@ import TrackableFetcher from "services/trackable-fetcher";
 import {
   validateDifficulty,
   validateIconId,
-  validateIdAndClientId,
   validateProgressDisplayModeId,
   validateTitle,
   validateUserId

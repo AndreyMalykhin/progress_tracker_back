@@ -5,11 +5,11 @@ import { ITrackable } from "models/trackable";
 import {
   validateDifficulty,
   validateIconId,
-  validateIdAndClientId,
   validateProgressDisplayModeId,
   validateTitle,
   validateUserId
 } from "services/trackable-validators";
+import { validateIdAndClientId } from "utils/common-validators";
 import ConstraintViolationError from "utils/constraint-violation-error";
 import ID from "utils/id";
 import UUID from "utils/uuid";

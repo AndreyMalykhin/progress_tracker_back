@@ -33,6 +33,7 @@ import {
   IEditNumericalGoalCmd,
   makeEditNumericalGoalCmd
 } from "commands/edit-numerical-goal-cmd";
+import { IEditTaskCmd, makeEditTaskCmd } from "commands/edit-task-cmd";
 import {
   IEditTaskGoalCmd,
   makeEditTaskGoalCmd
@@ -187,6 +188,10 @@ class DIContainer {
   public get editTaskGoalCmd(): IEditTaskGoalCmd {
     return this.impl.editTaskGoalCmd;
   }
+
+  public get editTaskCmd(): IEditTaskCmd {
+    return this.impl.editTaskCmd;
+  }
 }
 
 function makeDIContainer() {
@@ -266,6 +271,7 @@ function makeDIContainer() {
     "db",
     "trackableFetcher"
   );
+  di.serviceFactory("editTaskCmd", makeEditTaskCmd, "db", "taskFetcher");
   di.service("fetcher", makeFetcher);
   di.service("avatarFetcher", AvatarFetcher, "db");
   di.service("reviewFetcher", ReviewFetcher, "db");

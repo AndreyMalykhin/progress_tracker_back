@@ -3,6 +3,7 @@ import UUID from "utils/uuid";
 
 interface IGymExerciseEntry {
   id: ID;
+  userId: ID;
   clientId?: UUID;
   gymExerciseId: ID;
   date: Date;

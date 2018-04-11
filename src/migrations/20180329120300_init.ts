@@ -1,4 +1,9 @@
 import * as Knex from "knex";
+import { TrackableStatus } from "models/trackable-status";
+
+const trackableStatusIdActive = 1;
+const trackableStatusIdPendingProof = 3;
+const trackableStatusIdPendingReview = 4;
 
 async function createReviewStatuses(knex: Knex) {
   await knex.schema.createTable("reviewStatuses", table => {
@@ -134,10 +139,10 @@ async function createTrackableStatuses(knex: Knex) {
   });
 
   await knex("trackableStatuses").insert([
-    { id: 1, name: "Active" },
+    { id: trackableStatusIdActive, name: "Active" },
     { id: 2, name: "Expired" },
-    { id: 3, name: "PendingProof" },
-    { id: 4, name: "PendingReview" },
+    { id: trackableStatusIdPendingProof, name: "PendingProof" },
+    { id: trackableStatusIdPendingReview, name: "PendingReview" },
     { id: 5, name: "Approved" },
     { id: 6, name: "Rejected" }
   ]);
@@ -334,83 +339,102 @@ function createUsers(knex: Knex) {
   });
 }
 
-function createTrackables(knex: Knex) {
-  return knex.schema.createTable("trackables", table => {
-    table.increments("id").unsigned();
-    table.uuid("clientId").index();
-    table
-      .integer("typeId")
-      .unsigned()
-      .notNullable()
-      .references("id")
-      .inTable("trackableTypes");
-    table.string("title").notNullable();
-    table
-      .specificType("order", "double precision")
-      .notNullable()
-      .index();
-    table
-      .integer("statusId")
-      .unsigned()
-      .notNullable()
-      .references("id")
-      .inTable("trackableStatuses")
-      .index();
-    table
-      .boolean("isPublic")
-      .notNullable()
-      .index();
-    table.timestamp("statusChangeDate");
-    table.timestamp("achievementDate");
-    table.dateTime("deadlineDate");
-    table
-      .timestamp("creationDate")
-      .notNullable()
-      .defaultTo(knex.fn.now());
-    table
-      .integer("userId")
-      .notNullable()
-      .unsigned()
-      .references("id")
-      .inTable("users")
-      .index();
-    table
-      .integer("parentId")
-      .unsigned()
-      .references("id")
-      .inTable("trackables")
-      .index();
-    table
-      .integer("iconId")
-      .unsigned()
-      .references("id")
-      .inTable("icons")
-      .index();
-    table.specificType("progress", "double precision");
-    table.specificType("maxProgress", "double precision");
-    table
-      .integer("progressDisplayModeId")
-      .unsigned()
-      .references("id")
-      .inTable("progressDisplayModes");
-    table.integer("difficulty").unsigned();
-    table.integer("estimatedDifficulty").unsigned();
-    table
-      .integer("proofPhotoId")
-      .unsigned()
-      .references("id")
-      .inTable("assets")
-      .index();
-    table.integer("rating").unsigned();
-    table.integer("approveCount").unsigned();
-    table.integer("rejectCount").unsigned();
-  });
+async function createTrackables(knex: Knex) {
+  return knex.schema
+    .createTable("trackables", table => {
+      table.increments("id").unsigned();
+      table.uuid("clientId");
+      table
+        .integer("typeId")
+        .unsigned()
+        .notNullable()
+        .references("id")
+        .inTable("trackableTypes");
+      table.string("title").notNullable();
+      table.specificType("order", "double precision").notNullable();
+      table
+        .integer("statusId")
+        .unsigned()
+        .notNullable()
+        .references("id")
+        .inTable("trackableStatuses");
+      table.boolean("isPublic").notNullable();
+      table.timestamp("statusChangeDate");
+      table.timestamp("achievementDate");
+      table.dateTime("deadlineDate");
+      table
+        .timestamp("creationDate")
+        .notNullable()
+        .defaultTo(knex.fn.now());
+      table
+        .integer("userId")
+        .notNullable()
+        .unsigned()
+        .references("id")
+        .inTable("users");
+      table
+        .integer("parentId")
+        .unsigned()
+        .references("id")
+        .inTable("trackables")
+        .index();
+      table
+        .integer("iconId")
+        .unsigned()
+        .references("id")
+        .inTable("icons");
+      table.specificType("progress", "double precision");
+      table.specificType("maxProgress", "double precision");
+      table
+        .integer("progressDisplayModeId")
+        .unsigned()
+        .references("id")
+        .inTable("progressDisplayModes");
+      table.integer("difficulty").unsigned();
+      table.integer("estimatedDifficulty").unsigned();
+      table
+        .integer("proofPhotoId")
+        .unsigned()
+        .references("id")
+        .inTable("assets");
+      table.integer("rating").unsigned();
+      table.integer("approveCount").unsigned();
+      table.integer("rejectCount").unsigned();
+      table.unique(["userId", "clientId"]);
+    })
+    .raw(
+      `CREATE INDEX "trackables_userId_statusId_statusChangeDate_index"
+      ON trackables ("userId", "statusId", "statusChangeDate")
+      WHERE "statusId" NOT IN (
+        ${trackableStatusIdActive},
+        ${trackableStatusIdPendingProof}
+      )`
+    )
+    .raw(
+      `CREATE INDEX "trackables_userId_statusId_order_index"
+      ON trackables ("userId", "statusId", "order")
+      WHERE "statusId" IN (
+        ${trackableStatusIdActive},
+        ${trackableStatusIdPendingProof}
+      )`
+    )
+    .raw(
+      `CREATE INDEX "trackables_statusId_statusChangeDate_index"
+      ON trackables ("statusId", "statusChangeDate")
+      WHERE "statusId" = ${trackableStatusIdPendingReview}`
+    );
 }
 
 function createTasks(knex: Knex) {
   return knex.schema.createTable("tasks", table => {
     table.increments("id").unsigned();
-    table.uuid("clientId").index();
+    table
+      .integer("userId")
+      .notNullable()
+      .unsigned()
+      .references("id")
+      .inTable("users");
+    table.uuid("clientId");
     table
       .timestamp("creationDate")
       .notNullable()
@@ -424,13 +448,20 @@ function createTasks(knex: Knex) {
       .references("id")
       .inTable("trackables")
       .index();
+    table.unique(["userId", "clientId"]);
   });
 }
 
 function createGymExerciseEntries(knex: Knex) {
   return knex.schema.createTable("gymExerciseEntries", table => {
     table.increments("id").unsigned();
-    table.uuid("clientId").index();
+    table
+      .integer("userId")
+      .notNullable()
+      .unsigned()
+      .references("id")
+      .inTable("users");
+    table.uuid("clientId");
     table
       .timestamp("date")
       .notNullable()
@@ -445,6 +476,7 @@ function createGymExerciseEntries(knex: Knex) {
     table.integer("repetitionCount").notNullable();
     table.specificType("weight", "double precision").notNullable();
     table.index(["gymExerciseId", "date"]);
+    table.unique(["userId", "clientId"]);
   });
 }
 

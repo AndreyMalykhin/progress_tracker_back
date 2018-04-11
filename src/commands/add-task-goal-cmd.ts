@@ -7,6 +7,7 @@ import Knex from "knex";
 import { ActivityType } from "models/activity";
 import Difficulty from "models/difficulty";
 import ProgressDisplayMode from "models/progress-display-mode";
+import { ITask } from "models/task";
 import { ITaskGoal } from "models/task-goal";
 import { TrackableType } from "models/trackable";
 import { ITrackableAddedActivity } from "models/trackable-added-activity";
@@ -85,12 +86,13 @@ async function addTasks(
   transaction: Knex.Transaction,
   db: Knex
 ) {
-  const tasks = input.tasks.map(task => {
+  const tasks: Array<Partial<ITask>> = input.tasks.map(task => {
     return {
       clientId: task.clientId,
       goalId: trackable.id,
       isDone: false,
-      title: task.title
+      title: task.title,
+      userId: input.userId
     };
   });
   await db(DbTable.Tasks)
