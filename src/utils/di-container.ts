@@ -33,6 +33,10 @@ import {
   IEditNumericalGoalCmd,
   makeEditNumericalGoalCmd
 } from "commands/edit-numerical-goal-cmd";
+import {
+  IEditTaskGoalCmd,
+  makeEditTaskGoalCmd
+} from "commands/edit-task-goal-cmd";
 import { ILoginCmd, makeLoginCmd } from "commands/login-cmd";
 import { ISyncFriendsCmd, makeSyncFriendsCmd } from "commands/sync-friends-cmd";
 import {
@@ -179,6 +183,10 @@ class DIContainer {
   public get editNumericalGoalCmd(): IEditNumericalGoalCmd {
     return this.impl.editNumericalGoalCmd;
   }
+
+  public get editTaskGoalCmd(): IEditTaskGoalCmd {
+    return this.impl.editTaskGoalCmd;
+  }
 }
 
 function makeDIContainer() {
@@ -249,6 +257,12 @@ function makeDIContainer() {
   di.serviceFactory(
     "editNumericalGoalCmd",
     makeEditNumericalGoalCmd,
+    "db",
+    "trackableFetcher"
+  );
+  di.serviceFactory(
+    "editTaskGoalCmd",
+    makeEditTaskGoalCmd,
     "db",
     "trackableFetcher"
   );

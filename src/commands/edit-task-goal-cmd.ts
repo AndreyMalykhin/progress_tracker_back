@@ -4,8 +4,8 @@ import {
 } from "commands/edit-goal-cmd-helpers";
 import Knex from "knex";
 import Difficulty from "models/difficulty";
-import { INumericalGoal } from "models/numerical-goal";
 import ProgressDisplayMode from "models/progress-display-mode";
+import { ITaskGoal } from "models/task-goal";
 import { TrackableType } from "models/trackable";
 import TrackableFetcher from "services/trackable-fetcher";
 import {
@@ -29,27 +29,27 @@ import undefinedIfNull from "utils/undefined-if-null";
 import UUID from "utils/uuid";
 import { isEmpty, IValidationErrors, setError } from "utils/validation-result";
 
-type IEditNumericalGoalCmd = (
-  input: IEditNumericalGoalCmdInput,
+type IEditTaskGoalCmd = (
+  input: IEditTaskGoalCmdInput,
   transaction: Knex.Transaction
-) => Promise<INumericalGoal>;
+) => Promise<ITaskGoal>;
 
-type IEditNumericalGoalCmdInput = IEditGoalCmdInput;
+type IEditTaskGoalCmdInput = IEditGoalCmdInput;
 
-function makeEditNumericalGoalCmd(
+function makeEditTaskGoalCmd(
   db: Knex,
   trackableFetcher: TrackableFetcher
-): IEditNumericalGoalCmd {
+): IEditTaskGoalCmd {
   return async (input, transaction) => {
     const goal = await trackableFetcher.getByIdOrClientId(
       input.id,
       input.clientId,
-      TrackableType.NumericalGoal,
+      TrackableType.TaskGoal,
       input.userId,
       transaction
     );
-    validateInput(input, goal as INumericalGoal);
-    const dataToUpdate: Partial<INumericalGoal> = {
+    validateInput(input, goal as ITaskGoal);
+    const dataToUpdate: Partial<ITaskGoal> = {
       deadlineDate: input.deadlineDate,
       difficulty: undefinedIfNull(input.difficulty),
       iconId: undefinedIfNull(input.iconId),
@@ -64,4 +64,4 @@ function makeEditNumericalGoalCmd(
   };
 }
 
-export { makeEditNumericalGoalCmd, IEditNumericalGoalCmd };
+export { makeEditTaskGoalCmd, IEditTaskGoalCmd };
