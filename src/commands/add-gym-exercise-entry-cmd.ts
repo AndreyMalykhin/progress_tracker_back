@@ -8,7 +8,9 @@ import {
   validateId,
   validateRange
 } from "utils/common-validators";
-import ConstraintViolationError from "utils/constraint-violation-error";
+import ConstraintViolationError, {
+  throwIfNotEmpty
+} from "utils/constraint-violation-error";
 import DbTable from "utils/db-table";
 import ID from "utils/id";
 import UUID from "utils/uuid";
@@ -94,10 +96,7 @@ async function validateInput(
       min: 0
     })
   );
-
-  if (!isEmpty(errors)) {
-    throw new ConstraintViolationError("Invalid input", { errors });
-  }
+  throwIfNotEmpty(errors);
 }
 
 export { makeAddGymExerciseEntryCmd, IAddGymExerciseEntryCmd };

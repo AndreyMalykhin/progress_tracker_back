@@ -1,4 +1,8 @@
-import { IValidationResult } from "utils/validation-result";
+import {
+  isEmpty,
+  IValidationErrors,
+  IValidationResult
+} from "utils/validation-result";
 
 class ConstraintViolationError extends Error {
   public validationResult: IValidationResult;
@@ -9,4 +13,11 @@ class ConstraintViolationError extends Error {
   }
 }
 
+function throwIfNotEmpty(errors: IValidationErrors) {
+  if (!isEmpty(errors)) {
+    throw new ConstraintViolationError("Invalid input", { errors });
+  }
+}
+
+export { throwIfNotEmpty };
 export default ConstraintViolationError;

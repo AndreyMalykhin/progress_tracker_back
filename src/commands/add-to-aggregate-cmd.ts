@@ -5,7 +5,9 @@ import aggregateProgress from "services/aggregate-progress";
 import TrackableFetcher from "services/trackable-fetcher";
 import { validateChildren } from "services/trackable-validators";
 import { validateId } from "utils/common-validators";
-import ConstraintViolationError from "utils/constraint-violation-error";
+import ConstraintViolationError, {
+  throwIfNotEmpty
+} from "utils/constraint-violation-error";
 import DbTable from "utils/db-table";
 import ID from "utils/id";
 import UUID from "utils/uuid";
@@ -103,10 +105,7 @@ function validateInput(
   const errors: IValidationErrors = {};
   setError(errors, "aggregate", validateId(aggregate && aggregate.id));
   setError(errors, "children", validateChildren(childrenToAdd, oldChildren));
-
-  if (!isEmpty(errors)) {
-    throw new ConstraintViolationError("Invalid input", { errors });
-  }
+  throwIfNotEmpty(errors);
 }
 
 export { makeAddToAggregateCmd, IAddToAggregateCmd };

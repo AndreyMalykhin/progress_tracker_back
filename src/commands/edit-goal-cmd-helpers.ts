@@ -10,7 +10,9 @@ import {
   validateUserId
 } from "services/trackable-validators";
 import { validateIdAndClientId } from "utils/common-validators";
-import ConstraintViolationError from "utils/constraint-violation-error";
+import ConstraintViolationError, {
+  throwIfNotEmpty
+} from "utils/constraint-violation-error";
 import ID from "utils/id";
 import UUID from "utils/uuid";
 import { isEmpty, IValidationErrors, setError } from "utils/validation-result";
@@ -51,9 +53,7 @@ function validateInput(input: IEditGoalCmdInput, goal?: ITrackable & IGoal) {
     setError(errors, "iconId", validateIconId(input.iconId));
   }
 
-  if (!isEmpty(errors)) {
-    throw new ConstraintViolationError("Invalid input", { errors });
-  }
+  throwIfNotEmpty(errors);
 }
 
 export { validateInput, IEditGoalCmdInput };

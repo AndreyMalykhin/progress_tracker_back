@@ -5,7 +5,9 @@ import { ITrackable, TrackableType } from "models/trackable";
 import aggregateProgress from "services/aggregate-progress";
 import TrackableFetcher from "services/trackable-fetcher";
 import { validateId } from "utils/common-validators";
-import ConstraintViolationError from "utils/constraint-violation-error";
+import ConstraintViolationError, {
+  throwIfNotEmpty
+} from "utils/constraint-violation-error";
 import DbTable from "utils/db-table";
 import ID from "utils/id";
 import UUID from "utils/uuid";
@@ -56,10 +58,7 @@ function validateInput(trackable?: ITrackable & IAggregatable) {
   }
 
   setError(errors, "trackable", trackableError);
-
-  if (!isEmpty(errors)) {
-    throw new ConstraintViolationError("Invalid input", { errors });
-  }
+  throwIfNotEmpty(errors);
 }
 
 async function updateTarget(

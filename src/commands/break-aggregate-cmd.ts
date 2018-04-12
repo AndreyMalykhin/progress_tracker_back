@@ -3,7 +3,9 @@ import { IAggregate, IAggregateChildren } from "models/aggregate";
 import { ITrackable, TrackableType } from "models/trackable";
 import TrackableFetcher from "services/trackable-fetcher";
 import { validateId } from "utils/common-validators";
-import ConstraintViolationError from "utils/constraint-violation-error";
+import ConstraintViolationError, {
+  throwIfNotEmpty
+} from "utils/constraint-violation-error";
 import DbTable from "utils/db-table";
 import ID from "utils/id";
 import UUID from "utils/uuid";
@@ -42,10 +44,7 @@ function makeBreakAggregateCmd(
 function validateInput(aggregate?: ITrackable) {
   const errors: IValidationErrors = {};
   setError(errors, "aggregate", validateId(aggregate && aggregate.id));
-
-  if (!isEmpty(errors)) {
-    throw new ConstraintViolationError("Invalid input", { errors });
-  }
+  throwIfNotEmpty(errors);
 }
 
 async function updateChildren(

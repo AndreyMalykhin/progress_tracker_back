@@ -8,7 +8,9 @@ import {
   validateId,
   validateLength
 } from "utils/common-validators";
-import ConstraintViolationError from "utils/constraint-violation-error";
+import ConstraintViolationError, {
+  throwIfNotEmpty
+} from "utils/constraint-violation-error";
 import DbTable from "utils/db-table";
 import IGqlContext from "utils/gql-context";
 import ID from "utils/id";
@@ -80,10 +82,7 @@ async function validate<TInput extends IAddTrackableCmdInput>(
   setError(errors, "userId", validateUserId(userId));
   setError(errors, "title", validateTitle(title));
   await doValidate(input, errors);
-
-  if (!isEmpty(errors)) {
-    throw new ConstraintViolationError("Invalid input", { errors });
-  }
+  throwIfNotEmpty(errors);
 }
 
 async function addTrackableAddedActivity(

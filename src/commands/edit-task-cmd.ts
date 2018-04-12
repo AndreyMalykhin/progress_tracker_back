@@ -7,7 +7,9 @@ import {
   validateId,
   validateIdAndClientId
 } from "utils/common-validators";
-import ConstraintViolationError from "utils/constraint-violation-error";
+import ConstraintViolationError, {
+  throwIfNotEmpty
+} from "utils/constraint-violation-error";
 import DbTable from "utils/db-table";
 import ID from "utils/id";
 import undefinedIfNull from "utils/undefined-if-null";
@@ -50,10 +52,7 @@ function validateInput(input: IEditTaskCmdInput, task: ITask | undefined) {
   const errors: IValidationErrors = {};
   setError(errors, "title", validateTitle(input.title));
   validateIdAndClientId(input, task, errors);
-
-  if (!isEmpty(errors)) {
-    throw new ConstraintViolationError("Invalid input", { errors });
-  }
+  throwIfNotEmpty(errors);
 }
 
 export { makeEditTaskCmd, IEditTaskCmd };
