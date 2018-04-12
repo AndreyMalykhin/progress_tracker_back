@@ -9,11 +9,12 @@ import IGqlContext from "utils/gql-context";
 import { makeCheckAuthResolver } from "utils/gql-resolver-utils";
 import ID from "utils/id";
 import nonexistentId from "utils/nonexistent-id";
+import UUID from "utils/uuid";
 import { IValidationResult, mapErrors } from "utils/validation-result";
 
 interface IArgs {
   goal: {
-    id?: ID;
+    id?: UUID;
     title: string;
     deadlineDate?: number;
     difficulty: Difficulty;

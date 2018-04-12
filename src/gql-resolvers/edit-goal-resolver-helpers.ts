@@ -4,10 +4,11 @@ import IGqlContext from "utils/gql-context";
 import ID from "utils/id";
 import isClientId from "utils/is-client-id";
 import nonexistentId from "utils/nonexistent-id";
+import UUID from "utils/uuid";
 
 interface IArgs {
   goal: {
-    id: ID;
+    id: ID | UUID;
     title?: string;
     deadlineDate?: number | null;
     difficulty?: Difficulty;

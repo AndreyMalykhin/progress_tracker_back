@@ -5,11 +5,12 @@ import { makeCheckAuthResolver } from "utils/gql-resolver-utils";
 import ID from "utils/id";
 import isClientId from "utils/is-client-id";
 import nonexistentId from "utils/nonexistent-id";
+import UUID from "utils/uuid";
 import { mapErrors } from "utils/validation-result";
 
 interface IArgs {
   gymExercise: {
-    id: ID;
+    id: ID | UUID;
     title?: string;
     iconName?: string;
   };

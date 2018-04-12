@@ -4,11 +4,12 @@ import Knex from "knex";
 import IGqlContext from "utils/gql-context";
 import ID from "utils/id";
 import nonexistentId from "utils/nonexistent-id";
+import UUID from "utils/uuid";
 import { IValidationResult, mapErrors } from "utils/validation-result";
 
 interface IArgs {
   counter: {
-    id?: ID;
+    id?: UUID;
     title: string;
     iconName: string;
     isPublic: boolean;

@@ -8,8 +8,8 @@ import UUID from "utils/uuid";
 import { mapErrors } from "utils/validation-result";
 
 interface IArgs {
-  ids: ID[];
-  aggregateId: ID;
+  ids: Array<ID | UUID>;
+  aggregateId: ID | UUID;
 }
 
 async function addToAggregateResolver(

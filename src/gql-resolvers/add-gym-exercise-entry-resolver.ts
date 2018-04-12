@@ -4,12 +4,13 @@ import IGqlContext from "utils/gql-context";
 import { makeCheckAuthResolver } from "utils/gql-resolver-utils";
 import ID from "utils/id";
 import isClientId from "utils/is-client-id";
+import UUID from "utils/uuid";
 import { mapErrors } from "utils/validation-result";
 
 interface IArgs {
   entry: {
-    gymExerciseId: ID;
-    id?: ID;
+    gymExerciseId: ID | UUID;
+    id?: UUID;
     setCount: number;
     repetitionCount: number;
     weight: number;

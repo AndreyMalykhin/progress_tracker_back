@@ -4,13 +4,14 @@ import Knex from "knex";
 import IGqlContext from "utils/gql-context";
 import ID from "utils/id";
 import isClientId from "utils/is-client-id";
+import UUID from "utils/uuid";
 import { IValidationResult, mapErrors } from "utils/validation-result";
 
 interface IArgs {
   aggregate: {
-    id: ID;
+    id?: UUID;
     title: string;
-    children: Array<{ id: ID }>;
+    children: Array<{ id: ID | UUID }>;
   };
 }
 

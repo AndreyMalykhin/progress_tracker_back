@@ -16,7 +16,7 @@ interface IValidateConfig {
 }
 
 interface IValidateRangeConfig extends IValidateConfig {
-  min: number;
+  min?: number;
   max: number;
   isInteger?: boolean;
 }
@@ -62,6 +62,12 @@ function validateRange(
         }
       }
 
+      if (min == null) {
+        return newValue > max
+          ? `Should be less then or equal to ${max}`
+          : undefined;
+      }
+
       return newValue < min || newValue > max
         ? `Should be between ${min} and ${max}`
         : undefined;
@@ -103,6 +109,16 @@ function validateLength(
       return !isLength(newValue, { min, max })
         ? `Length should be between ${min} and ${max}`
         : undefined;
+    },
+    config
+  );
+}
+
+function validateNonZero(value: number | undefined, config?: IValidateConfig) {
+  return validate(
+    value,
+    (newValue, newConfig) => {
+      return value === 0 ? `Should no be zero` : undefined;
     },
     config
   );
@@ -197,5 +213,6 @@ export {
   validateLength,
   validateList,
   validateEnum,
-  validateInt
+  validateInt,
+  validateNonZero
 };

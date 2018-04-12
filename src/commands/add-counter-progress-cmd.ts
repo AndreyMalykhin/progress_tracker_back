@@ -1,0 +1,146 @@
+import Knex from "knex";
+import { ActivityType } from "models/activity";
+import { IAggregatable } from "models/aggregatable";
+import { ICounter } from "models/counter";
+import { ICounterProgressChangedActivity } from "models/counter-progress-changed-activity";
+import { TrackableType } from "models/trackable";
+import aggregateProgress from "services/aggregate-progress";
+import TrackableFetcher from "services/trackable-fetcher";
+import { validateUserId } from "services/trackable-validators";
+import {
+  validateIdAndClientId,
+  validateNonZero,
+  validateRange
+} from "utils/common-validators";
+import { throwIfNotEmpty } from "utils/constraint-violation-error";
+import DbTable from "utils/db-table";
+import ID from "utils/id";
+import UUID from "utils/uuid";
+import { IValidationErrors, setError } from "utils/validation-result";
+
+type IAddCounterProgressCmd = (
+  input: IAddCounterProgressCmdInput,
+  transaction: Knex.Transaction
+) => Promise<ICounter>;
+
+interface IAddCounterProgressCmdInput {
+  id?: ID;
+  clientId?: UUID;
+  userId: ID;
+  progressDelta: number;
+}
+
+function makeAddCounterProgressCmd(
+  db: Knex,
+  trackableFetcher: TrackableFetcher
+): IAddCounterProgressCmd {
+  return async (input, transaction) => {
+    let counter = (await trackableFetcher.getByIdOrClientId(
+      input.id,
+      input.clientId,
+      TrackableType.Counter,
+      input.userId,
+      transaction
+    )) as ICounter | undefined;
+    validateInput(input, counter);
+
+    if (input.progressDelta === 0) {
+      return counter!;
+    }
+
+    counter = await updateCounter(
+      counter!,
+      input.progressDelta,
+      db,
+      transaction
+    );
+
+    if (counter.parentId) {
+      await updateAggregate(
+        counter.parentId,
+        db,
+        transaction,
+        trackableFetcher
+      );
+    }
+
+    await addActivity(
+      counter.id,
+      input.progressDelta,
+      input.userId,
+      db,
+      transaction
+    );
+    return counter;
+  };
+}
+
+function validateInput(
+  input: IAddCounterProgressCmdInput,
+  counter: ICounter | undefined
+) {
+  const errors: IValidationErrors = {};
+  validateIdAndClientId(input, counter, errors);
+  const { userId, progressDelta } = input;
+  setError(errors, "userId", validateUserId(userId));
+  const progress = counter ? counter.progress : 0;
+  setError(
+    errors,
+    "progressDelta",
+    validateRange(progressDelta, {
+      max: Number.MAX_SAFE_INTEGER - progress
+    })
+  );
+  throwIfNotEmpty(errors);
+}
+
+async function updateCounter(
+  counter: ICounter,
+  progressDelta: number,
+  db: Knex,
+  transaction: Knex.Transaction
+): Promise<ICounter> {
+  const dataToUpdate = {
+    id: counter.id,
+    progress: counter.progress + progressDelta
+  } as ICounter;
+  const rows = await db(DbTable.Trackables)
+    .transacting(transaction)
+    .update(dataToUpdate, "*")
+    .where("id", counter.id);
+  return rows[0];
+}
+
+async function updateAggregate(
+  id: ID,
+  db: Knex,
+  transaction: Knex.Transaction,
+  trackableFetcher: TrackableFetcher
+) {
+  const children = await trackableFetcher.getByParentId(id, transaction);
+  const progress = aggregateProgress(children).current;
+  await db(DbTable.Trackables)
+    .transacting(transaction)
+    .update({ progress })
+    .where("id", id);
+}
+
+async function addActivity(
+  trackableId: ID,
+  progressDelta: number,
+  userId: ID,
+  db: Knex,
+  transaction: Knex.Transaction
+) {
+  const activity = {
+    progressDelta,
+    trackableId,
+    typeId: ActivityType.CounterProgressChanged,
+    userId
+  } as ICounterProgressChangedActivity;
+  await db(DbTable.Activities)
+    .transacting(transaction)
+    .insert(activity);
+}
+
+export { makeAddCounterProgressCmd, IAddCounterProgressCmd };

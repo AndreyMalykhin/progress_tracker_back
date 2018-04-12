@@ -6,6 +6,10 @@ import {
 import { IAddAvatarCmd, makeAddAvatarCmd } from "commands/add-avatar-cmd";
 import { IAddCounterCmd, makeAddCounterCmd } from "commands/add-counter-cmd";
 import {
+  IAddCounterProgressCmd,
+  makeAddCounterProgressCmd
+} from "commands/add-counter-progress-cmd";
+import {
   IAddGymExerciseCmd,
   makeAddGymExerciseCmd
 } from "commands/add-gym-exercise-cmd";
@@ -213,6 +217,10 @@ class DIContainer {
   public get editAggregateCmd(): IEditAggregateCmd {
     return this.impl.editAggregateCmd;
   }
+
+  public get addCounterProgressCmd(): IAddCounterProgressCmd {
+    return this.impl.addCounterProgressCmd;
+  }
 }
 
 function makeDIContainer() {
@@ -307,6 +315,12 @@ function makeDIContainer() {
   di.serviceFactory(
     "editAggregateCmd",
     makeEditAggregateCmd,
+    "db",
+    "trackableFetcher"
+  );
+  di.serviceFactory(
+    "addCounterProgressCmd",
+    makeAddCounterProgressCmd,
     "db",
     "trackableFetcher"
   );

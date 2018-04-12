@@ -1,6 +1,8 @@
 import Knex from "knex";
+import { ActivityType } from "models/activity";
 import { IGymExercise } from "models/gym-exercise";
 import { IGymExerciseEntry } from "models/gym-exercise-entry";
+import { IGymExerciseEntryAddedActivity } from "models/gym-exercise-entry-added-activity";
 import { TrackableType } from "models/trackable";
 import TrackableFetcher from "services/trackable-fetcher";
 import {
@@ -35,26 +37,28 @@ function makeAddGymExerciseEntryCmd(
   trackableFetcher: TrackableFetcher
 ): IAddGymExerciseEntryCmd {
   return async (input, transaction) => {
-    const gymExercise = await trackableFetcher.getByIdOrClientId(
+    const gymExercise = (await trackableFetcher.getByIdOrClientId(
       input.gymExercise.id,
       input.gymExercise.clientId,
       TrackableType.GymExercise,
       input.userId,
       transaction
-    );
-    await validateInput(input, gymExercise as IGymExercise);
-    const entry: Partial<IGymExerciseEntry> = {
+    )) as IGymExercise | undefined;
+    await validateInput(input, gymExercise);
+    let entry = {
       clientId: input.clientId,
       gymExerciseId: gymExercise!.id,
       repetitionCount: input.repetitionCount,
       setCount: input.setCount,
       userId: input.userId,
       weight: input.weight
-    };
+    } as IGymExerciseEntry;
     const rows = await db(DbTable.GymExerciseEntries)
       .transacting(transaction)
       .insert(entry, "*");
-    return rows[0];
+    entry = rows[0];
+    await addActivity(entry, db, transaction);
+    return entry;
   };
 }
 
@@ -97,6 +101,22 @@ async function validateInput(
     })
   );
   throwIfNotEmpty(errors);
+}
+
+async function addActivity(
+  entry: IGymExerciseEntry,
+  db: Knex,
+  transaction: Knex.Transaction
+) {
+  const activity = {
+    gymExerciseEntryId: entry.id,
+    trackableId: entry.gymExerciseId,
+    typeId: ActivityType.GymExerciseEntryAdded,
+    userId: entry.userId
+  } as IGymExerciseEntryAddedActivity;
+  await db(DbTable.Activities)
+    .transacting(transaction)
+    .insert(activity);
 }
 
 export { makeAddGymExerciseEntryCmd, IAddGymExerciseEntryCmd };
