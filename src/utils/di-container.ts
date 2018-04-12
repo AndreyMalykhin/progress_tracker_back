@@ -31,6 +31,10 @@ import {
 } from "commands/break-aggregate-cmd";
 import { IEditCounterCmd, makeEditCounterCmd } from "commands/edit-counter-cmd";
 import {
+  IEditGymExerciseCmd,
+  makeEditGymExerciseCmd
+} from "commands/edit-gym-exercise-cmd";
+import {
   IEditNumericalGoalCmd,
   makeEditNumericalGoalCmd
 } from "commands/edit-numerical-goal-cmd";
@@ -197,6 +201,10 @@ class DIContainer {
   public get editCounterCmd(): IEditCounterCmd {
     return this.impl.editCounterCmd;
   }
+
+  public get editGymExerciseCmd(): IEditGymExerciseCmd {
+    return this.impl.editGymExerciseCmd;
+  }
 }
 
 function makeDIContainer() {
@@ -279,6 +287,12 @@ function makeDIContainer() {
   di.serviceFactory(
     "editCounterCmd",
     makeEditCounterCmd,
+    "db",
+    "trackableFetcher"
+  );
+  di.serviceFactory(
+    "editGymExerciseCmd",
+    makeEditGymExerciseCmd,
     "db",
     "trackableFetcher"
   );
