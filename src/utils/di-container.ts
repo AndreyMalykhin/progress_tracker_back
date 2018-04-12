@@ -29,6 +29,10 @@ import {
   IBreakAggregateCmd,
   makeBreakAggregateCmd
 } from "commands/break-aggregate-cmd";
+import {
+  IEditAggregateCmd,
+  makeEditAggregateCmd
+} from "commands/edit-aggregate-cmd";
 import { IEditCounterCmd, makeEditCounterCmd } from "commands/edit-counter-cmd";
 import {
   IEditGymExerciseCmd,
@@ -205,6 +209,10 @@ class DIContainer {
   public get editGymExerciseCmd(): IEditGymExerciseCmd {
     return this.impl.editGymExerciseCmd;
   }
+
+  public get editAggregateCmd(): IEditAggregateCmd {
+    return this.impl.editAggregateCmd;
+  }
 }
 
 function makeDIContainer() {
@@ -293,6 +301,12 @@ function makeDIContainer() {
   di.serviceFactory(
     "editGymExerciseCmd",
     makeEditGymExerciseCmd,
+    "db",
+    "trackableFetcher"
+  );
+  di.serviceFactory(
+    "editAggregateCmd",
+    makeEditAggregateCmd,
     "db",
     "trackableFetcher"
   );

@@ -1,6 +1,6 @@
 input EditAggregateInput {
   id: ID!
-  title: String
+  title: String!
 }
 
 type EditAggregateResponse {
