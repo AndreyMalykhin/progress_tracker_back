@@ -16,13 +16,14 @@ function unaggregateTrackableResolver(
   args: IArgs,
   context: IGqlContext
 ) {
-  const { id } = args;
-  const trackable = isClientId(id) ? { clientId: id } : { id };
+  const input = {
+    [isClientId(args.id) ? "clientId" : "id"]: args.id,
+    userId: context.session!.userId
+  };
   return context.diContainer.db.transaction(async transaction => {
     try {
       return await context.diContainer.unaggregateTrackableCmd(
-        trackable,
-        context.session!.userId,
+        input,
         transaction
       );
     } catch (e) {

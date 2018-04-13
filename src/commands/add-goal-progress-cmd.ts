@@ -1,4 +1,4 @@
-import { IUpdateAggregateProgressCmd } from "commands/update-aggregate-progress-cmd";
+import { IUpdateAggregateCmd } from "commands/update-aggregate-cmd";
 import Knex from "knex";
 import { ActivityType } from "models/activity";
 import { IAggregatable } from "models/aggregatable";
@@ -21,7 +21,7 @@ interface IAddGoalProgressCmdInput<TGoal> {
 
 function makeAddGoalProgressCmd(
   db: Knex,
-  updateAggregateProgressCmd: IUpdateAggregateProgressCmd
+  updateAggregateCmd: IUpdateAggregateCmd
 ): IAddGoalProgressCmd {
   return async (input, transaction) => {
     if (input.progressDelta === 0) {
@@ -36,7 +36,7 @@ function makeAddGoalProgressCmd(
     );
 
     if (goal.parentId) {
-      await updateAggregateProgressCmd({ id: goal.parentId }, transaction);
+      await updateAggregateCmd({ id: goal.parentId }, transaction);
     }
 
     return goal;

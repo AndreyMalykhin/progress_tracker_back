@@ -1,7 +1,4 @@
-import {
-  IUpdateAggregateProgressCmd,
-  makeUpdateAggregateProgressCmd
-} from "commands/update-aggregate-progress-cmd";
+import { IUpdateAggregateCmd } from "commands/update-aggregate-cmd";
 import Knex from "knex";
 import { IAggregatable } from "models/aggregatable";
 import { IAggregate } from "models/aggregate";
@@ -18,8 +15,7 @@ import UUID from "utils/uuid";
 import { isEmpty, IValidationErrors, setError } from "utils/validation-result";
 
 type IUnaggregateTrackableCmd = (
-  trackable: { id?: ID; clientId?: UUID },
-  userId: ID,
+  input: IUnaggregateTrackableCmdInput,
   transaction: Knex.Transaction
 ) => Promise<{
   removedAggregateId?: ID;
@@ -27,35 +23,39 @@ type IUnaggregateTrackableCmd = (
   trackable: ITrackable;
 }>;
 
+interface IUnaggregateTrackableCmdInput {
+  id?: ID;
+  clientId?: ID;
+  userId: ID;
+}
+
 function makeUnaggregateTrackableCmd(
   db: Knex,
   trackableFetcher: TrackableFetcher,
-  updateAggregateProgressCmd: IUpdateAggregateProgressCmd
+  updateAggregateCmd: IUpdateAggregateCmd
 ): IUnaggregateTrackableCmd {
-  const trackableType = undefined;
-  return async (inputTrackable, userId, transaction) => {
+  return async (input, transaction) => {
+    const trackableType = undefined;
     let trackable = await trackableFetcher.getByIdOrClientId(
-      inputTrackable.id,
-      inputTrackable.clientId,
+      input.id,
+      input.clientId,
       trackableType,
-      userId,
+      input.userId,
       transaction
     );
     validateInput(trackable);
     const aggregateId = (trackable as IAggregatable).parentId!;
-    trackable = await updateTarget(trackable!.id, db, transaction);
-    const { aggregate, removedAggregateId } = await updateAggregate(
-      aggregateId,
-      db,
-      transaction,
-      trackableFetcher,
-      updateAggregateProgressCmd
+    trackable = await updateTrackable(trackable!.id, db, transaction);
+    const aggregate = await updateAggregateCmd(
+      { id: aggregateId },
+      transaction
     );
+    const removedAggregateId = aggregate ? undefined : aggregateId;
     return { aggregate, trackable, removedAggregateId };
   };
 }
 
-function validateInput(trackable?: ITrackable & IAggregatable) {
+function validateInput(trackable: (ITrackable & IAggregatable) | undefined) {
   const errors: IValidationErrors = {};
   let trackableError = validateId(trackable && trackable.id);
 
@@ -67,7 +67,7 @@ function validateInput(trackable?: ITrackable & IAggregatable) {
   throwIfNotEmpty(errors);
 }
 
-async function updateTarget(
+async function updateTrackable(
   id: ID,
   db: Knex,
   transaction: Knex.Transaction
@@ -77,30 +77,6 @@ async function updateTarget(
     .update({ parentId: null, order: Date.now() }, "*")
     .where("id", id);
   return rows[0];
-}
-
-async function updateAggregate(
-  id: ID,
-  db: Knex,
-  transaction: Knex.Transaction,
-  trackableFetcher: TrackableFetcher,
-  updateAggregateProgressCmd: IUpdateAggregateProgressCmd
-) {
-  const children = await trackableFetcher.getByParentId(id, transaction);
-  let removedAggregateId;
-  let aggregate: IAggregate;
-
-  if (children.length) {
-    aggregate = await updateAggregateProgressCmd({ id, children }, transaction);
-  } else {
-    await db(DbTable.Trackables)
-      .transacting(transaction)
-      .delete()
-      .where("id", id);
-    removedAggregateId = id;
-  }
-
-  return { aggregate: aggregate!, removedAggregateId };
 }
 
 export { makeUnaggregateTrackableCmd, IUnaggregateTrackableCmd };

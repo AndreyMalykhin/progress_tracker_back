@@ -61,6 +61,10 @@ import {
 } from "commands/edit-task-goal-cmd";
 import { ILoginCmd, makeLoginCmd } from "commands/login-cmd";
 import {
+  IRemoveTrackableCmd,
+  makeRemoveTrackableCmd
+} from "commands/remove-trackable-cmd";
+import {
   ISetTaskDoneCmd,
   makeSetTaskDoneCmd
 } from "commands/set-task-done-cmd";
@@ -70,9 +74,9 @@ import {
   makeUnaggregateTrackableCmd
 } from "commands/unaggregate-trackable-cmd";
 import {
-  IUpdateAggregateProgressCmd,
-  makeUpdateAggregateProgressCmd
-} from "commands/update-aggregate-progress-cmd";
+  IUpdateAggregateCmd,
+  makeUpdateAggregateCmd
+} from "commands/update-aggregate-cmd";
 import Knex from "knex";
 import AccessTokenIssuer from "services/access-token-issuer";
 import AssetFetcher from "services/asset-fetcher";
@@ -242,8 +246,8 @@ class DIContainer {
     return this.impl.addNumericalGoalProgressCmd;
   }
 
-  public get updateAggregateProgressCmd(): IUpdateAggregateProgressCmd {
-    return this.impl.updateAggregateProgressCmd;
+  public get updateAggregateCmd(): IUpdateAggregateCmd {
+    return this.impl.updateAggregateCmd;
   }
 
   public get setTaskDoneCmd(): ISetTaskDoneCmd {
@@ -252,6 +256,10 @@ class DIContainer {
 
   public get addGoalProgressCmd(): IAddGoalProgressCmd {
     return this.impl.addGoalProgressCmd;
+  }
+
+  public get removeTrackableCmd(): IRemoveTrackableCmd {
+    return this.impl.removeTrackableCmd;
   }
 }
 
@@ -301,7 +309,7 @@ function makeDIContainer() {
     makeAddToAggregateCmd,
     "db",
     "trackableFetcher",
-    "updateAggregateProgressCmd"
+    "updateAggregateCmd"
   );
   di.serviceFactory(
     "breakAggregateCmd",
@@ -314,7 +322,7 @@ function makeDIContainer() {
     makeUnaggregateTrackableCmd,
     "db",
     "trackableFetcher",
-    "updateAggregateProgressCmd"
+    "updateAggregateCmd"
   );
   di.serviceFactory(
     "addGymExerciseEntryCmd",
@@ -357,7 +365,7 @@ function makeDIContainer() {
     makeAddCounterProgressCmd,
     "db",
     "trackableFetcher",
-    "updateAggregateProgressCmd"
+    "updateAggregateCmd"
   );
   di.serviceFactory(
     "addNumericalGoalProgressCmd",
@@ -367,8 +375,8 @@ function makeDIContainer() {
     "addGoalProgressCmd"
   );
   di.serviceFactory(
-    "updateAggregateProgressCmd",
-    makeUpdateAggregateProgressCmd,
+    "updateAggregateCmd",
+    makeUpdateAggregateCmd,
     "db",
     "trackableFetcher"
   );
@@ -384,7 +392,14 @@ function makeDIContainer() {
     "addGoalProgressCmd",
     makeAddGoalProgressCmd,
     "db",
-    "updateAggregateProgressCmd"
+    "updateAggregateCmd"
+  );
+  di.serviceFactory(
+    "removeTrackableCmd",
+    makeRemoveTrackableCmd,
+    "db",
+    "trackableFetcher",
+    "updateAggregateCmd"
   );
   di.serviceFactory("editTaskCmd", makeEditTaskCmd, "db", "taskFetcher");
   di.service("fetcher", makeFetcher);

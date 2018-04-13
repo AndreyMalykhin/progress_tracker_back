@@ -1,4 +1,4 @@
-import { IUpdateAggregateProgressCmd } from "commands/update-aggregate-progress-cmd";
+import { IUpdateAggregateCmd } from "commands/update-aggregate-cmd";
 import Knex from "knex";
 import { ActivityType } from "models/activity";
 import { IAggregatable } from "models/aggregatable";
@@ -37,7 +37,7 @@ interface IAddCounterProgressCmdInput {
 function makeAddCounterProgressCmd(
   db: Knex,
   trackableFetcher: TrackableFetcher,
-  updateAggregateProgressCmd: IUpdateAggregateProgressCmd
+  updateAggregateCmd: IUpdateAggregateCmd
 ): IAddCounterProgressCmd {
   return async (input, transaction) => {
     let counter = (await trackableFetcher.getByIdOrClientId(
@@ -61,7 +61,7 @@ function makeAddCounterProgressCmd(
     );
 
     if (counter.parentId) {
-      await updateAggregateProgressCmd({ id: counter.parentId }, transaction);
+      await updateAggregateCmd({ id: counter.parentId }, transaction);
     }
 
     await addActivity(

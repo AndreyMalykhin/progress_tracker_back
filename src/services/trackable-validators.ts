@@ -47,7 +47,7 @@ function validateIconId(iconId: ID | undefined) {
 function validateChildren(
   childrenToAdd: Array<ITrackable & IAggregatable>,
   currentChildren: IAggregateChildren
-): string | undefined {
+) {
   if (!childrenToAdd.length) {
     return "Should not be empty";
   }
@@ -58,8 +58,12 @@ function validateChildren(
   } = currentChildren.length ? currentChildren[0] : childrenToAdd[0];
 
   for (const child of childrenToAdd) {
+    if (child.statusId !== TrackableStatus.Active) {
+      return "Should have only active items";
+    }
+
     if (child.parentId) {
-      return "Should not be a part of another aggregate";
+      return "Should not have items that are part of another aggregate";
     }
 
     if (child.isPublic !== aggregateIsPublic) {
@@ -89,6 +93,8 @@ function validateChildren(
         return typeError;
     }
   }
+
+  return undefined;
 }
 
 function validateProgressDelta(delta: number, progress: number) {

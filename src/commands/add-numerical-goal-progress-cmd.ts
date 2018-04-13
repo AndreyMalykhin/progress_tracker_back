@@ -1,5 +1,4 @@
 import { IAddGoalProgressCmd } from "commands/add-goal-progress-cmd";
-import { IUpdateAggregateProgressCmd } from "commands/update-aggregate-progress-cmd";
 import Knex from "knex";
 import { ActivityType } from "models/activity";
 import { IAggregatable } from "models/aggregatable";

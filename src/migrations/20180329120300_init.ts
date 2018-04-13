@@ -499,12 +499,14 @@ function createActivities(knex: Knex) {
       .notNullable()
       .references("id")
       .inTable("users")
+      .onDelete("cascade")
       .index();
     table
       .integer("trackableId")
       .unsigned()
       .references("id")
-      .inTable("trackables");
+      .inTable("trackables")
+      .onDelete("cascade");
     table.boolean("isApprove");
     table.integer("ratingDelta");
     table.specificType("progressDelta", "double precision");
@@ -512,12 +514,14 @@ function createActivities(knex: Knex) {
       .integer("gymExerciseEntryId")
       .unsigned()
       .references("id")
-      .inTable("gymExerciseEntries");
+      .inTable("gymExerciseEntries")
+      .onDelete("cascade");
     table
       .integer("taskId")
       .unsigned()
       .references("id")
-      .inTable("tasks");
+      .inTable("tasks")
+      .onDelete("cascade");
   });
 }
 
