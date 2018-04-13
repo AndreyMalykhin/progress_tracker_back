@@ -1,3 +1,7 @@
+import {
+  IUpdateAggregateProgressCmd,
+  makeUpdateAggregateProgressCmd
+} from "commands/update-aggregate-progress-cmd";
 import Knex from "knex";
 import { IAggregatable } from "models/aggregatable";
 import { IAggregate } from "models/aggregate";
@@ -25,7 +29,8 @@ type IUnaggregateTrackableCmd = (
 
 function makeUnaggregateTrackableCmd(
   db: Knex,
-  trackableFetcher: TrackableFetcher
+  trackableFetcher: TrackableFetcher,
+  updateAggregateProgressCmd: IUpdateAggregateProgressCmd
 ): IUnaggregateTrackableCmd {
   const trackableType = undefined;
   return async (inputTrackable, userId, transaction) => {
@@ -43,7 +48,8 @@ function makeUnaggregateTrackableCmd(
       aggregateId,
       db,
       transaction,
-      trackableFetcher
+      trackableFetcher,
+      updateAggregateProgressCmd
     );
     return { aggregate, trackable, removedAggregateId };
   };
@@ -77,19 +83,15 @@ async function updateAggregate(
   id: ID,
   db: Knex,
   transaction: Knex.Transaction,
-  trackableFetcher: TrackableFetcher
+  trackableFetcher: TrackableFetcher,
+  updateAggregateProgressCmd: IUpdateAggregateProgressCmd
 ) {
   const children = await trackableFetcher.getByParentId(id, transaction);
   let removedAggregateId;
   let aggregate: IAggregate;
 
   if (children.length) {
-    const progress = aggregateProgress(children).current;
-    const rows = await db(DbTable.Trackables)
-      .transacting(transaction)
-      .update("progress", progress, "*")
-      .where("id", id);
-    aggregate = rows[0];
+    aggregate = await updateAggregateProgressCmd({ id, children }, transaction);
   } else {
     await db(DbTable.Trackables)
       .transacting(transaction)

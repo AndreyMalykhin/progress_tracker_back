@@ -38,7 +38,7 @@ class TrackableFetcher {
 
   public async get(
     id: ID,
-    typeId: TrackableType,
+    typeId?: TrackableType,
     userId?: ID,
     transaction?: Knex.Transaction
   ): Promise<ITrackable | undefined> {

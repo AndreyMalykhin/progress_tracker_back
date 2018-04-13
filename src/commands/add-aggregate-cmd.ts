@@ -99,9 +99,7 @@ async function inputToTrackable(
   input: IAddAggregateCmdInput,
   children: IAggregateChildren
 ): Promise<Partial<IAggregate>> {
-  const { current: progress, max: maxProgress } = aggregateProgress(
-    children as IAggregateChildren
-  );
+  const { current: progress, max: maxProgress } = aggregateProgress(children);
   let isPublic = false;
 
   for (const child of children) {

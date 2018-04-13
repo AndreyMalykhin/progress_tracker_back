@@ -3,11 +3,13 @@ import { IAggregateChildren } from "models/aggregate";
 import Difficulty from "models/difficulty";
 import ProgressDisplayMode from "models/progress-display-mode";
 import { ITrackable, TrackableType } from "models/trackable";
+import { TrackableStatus } from "models/trackable-status";
 import {
   validateClientId,
   validateEnum,
   validateId,
-  validateLength
+  validateLength,
+  validateRange
 } from "utils/common-validators";
 import ID from "utils/id";
 import UUID from "utils/uuid";
@@ -89,11 +91,23 @@ function validateChildren(
   }
 }
 
+function validateProgressDelta(delta: number, progress: number) {
+  return validateRange(delta, {
+    max: Number.MAX_SAFE_INTEGER - progress
+  });
+}
+
+function validateStatusIdIsActive(statusId: TrackableStatus) {
+  return statusId !== TrackableStatus.Active ? "Should be active" : undefined;
+}
+
 export {
   validateUserId,
   validateTitle,
   validateDifficulty,
   validateProgressDisplayModeId,
   validateIconId,
-  validateChildren
+  validateChildren,
+  validateProgressDelta,
+  validateStatusIdIsActive
 };

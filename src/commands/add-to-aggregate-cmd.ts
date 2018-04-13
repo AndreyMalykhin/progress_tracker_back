@@ -1,3 +1,4 @@
+import { IUpdateAggregateProgressCmd } from "commands/update-aggregate-progress-cmd";
 import Knex from "knex";
 import { IAggregate, IAggregateChildren } from "models/aggregate";
 import { ITrackable, TrackableType } from "models/trackable";
@@ -22,7 +23,8 @@ type IAddToAggregateCmd = (
 
 function makeAddToAggregateCmd(
   db: Knex,
-  trackableFetcher: TrackableFetcher
+  trackableFetcher: TrackableFetcher,
+  updateAggregateProgressCmd: IUpdateAggregateProgressCmd
 ): IAddToAggregateCmd {
   return async (inputChildren, inputAggregate, userId, transaction) => {
     const inputChildIds = [];
@@ -57,27 +59,11 @@ function makeAddToAggregateCmd(
     validateInput(childrenToAdd, oldChildren, aggregate);
     await updateChildren(childrenToAdd, aggregate!.id, transaction, db);
     const newChildren = oldChildren.concat(childrenToAdd as IAggregateChildren);
-    return await updateAggregate(
-      aggregate!.id,
-      newChildren as IAggregateChildren,
-      transaction,
-      db
+    return await updateAggregateProgressCmd(
+      { id: aggregate!.id, children: newChildren },
+      transaction
     );
   };
-}
-
-async function updateAggregate(
-  aggregateId: ID,
-  children: IAggregateChildren,
-  transaction: Knex.Transaction,
-  db: Knex
-) {
-  const progress = aggregateProgress(children).current;
-  const rows = await db(DbTable.Trackables)
-    .transacting(transaction)
-    .update("progress", progress, "*")
-    .where("id", aggregateId);
-  return rows[0];
 }
 
 async function updateChildren(
