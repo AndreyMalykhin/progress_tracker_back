@@ -33,11 +33,13 @@ async function isReported(user: IUser, args: object, context: IGqlContext) {
 
 async function isMuted(user: IUser, args: object, context: IGqlContext) {
   const { diContainer, session } = context;
-  const mute = await diContainer.muteFetcher.get(
-    user.id,
-    session && session.userId
-  );
-  return mute != null;
+  const viewerId = session && session.userId;
+
+  if (!viewerId) {
+    return false;
+  }
+
+  return (await diContainer.muteFetcher.get(user.id, viewerId)) != null;
 }
 
 export default userResolver;

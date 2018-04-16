@@ -125,7 +125,7 @@ function validateNonZero(value: number | undefined, config?: IValidateConfig) {
 }
 
 function validateId(
-  value: string | number | undefined,
+  value: string | number | undefined | null,
   config?: IValidateConfig
 ) {
   const msg = "Not found";

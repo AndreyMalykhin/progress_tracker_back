@@ -1,5 +1,5 @@
 import Knex from "knex";
-import { IAvatar } from "models/avatar";
+import { defaultAvatarId, IAvatar } from "models/avatar";
 import { IUser } from "models/user";
 import AvatarFetcher from "services/avatar-fetcher";
 import UserFetcher from "services/user-fetcher";
@@ -23,7 +23,7 @@ type IEditUserCmd = (
 interface IEditUserCmdInput {
   id: ID;
   name?: string;
-  avatar?: { id?: ID; clientId?: UUID };
+  avatar?: { id?: ID; clientId?: UUID } | null;
 }
 
 function makeEditUserCmd(
@@ -42,11 +42,19 @@ function makeEditUserCmd(
         transaction
       ));
     validateInput(input, user, avatar);
+    let avatarId: ID | undefined;
+
+    if (input.avatar) {
+      avatarId = avatar!.id;
+    } else if (input.avatar === null) {
+      avatarId = defaultAvatarId;
+    }
+
     const rows = await db(DbTable.Users)
       .transacting(transaction)
       .update(
         {
-          avatarId: avatar ? avatar.id : undefined,
+          avatarId,
           name: undefinedIfNull(input.name)
         } as IUser,
         "*"
@@ -59,20 +67,19 @@ function makeEditUserCmd(
 function validateInput(
   input: IEditUserCmdInput,
   user: IUser | undefined,
-  avatar: IAvatar | undefined
+  avatar: IAvatar | undefined | null
 ) {
   const errors: IValidationErrors = {};
   setError(errors, "id", validateId(user && user.id));
 
-  if (input.avatar) {
+  if (input.avatar != null) {
     setError(errors, "avatar", validateId(avatar && avatar.id));
   }
 
-  setError(
-    errors,
-    "name",
-    validateLength(input.name, { max: 128, isOptional: true })
-  );
+  if (input.name != null) {
+    setError(errors, "name", validateLength(input.name, { max: 128 }));
+  }
+
   throwIfNotEmpty(errors);
 }
 

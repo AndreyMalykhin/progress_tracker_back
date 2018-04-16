@@ -12,21 +12,25 @@ import UUID from "utils/uuid";
 import { isEmpty, IValidationErrors, setError } from "utils/validation-result";
 
 type IBreakAggregateCmd = (
-  aggregate: { id?: ID; clientId?: UUID },
-  userId: ID,
+  input: IBreakAggregateCmdInput,
   transaction: Knex.Transaction
 ) => Promise<ITrackable[]>;
+
+interface IBreakAggregateCmdInput {
+  aggregate: { id?: ID; clientId?: UUID };
+  userId: ID;
+}
 
 function makeBreakAggregateCmd(
   db: Knex,
   trackableFetcher: TrackableFetcher
 ): IBreakAggregateCmd {
-  return async (inputAggregate, userId, transaction) => {
+  return async (input, transaction) => {
     const aggregate = await trackableFetcher.getByIdOrClientId(
-      inputAggregate.id,
-      inputAggregate.clientId,
+      input.aggregate.id,
+      input.aggregate.clientId,
       TrackableType.Aggregate,
-      userId,
+      input.userId,
       transaction
     );
     validateInput(aggregate);

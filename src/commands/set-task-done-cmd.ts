@@ -76,13 +76,10 @@ function validateInput(
 ) {
   const errors: IValidationErrors = {};
   validateIdAndClientId(input, task, errors);
+  const idField = input.id != null ? "id" : "clientId";
 
-  if (goal) {
-    setError(
-      errors,
-      input.id ? "id" : "clientId",
-      validateStatusIdIsActive(goal.statusId)
-    );
+  if (!errors[idField]) {
+    setError(errors, idField, validateStatusIdIsActive(goal && goal.statusId));
   }
 
   setError(errors, "userId", validateUserId(input.userId));

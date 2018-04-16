@@ -15,21 +15,25 @@ import UUID from "utils/uuid";
 import { isEmpty, IValidationErrors, setError } from "utils/validation-result";
 
 type IAddToAggregateCmd = (
-  children: Array<{ id?: ID; clientId?: UUID }>,
-  aggregate: { id?: ID; clientId?: UUID },
-  userId: ID,
+  input: IAddToAggregateCmdInput,
   transaction: Knex.Transaction
 ) => Promise<IAggregate>;
+
+interface IAddToAggregateCmdInput {
+  children: Array<{ id?: ID; clientId?: UUID }>;
+  aggregate: { id?: ID; clientId?: UUID };
+  userId: ID;
+}
 
 function makeAddToAggregateCmd(
   db: Knex,
   trackableFetcher: TrackableFetcher
 ): IAddToAggregateCmd {
-  return async (inputChildren, inputAggregate, userId, transaction) => {
+  return async (input, transaction) => {
     const inputChildIds = [];
     const inputChildClientIds = [];
 
-    for (const child of inputChildren) {
+    for (const child of input.children) {
       if (child.id) {
         inputChildIds.push(child.id);
       } else if (child.clientId) {
@@ -38,10 +42,10 @@ function makeAddToAggregateCmd(
     }
 
     let aggregate = (await trackableFetcher.getByIdOrClientId(
-      inputAggregate.id,
-      inputAggregate.clientId,
+      input.aggregate.id,
+      input.aggregate.clientId,
       TrackableType.Aggregate,
-      userId,
+      input.userId,
       transaction
     )) as IAggregate | undefined;
     const oldChildren: IAggregateChildren = aggregate
@@ -52,7 +56,7 @@ function makeAddToAggregateCmd(
       inputChildIds,
       inputChildClientIds,
       trackableType,
-      userId,
+      input.userId,
       transaction
     );
     validateInput(childrenToAdd, oldChildren, aggregate);
@@ -89,7 +93,7 @@ async function updateChildren(
 function validateInput(
   childrenToAdd: ITrackable[],
   oldChildren: IAggregateChildren,
-  aggregate?: ITrackable
+  aggregate: ITrackable | undefined
 ) {
   const errors: IValidationErrors = {};
   setError(errors, "aggregate", validateId(aggregate && aggregate.id));

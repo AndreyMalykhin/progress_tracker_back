@@ -1,4 +1,4 @@
-import { validateNotReviewed } from "commands/review-validators";
+import { validateCanReview } from "commands/review-validators";
 import rewardUserForReview from "commands/reward-user-for-review";
 import {
   validateDifficulty,
@@ -50,11 +50,12 @@ function makeRejectTrackableCmd(
 ): IRejectTrackableCmd {
   return async (input, transaction) => {
     const trackableType = undefined;
+    const trackableUserId = undefined;
     let trackable = await trackableFetcher.getByIdOrClientId(
       input.id,
       input.clientId,
       trackableType,
-      input.userId,
+      trackableUserId,
       transaction
     );
     const review = await reviewFetcher.get(trackable!.id, input.userId);
@@ -84,17 +85,21 @@ function validateInput(
 ) {
   const errors: IValidationErrors = {};
   validateIdAndClientId(input, trackable, errors);
-  const idField = input.id ? "id" : "clientId";
+  const idField = input.id != null ? "id" : "clientId";
 
-  if (trackable) {
+  if (!errors[idField]) {
     setError(
       errors,
       idField,
-      validateStatusIdIsPendingReview(trackable.statusId)
+      validateCanReview(
+        review,
+        input.userId,
+        trackable && trackable.userId,
+        trackable && trackable.statusId
+      )
     );
   }
 
-  setError(errors, idField, validateNotReviewed(review));
   setError(errors, "userId", validateUserId(input.userId));
   setError(
     errors,

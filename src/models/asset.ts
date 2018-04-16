@@ -3,6 +3,7 @@ import UUID from "utils/uuid";
 
 interface IAsset {
   id: ID;
+  userId: ID;
   clientId?: UUID;
   urlMedium: string;
 }

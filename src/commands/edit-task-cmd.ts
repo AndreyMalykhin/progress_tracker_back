@@ -50,8 +50,8 @@ function makeEditTaskCmd(db: Knex, taskFetcher: TaskFetcher): IEditTaskCmd {
 
 function validateInput(input: IEditTaskCmdInput, task: ITask | undefined) {
   const errors: IValidationErrors = {};
-  setError(errors, "title", validateTitle(input.title));
   validateIdAndClientId(input, task, errors);
+  setError(errors, "title", validateTitle(input.title));
   throwIfNotEmpty(errors);
 }
 

@@ -9,7 +9,7 @@ import UUID from "utils/uuid";
 import { mapErrors } from "utils/validation-result";
 
 interface IArgs {
-  avatarId: ID | UUID;
+  avatarId?: ID | UUID;
 }
 
 async function setUserAvatarResolver(
@@ -17,8 +17,11 @@ async function setUserAvatarResolver(
   args: IArgs,
   context: IGqlContext
 ) {
+  const avatar = args.avatarId
+    ? { [isClientId(args.avatarId) ? "clientId" : "id"]: args.avatarId }
+    : null;
   const input = {
-    avatar: { [isClientId(args.avatarId) ? "clientId" : "id"]: args.avatarId },
+    avatar,
     id: context.session!.userId
   };
   const user = await context.diContainer.db.transaction(async transaction => {

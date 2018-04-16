@@ -11,16 +11,9 @@ class MuteFetcher {
     this.db = db;
   }
 
-  public async get(
-    mutedId: ID,
-    viewerId: ID | undefined
-  ): Promise<IMute | undefined> {
-    if (!viewerId) {
-      return undefined;
-    }
-
+  public async get(targetId: ID, srcId: ID): Promise<IMute | undefined> {
     return await this.db(DbTable.Mutes)
-      .where({ srcId: safeId(viewerId), targetId: safeId(mutedId) })
+      .where({ srcId: safeId(srcId), targetId: safeId(targetId) })
       .first();
   }
 }

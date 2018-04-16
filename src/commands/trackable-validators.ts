@@ -103,11 +103,13 @@ function validateProgressDelta(delta: number, progress: number) {
   });
 }
 
-function validateStatusIdIsActive(statusId: TrackableStatus) {
+function validateStatusIdIsActive(statusId: TrackableStatus | undefined) {
   return statusId !== TrackableStatus.Active ? "Should be active" : undefined;
 }
 
-function validateStatusIdIsPendingReview(statusId: TrackableStatus) {
+function validateStatusIdIsPendingReview(
+  statusId: TrackableStatus | undefined
+) {
   return statusId !== TrackableStatus.PendingReview
     ? "Should be pending review"
     : undefined;

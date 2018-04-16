@@ -72,6 +72,10 @@ import {
   ISetTaskDoneCmd,
   makeSetTaskDoneCmd
 } from "commands/set-task-done-cmd";
+import {
+  ISetUserMutedCmd,
+  makeSetUserMutedCmd
+} from "commands/set-user-muted-cmd";
 import { ISyncFriendsCmd, makeSyncFriendsCmd } from "commands/sync-friends-cmd";
 import {
   IUnaggregateTrackableCmd,
@@ -261,6 +265,10 @@ class DIContainer {
   public get editUserCmd(): IEditUserCmd {
     return this.impl.editUserCmd;
   }
+
+  public get setUserMutedCmd(): ISetUserMutedCmd {
+    return this.impl.setUserMutedCmd;
+  }
 }
 
 function makeDIContainer() {
@@ -406,6 +414,13 @@ function makeDIContainer() {
     "db",
     "userFetcher",
     "avatarFetcher"
+  );
+  di.serviceFactory(
+    "setUserMutedCmd",
+    makeSetUserMutedCmd,
+    "db",
+    "muteFetcher",
+    "userFetcher"
   );
   di.serviceFactory("editTaskCmd", makeEditTaskCmd, "db", "taskFetcher");
   di.service("fetcher", makeFetcher);

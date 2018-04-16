@@ -17,15 +17,14 @@ async function breakAggregateResolver(
   context: IGqlContext
 ) {
   const { id } = args;
-  const aggregate = isClientId(id) ? { clientId: id } : { id };
+  const input = {
+    aggregate: isClientId(id) ? { clientId: id } : { id },
+    userId: context.session!.userId
+  };
   const trackables = await context.diContainer.db.transaction(
     async transaction => {
       try {
-        return await context.diContainer.breakAggregateCmd(
-          aggregate,
-          context.session!.userId,
-          transaction
-        );
+        return await context.diContainer.breakAggregateCmd(input, transaction);
       } catch (e) {
         if (e instanceof ConstraintViolationError) {
           mapErrors(e.validationResult, {

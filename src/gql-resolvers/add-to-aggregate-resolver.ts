@@ -17,10 +17,10 @@ async function addToAggregateResolver(
   args: IArgs,
   context: IGqlContext
 ) {
-  const { ids, aggregateId } = args;
+  const { ids: childIds, aggregateId } = args;
   const children: Array<{ id?: ID; clientId?: UUID }> = [];
 
-  for (const id of ids) {
+  for (const id of childIds) {
     if (isClientId(id)) {
       children.push({ clientId: id });
     } else {
@@ -28,23 +28,15 @@ async function addToAggregateResolver(
     }
   }
 
-  let aggregate: { id?: ID; clientId?: UUID };
-
-  if (isClientId(aggregateId)) {
-    aggregate = { clientId: aggregateId };
-  } else {
-    aggregate = { id: aggregateId };
-  }
-
+  const input = {
+    aggregate: { [isClientId(aggregateId) ? "clientId" : "id"]: aggregateId },
+    children,
+    userId: context.session!.userId
+  };
   const trackable = await context.diContainer.db.transaction(
     async transaction => {
       try {
-        return await context.diContainer.addToAggregateCmd(
-          children,
-          aggregate,
-          context.session!.userId,
-          transaction
-        );
+        return await context.diContainer.addToAggregateCmd(input, transaction);
       } catch (e) {
         if (e instanceof ConstraintViolationError) {
           mapErrors(e.validationResult, {

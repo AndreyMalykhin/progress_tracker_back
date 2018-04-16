@@ -149,28 +149,33 @@ async function createTrackableStatuses(knex: Knex) {
   ]);
 }
 
-function createAvatars(knex: Knex) {
-  return knex.schema.createTable("avatars", table => {
+async function createAvatars(knex: Knex) {
+  await knex.schema.createTable("avatars", table => {
     table.increments("id").unsigned();
     table.uuid("clientId");
-    table
-      .integer("userId")
-      .notNullable()
-      .unsigned()
-      .references("id")
-      .inTable("users")
-      .onDelete("cascade");
+    table.integer("userId").unsigned();
     table.string("urlSmall").notNullable();
     table.string("urlMedium").notNullable();
     table.unique(["userId", "clientId"]);
   });
+  await knex("avatars").insert({
+    id: 1,
+    urlMedium: process.env.PT_DEFAULT_AVATAR_URL_MEDIUM,
+    urlSmall: process.env.PT_DEFAULT_AVATAR_URL_SMALL
+  });
+  await knex.schema.raw('alter sequence "avatars_id_seq" restart with 128');
 }
 
 function createAssets(knex: Knex) {
   return knex.schema.createTable("assets", table => {
     table.increments("id").unsigned();
-    table.uuid("clientId").index();
+    table.uuid("clientId");
+    table
+      .integer("userId")
+      .notNullable()
+      .unsigned();
     table.string("urlMedium").notNullable();
+    table.unique(["userId", "clientId"]);
   });
 }
 
@@ -380,7 +385,8 @@ async function createTrackables(knex: Knex) {
         .notNullable()
         .unsigned()
         .references("id")
-        .inTable("users");
+        .inTable("users")
+        .onDelete("cascade");
       table
         .integer("parentId")
         .unsigned()
@@ -442,7 +448,8 @@ function createTasks(knex: Knex) {
       .notNullable()
       .unsigned()
       .references("id")
-      .inTable("users");
+      .inTable("users")
+      .onDelete("cascade");
     table.uuid("clientId");
     table
       .timestamp("creationDate")
@@ -456,6 +463,7 @@ function createTasks(knex: Knex) {
       .notNullable()
       .references("id")
       .inTable("trackables")
+      .onDelete("cascade")
       .index();
     table.unique(["userId", "clientId"]);
   });
@@ -469,7 +477,8 @@ function createGymExerciseEntries(knex: Knex) {
       .notNullable()
       .unsigned()
       .references("id")
-      .inTable("users");
+      .inTable("users")
+      .onDelete("cascade");
     table.uuid("clientId");
     table
       .timestamp("date")
@@ -480,7 +489,8 @@ function createGymExerciseEntries(knex: Knex) {
       .unsigned()
       .notNullable()
       .references("id")
-      .inTable("trackables");
+      .inTable("trackables")
+      .onDelete("cascade");
     table.integer("setCount").notNullable();
     table.integer("repetitionCount").notNullable();
     table.specificType("weight", "double precision").notNullable();
@@ -508,8 +518,7 @@ function createActivities(knex: Knex) {
       .notNullable()
       .references("id")
       .inTable("users")
-      .onDelete("cascade")
-      .index();
+      .onDelete("cascade");
     table
       .integer("trackableId")
       .unsigned()
@@ -534,6 +543,7 @@ function createActivities(knex: Knex) {
       .references("id")
       .inTable("tasks")
       .onDelete("cascade");
+    table.index(["userId", "date"]);
   });
 }
 
@@ -544,13 +554,15 @@ async function createReviews(knex: Knex) {
       .unsigned()
       .notNullable()
       .references("id")
-      .inTable("users");
+      .inTable("users")
+      .onDelete("cascade");
     table
       .integer("trackableId")
       .unsigned()
       .notNullable()
       .references("id")
-      .inTable("trackables");
+      .inTable("trackables")
+      .onDelete("cascade");
     table
       .integer("reasonId")
       .unsigned()
@@ -588,13 +600,15 @@ async function createUserReports(knex: Knex) {
       .unsigned()
       .notNullable()
       .references("id")
-      .inTable("users");
+      .inTable("users")
+      .onDelete("cascade");
     table
       .integer("reportedId")
       .unsigned()
       .notNullable()
       .references("id")
-      .inTable("users");
+      .inTable("users")
+      .onDelete("cascade");
     table.primary(["reporterId", "reportedId"]);
   });
 }
@@ -610,13 +624,15 @@ async function createMutes(knex: Knex) {
       .unsigned()
       .notNullable()
       .references("id")
-      .inTable("users");
+      .inTable("users")
+      .onDelete("cascade");
     table
       .integer("targetId")
       .unsigned()
       .notNullable()
       .references("id")
-      .inTable("users");
+      .inTable("users")
+      .onDelete("cascade");
     table.primary(["srcId", "targetId"]);
   });
 }
@@ -632,14 +648,33 @@ async function createFriendships(knex: Knex) {
       .unsigned()
       .notNullable()
       .references("id")
-      .inTable("users");
+      .inTable("users")
+      .onDelete("cascade");
     table
       .integer("targetId")
       .unsigned()
       .notNullable()
       .references("id")
-      .inTable("users");
+      .inTable("users")
+      .onDelete("cascade");
     table.primary(["srcId", "targetId"]);
+  });
+}
+
+async function createForeignKeys(knex: Knex) {
+  await knex.schema.table("avatars", table => {
+    table
+      .foreign("userId")
+      .references("id")
+      .inTable("users")
+      .onDelete("cascade");
+  });
+  await knex.schema.table("assets", table => {
+    table
+      .foreign("userId")
+      .references("id")
+      .inTable("users")
+      .onDelete("cascade");
   });
 }
 
@@ -663,6 +698,7 @@ exports.up = async (knex: Knex) => {
   await createUserReports(knex);
   await createMutes(knex);
   await createFriendships(knex);
+  await createForeignKeys(knex);
 };
 
 exports.down = async (knex: Knex) => {
@@ -689,6 +725,6 @@ exports.down = async (knex: Knex) => {
   ];
 
   for (const table of tables) {
-    await knex.schema.dropTableIfExists(table);
+    await knex.schema.raw(`drop table if exists "${table}" cascade`);
   }
 };

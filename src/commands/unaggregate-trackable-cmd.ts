@@ -42,7 +42,7 @@ function makeUnaggregateTrackableCmd(
       input.userId,
       transaction
     );
-    validateInput(trackable);
+    validateInput(input, trackable);
     const aggregateId = (trackable as IAggregatable).parentId!;
     trackable = await updateTrackable(trackable!.id, db, transaction);
     const aggregate = await updateAggregate(
@@ -56,15 +56,18 @@ function makeUnaggregateTrackableCmd(
   };
 }
 
-function validateInput(trackable: (ITrackable & IAggregatable) | undefined) {
+function validateInput(
+  input: IUnaggregateTrackableCmdInput,
+  trackable: (ITrackable & IAggregatable) | undefined
+) {
   const errors: IValidationErrors = {};
-  let trackableError = validateId(trackable && trackable.id);
+  let idError = validateId(trackable && trackable.id);
 
   if (trackable && !trackable.parentId) {
-    trackableError = "Should be aggregated";
+    idError = "Should be aggregated";
   }
 
-  setError(errors, "trackable", trackableError);
+  setError(errors, input.id != null ? "id" : "clientId", idError);
   throwIfNotEmpty(errors);
 }
 

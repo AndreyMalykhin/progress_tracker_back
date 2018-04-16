@@ -1,4 +1,5 @@
 import { ISyncFriendsCmd } from "commands/sync-friends-cmd";
+import setUserAvatarResolver from "gql-resolvers/set-user-avatar-resolver";
 import Knex from "knex";
 import { IAvatar } from "models/avatar";
 import { IUser, rewardableReviewsPerDay } from "models/user";
@@ -102,17 +103,33 @@ async function addUser(
     db,
     transaction
   );
-  const user = {
-    avatarId: avatar.id,
-    facebookAccessToken,
-    facebookId: facebookUser.id,
-    name: facebookUser.name,
-    rewardableReviewsLeft: rewardableReviewsPerDay
-  } as IUser;
   const rows = await db(DbTable.Users)
     .transacting(transaction)
-    .insert(user, "*");
-  return rows[0];
+    .insert(
+      {
+        avatarId: avatar.id,
+        facebookAccessToken,
+        facebookId: facebookUser.id,
+        name: facebookUser.name,
+        rewardableReviewsLeft: rewardableReviewsPerDay
+      } as IUser,
+      "*"
+    );
+  const user = rows[0];
+  await updateAvatar(avatar.id, user.id, db, transaction);
+  return user;
+}
+
+async function updateAvatar(
+  avatarId: ID,
+  userId: ID,
+  db: Knex,
+  transaction: Knex.Transaction
+) {
+  await db(DbTable.Avatars)
+    .transacting(transaction)
+    .update("userId", userId)
+    .where("id", avatarId);
 }
 
 async function addAvatar(

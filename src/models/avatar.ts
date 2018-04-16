@@ -3,9 +3,12 @@ import UUID from "utils/uuid";
 
 interface IAvatar {
   id: ID;
+  userId?: ID;
   clientId?: UUID;
   urlSmall: string;
   urlMedium: string;
 }
 
-export { IAvatar };
+const defaultAvatarId = "1";
+
+export { IAvatar, defaultAvatarId };

@@ -29,7 +29,7 @@ function unaggregateTrackableResolver(
     } catch (e) {
       if (e instanceof ConstraintViolationError) {
         mapErrors(e.validationResult, {
-          trackable: { field: "id" }
+          clientId: { field: "id" }
         });
       }
 
