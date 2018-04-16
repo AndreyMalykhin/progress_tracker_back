@@ -152,9 +152,17 @@ async function createTrackableStatuses(knex: Knex) {
 function createAvatars(knex: Knex) {
   return knex.schema.createTable("avatars", table => {
     table.increments("id").unsigned();
-    table.uuid("clientId").index();
+    table.uuid("clientId");
+    table
+      .integer("userId")
+      .notNullable()
+      .unsigned()
+      .references("id")
+      .inTable("users")
+      .onDelete("cascade");
     table.string("urlSmall").notNullable();
     table.string("urlMedium").notNullable();
+    table.unique(["userId", "clientId"]);
   });
 }
 

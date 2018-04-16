@@ -3,7 +3,6 @@ import {
   IAddAggregateCmd,
   makeAddAggregateCmd
 } from "commands/add-aggregate-cmd";
-import { IAddAvatarCmd, makeAddAvatarCmd } from "commands/add-avatar-cmd";
 import { IAddCounterCmd, makeAddCounterCmd } from "commands/add-counter-cmd";
 import {
   IAddCounterProgressCmd,
@@ -59,6 +58,7 @@ import {
   IEditTaskGoalCmd,
   makeEditTaskGoalCmd
 } from "commands/edit-task-goal-cmd";
+import { IEditUserCmd, makeEditUserCmd } from "commands/edit-user-cmd";
 import { ILoginCmd, makeLoginCmd } from "commands/login-cmd";
 import {
   IRejectTrackableCmd,
@@ -174,10 +174,6 @@ class DIContainer {
     return this.impl.syncFriendsCmd;
   }
 
-  public get addAvatarCmd(): IAddAvatarCmd {
-    return this.impl.addAvatarCmd;
-  }
-
   public get addTaskGoalCmd(): IAddTaskGoalCmd {
     return this.impl.addTaskGoalCmd;
   }
@@ -261,6 +257,10 @@ class DIContainer {
   public get rejectTrackableCmd(): IRejectTrackableCmd {
     return this.impl.rejectTrackableCmd;
   }
+
+  public get editUserCmd(): IEditUserCmd {
+    return this.impl.editUserCmd;
+  }
 }
 
 function makeDIContainer() {
@@ -293,7 +293,6 @@ function makeDIContainer() {
     "facebook",
     "db"
   );
-  di.serviceFactory("addAvatarCmd", makeAddAvatarCmd, "db");
   di.serviceFactory("addTaskGoalCmd", makeAddTaskGoalCmd, "db");
   di.serviceFactory("addNumericalGoalCmd", makeAddNumericalGoalCmd, "db");
   di.serviceFactory("addCounterCmd", makeAddCounterCmd, "db");
@@ -400,6 +399,13 @@ function makeDIContainer() {
     "trackableFetcher",
     "userFetcher",
     "reviewFetcher"
+  );
+  di.serviceFactory(
+    "editUserCmd",
+    makeEditUserCmd,
+    "db",
+    "userFetcher",
+    "avatarFetcher"
   );
   di.serviceFactory("editTaskCmd", makeEditTaskCmd, "db", "taskFetcher");
   di.service("fetcher", makeFetcher);

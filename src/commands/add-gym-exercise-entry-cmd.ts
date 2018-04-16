@@ -68,7 +68,7 @@ async function validateInput(
 ) {
   const errors: IValidationErrors = {};
   setError(errors, "userId", validateId(input.userId));
-  setError(errors, "gymExerciseId", validateId(gymExercise && gymExercise.id));
+  setError(errors, "gymExercise", validateId(gymExercise && gymExercise.id));
   setError(
     errors,
     "clientId",

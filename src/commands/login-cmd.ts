@@ -1,6 +1,6 @@
-import { IAddAvatarCmd } from "commands/add-avatar-cmd";
 import { ISyncFriendsCmd } from "commands/sync-friends-cmd";
 import Knex from "knex";
+import { IAvatar } from "models/avatar";
 import { IUser, rewardableReviewsPerDay } from "models/user";
 import AccessTokenIssuer from "services/access-token-issuer";
 import Facebook, { IFacebookUser } from "services/facebook";
@@ -25,8 +25,7 @@ function makeLoginCmd(
   userFetcher: UserFetcher,
   accessTokenIssuer: AccessTokenIssuer,
   db: Knex,
-  syncFriendsCmd: ISyncFriendsCmd,
-  addAvatarCmd: IAddAvatarCmd
+  syncFriendsCmd: ISyncFriendsCmd
 ) {
   return async (facebookAccessToken: string, transaction: Knex.Transaction) => {
     const facebookUser = await facebook.getUser(facebookAccessToken);
@@ -46,8 +45,7 @@ function makeLoginCmd(
         facebookAccessToken,
         facebook,
         db,
-        transaction,
-        addAvatarCmd
+        transaction
       );
     }
 
@@ -86,8 +84,7 @@ async function addUser(
   facebookAccessToken: string,
   facebook: Facebook,
   db: Knex,
-  transaction: Knex.Transaction,
-  addAvatarCmd: IAddAvatarCmd
+  transaction: Knex.Transaction
 ) {
   let pictureSize = 48;
   const facebookPictureSmall = await facebook.getUserPicture(
@@ -99,11 +96,10 @@ async function addUser(
     facebookAccessToken,
     pictureSize
   );
-  const avatar = await addAvatarCmd(
-    {
-      urlMedium: facebookPictureMedium.url,
-      urlSmall: facebookPictureSmall.url
-    },
+  const avatar = await addAvatar(
+    facebookPictureMedium.url,
+    facebookPictureSmall.url,
+    db,
     transaction
   );
   const user = {
@@ -116,6 +112,18 @@ async function addUser(
   const rows = await db(DbTable.Users)
     .transacting(transaction)
     .insert(user, "*");
+  return rows[0];
+}
+
+async function addAvatar(
+  urlMedium: string,
+  urlSmall: string,
+  db: Knex,
+  transaction: Knex.Transaction
+) {
+  const rows = await db(DbTable.Avatars)
+    .transacting(transaction)
+    .insert({ urlSmall, urlMedium } as IAvatar, "*");
   return rows[0];
 }
 
