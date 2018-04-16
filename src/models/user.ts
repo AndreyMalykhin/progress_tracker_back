@@ -11,5 +11,6 @@ interface IUser {
 }
 
 const rewardableReviewsPerDay = 4;
+const bonusRatingForReview = 1;
 
-export { IUser, rewardableReviewsPerDay };
+export { IUser, rewardableReviewsPerDay, bonusRatingForReview };

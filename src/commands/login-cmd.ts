@@ -106,13 +106,13 @@ async function addUser(
     },
     transaction
   );
-  const user: Partial<IUser> = {
+  const user = {
     avatarId: avatar.id,
     facebookAccessToken,
     facebookId: facebookUser.id,
     name: facebookUser.name,
     rewardableReviewsLeft: rewardableReviewsPerDay
-  };
+  } as IUser;
   const rows = await db(DbTable.Users)
     .transacting(transaction)
     .insert(user, "*");

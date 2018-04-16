@@ -107,6 +107,12 @@ function validateStatusIdIsActive(statusId: TrackableStatus) {
   return statusId !== TrackableStatus.Active ? "Should be active" : undefined;
 }
 
+function validateStatusIdIsPendingReview(statusId: TrackableStatus) {
+  return statusId !== TrackableStatus.PendingReview
+    ? "Should be pending review"
+    : undefined;
+}
+
 export {
   validateUserId,
   validateTitle,
@@ -115,5 +121,6 @@ export {
   validateIconId,
   validateChildren,
   validateProgressDelta,
-  validateStatusIdIsActive
+  validateStatusIdIsActive,
+  validateStatusIdIsPendingReview
 };

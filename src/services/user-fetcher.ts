@@ -14,6 +14,16 @@ class UserFetcher {
     this.db = db;
   }
 
+  public async get(
+    id: ID,
+    transaction?: Knex.Transaction
+  ): Promise<IUser | undefined> {
+    return await this.db(DbTable.Users)
+      .transacting(transaction)
+      .where("id", safeId(id))
+      .first();
+  }
+
   public async getByIds(ids: ID[]): Promise<IUser[]> {
     return await this.db(DbTable.Users).whereIn("id", ids.map(safeId));
   }

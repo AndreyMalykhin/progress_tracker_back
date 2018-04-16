@@ -1,14 +1,14 @@
-import Difficulty from "models/difficulty";
-import { IGoal } from "models/goal";
-import ProgressDisplayMode from "models/progress-display-mode";
-import { ITrackable } from "models/trackable";
 import {
   validateDifficulty,
   validateIconId,
   validateProgressDisplayModeId,
   validateTitle,
   validateUserId
-} from "services/trackable-validators";
+} from "commands/trackable-validators";
+import Difficulty from "models/difficulty";
+import { IGoal } from "models/goal";
+import ProgressDisplayMode from "models/progress-display-mode";
+import { ITrackable } from "models/trackable";
 import { validateIdAndClientId } from "utils/common-validators";
 import ConstraintViolationError, {
   throwIfNotEmpty

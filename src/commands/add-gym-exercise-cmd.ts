@@ -3,11 +3,11 @@ import {
   IAddTrackableCmdInput,
   makeAddTrackableCmd
 } from "commands/add-trackable-cmd";
+import { validateIconId } from "commands/trackable-validators";
 import Knex from "knex";
 import { IGymExercise } from "models/gym-exercise";
 import { TrackableType } from "models/trackable";
 import { TrackableStatus } from "models/trackable-status";
-import { validateIconId } from "services/trackable-validators";
 import { validateId } from "utils/common-validators";
 import ID from "utils/id";
 import { IValidationErrors, setError } from "utils/validation-result";

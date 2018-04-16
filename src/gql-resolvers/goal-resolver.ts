@@ -22,7 +22,7 @@ async function myReviewStatus(
     trackable.id,
     context.session.userId
   );
-  return review && review.status;
+  return review && review.statusId;
 }
 
 async function proofPhotoUrlMedium(

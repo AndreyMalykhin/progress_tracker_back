@@ -1,4 +1,10 @@
-import { IAddGoalProgressCmd } from "commands/add-goal-progress-cmd";
+import addGoalProgress from "commands/add-goal-progress";
+import aggregateProgress from "commands/aggregate-progress";
+import {
+  validateProgressDelta,
+  validateStatusIdIsActive,
+  validateUserId
+} from "commands/trackable-validators";
 import Knex from "knex";
 import { ActivityType } from "models/activity";
 import { IAggregatable } from "models/aggregatable";
@@ -7,13 +13,7 @@ import { INumericalGoal } from "models/numerical-goal";
 import { INumericalGoalProgressChangedActivity } from "models/numerical-goal-progress-changed-activity";
 import { TrackableType } from "models/trackable";
 import { TrackableStatus } from "models/trackable-status";
-import aggregateProgress from "services/aggregate-progress";
 import TrackableFetcher from "services/trackable-fetcher";
-import {
-  validateProgressDelta,
-  validateStatusIdIsActive,
-  validateUserId
-} from "services/trackable-validators";
 import { validateIdAndClientId, validateRange } from "utils/common-validators";
 import { throwIfNotEmpty } from "utils/constraint-violation-error";
 import DbTable from "utils/db-table";
@@ -35,8 +35,7 @@ interface IAddNumericalGoalProgressCmdInput {
 
 function makeAddNumericalGoalProgressCmd(
   db: Knex,
-  trackableFetcher: TrackableFetcher,
-  addGoalProgressCmd: IAddGoalProgressCmd
+  trackableFetcher: TrackableFetcher
 ): IAddNumericalGoalProgressCmd {
   return async (input, transaction) => {
     const goal = (await trackableFetcher.getByIdOrClientId(
@@ -59,9 +58,12 @@ function makeAddNumericalGoalProgressCmd(
       db,
       transaction
     );
-    return (await addGoalProgressCmd(
-      { goal: goal!, progressDelta: input.progressDelta },
-      transaction
+    return (await addGoalProgress(
+      goal!,
+      input.progressDelta,
+      transaction,
+      db,
+      trackableFetcher
     )) as INumericalGoal;
   };
 }

@@ -3,6 +3,8 @@ import {
   IAddTrackableCmdInput,
   makeAddTrackableCmd
 } from "commands/add-trackable-cmd";
+import aggregateProgress from "commands/aggregate-progress";
+import { validateChildren } from "commands/trackable-validators";
 import Knex from "knex";
 import { IAggregatable } from "models/aggregatable";
 import { IAggregate, IAggregateChildren } from "models/aggregate";
@@ -11,9 +13,7 @@ import { INumericalGoal } from "models/numerical-goal";
 import { ITaskGoal } from "models/task-goal";
 import { ITrackable, TrackableType } from "models/trackable";
 import { TrackableStatus } from "models/trackable-status";
-import aggregateProgress from "services/aggregate-progress";
 import TrackableFetcher from "services/trackable-fetcher";
-import { validateChildren } from "services/trackable-validators";
 import { validateList } from "utils/common-validators";
 import DbTable from "utils/db-table";
 import IGqlContext from "utils/gql-context";

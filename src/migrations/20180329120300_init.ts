@@ -38,7 +38,8 @@ async function createRejectReasons(knex: Knex) {
   await knex("rejectReasons").insert([
     { id: 1, name: "Abuse" },
     { id: 2, name: "Spam" },
-    { id: 3, name: "Other" }
+    { id: 3, name: "Other" },
+    { id: 4, name: "Fake" }
   ]);
 }
 
@@ -507,7 +508,10 @@ function createActivities(knex: Knex) {
       .references("id")
       .inTable("trackables")
       .onDelete("cascade");
-    table.boolean("isApprove");
+    table
+      .integer("reviewStatusId")
+      .references("id")
+      .inTable("reviewStatuses");
     table.integer("ratingDelta");
     table.specificType("progressDelta", "double precision");
     table
@@ -550,7 +554,7 @@ async function createReviews(knex: Knex) {
       .notNullable()
       .defaultTo(knex.fn.now());
     table
-      .integer("status")
+      .integer("statusId")
       .notNullable()
       .unsigned()
       .references("id")

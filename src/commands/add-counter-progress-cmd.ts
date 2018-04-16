@@ -1,16 +1,16 @@
-import { IUpdateAggregateCmd } from "commands/update-aggregate-cmd";
+import aggregateProgress from "commands/aggregate-progress";
+import {
+  validateProgressDelta,
+  validateUserId
+} from "commands/trackable-validators";
+import updateAggregate from "commands/update-aggregate";
 import Knex from "knex";
 import { ActivityType } from "models/activity";
 import { IAggregatable } from "models/aggregatable";
 import { ICounter } from "models/counter";
 import { ICounterProgressChangedActivity } from "models/counter-progress-changed-activity";
 import { TrackableType } from "models/trackable";
-import aggregateProgress from "services/aggregate-progress";
 import TrackableFetcher from "services/trackable-fetcher";
-import {
-  validateProgressDelta,
-  validateUserId
-} from "services/trackable-validators";
 import {
   validateIdAndClientId,
   validateNonZero,
@@ -36,8 +36,7 @@ interface IAddCounterProgressCmdInput {
 
 function makeAddCounterProgressCmd(
   db: Knex,
-  trackableFetcher: TrackableFetcher,
-  updateAggregateCmd: IUpdateAggregateCmd
+  trackableFetcher: TrackableFetcher
 ): IAddCounterProgressCmd {
   return async (input, transaction) => {
     let counter = (await trackableFetcher.getByIdOrClientId(
@@ -61,7 +60,12 @@ function makeAddCounterProgressCmd(
     );
 
     if (counter.parentId) {
-      await updateAggregateCmd({ id: counter.parentId }, transaction);
+      await updateAggregate(
+        counter.parentId,
+        transaction,
+        db,
+        trackableFetcher
+      );
     }
 
     await addActivity(

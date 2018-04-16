@@ -1,8 +1,8 @@
+import { validateTitle, validateUserId } from "commands/trackable-validators";
 import Knex from "knex";
 import { ActivityType } from "models/activity";
 import { ITrackable } from "models/trackable";
 import { ITrackableAddedActivity } from "models/trackable-added-activity";
-import { validateTitle, validateUserId } from "services/trackable-validators";
 import {
   validateClientId,
   validateId,

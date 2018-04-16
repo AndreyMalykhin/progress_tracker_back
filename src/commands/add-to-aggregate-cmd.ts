@@ -1,10 +1,10 @@
-import { IUpdateAggregateCmd } from "commands/update-aggregate-cmd";
+import aggregateProgress from "commands/aggregate-progress";
+import { validateChildren } from "commands/trackable-validators";
+import updateAggregate from "commands/update-aggregate";
 import Knex from "knex";
 import { IAggregate, IAggregateChildren } from "models/aggregate";
 import { ITrackable, TrackableType } from "models/trackable";
-import aggregateProgress from "services/aggregate-progress";
 import TrackableFetcher from "services/trackable-fetcher";
-import { validateChildren } from "services/trackable-validators";
 import { validateId } from "utils/common-validators";
 import ConstraintViolationError, {
   throwIfNotEmpty
@@ -23,8 +23,7 @@ type IAddToAggregateCmd = (
 
 function makeAddToAggregateCmd(
   db: Knex,
-  trackableFetcher: TrackableFetcher,
-  updateAggregateCmd: IUpdateAggregateCmd
+  trackableFetcher: TrackableFetcher
 ): IAddToAggregateCmd {
   return async (inputChildren, inputAggregate, userId, transaction) => {
     const inputChildIds = [];
@@ -59,9 +58,12 @@ function makeAddToAggregateCmd(
     validateInput(childrenToAdd, oldChildren, aggregate);
     await updateChildren(childrenToAdd, aggregate!.id, transaction, db);
     const newChildren = oldChildren.concat(childrenToAdd as IAggregateChildren);
-    aggregate = await updateAggregateCmd(
-      { id: aggregate!.id, children: newChildren },
-      transaction
+    aggregate = await updateAggregate(
+      aggregate!.id,
+      transaction,
+      db,
+      trackableFetcher,
+      newChildren
     );
     return aggregate!;
   };

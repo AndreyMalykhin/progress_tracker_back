@@ -1,4 +1,4 @@
-import { IUpdateAggregateCmd } from "commands/update-aggregate-cmd";
+import updateAggregate from "commands/update-aggregate";
 import Knex from "knex";
 import { IAggregatable } from "models/aggregatable";
 import { IAggregate } from "models/aggregate";
@@ -27,8 +27,7 @@ interface IRemoveTrackableCmdInput {
 
 function makeRemoveTrackableCmd(
   db: Knex,
-  trackableFetcher: TrackableFetcher,
-  updateAggregateCmd: IUpdateAggregateCmd
+  trackableFetcher: TrackableFetcher
 ): IRemoveTrackableCmd {
   return async (input, transaction) => {
     const trackableType = undefined;
@@ -51,7 +50,12 @@ function makeRemoveTrackableCmd(
     let removedAggregateId: ID | undefined;
 
     if (aggregateId) {
-      aggregate = await updateAggregateCmd({ id: aggregateId }, transaction);
+      aggregate = await updateAggregate(
+        aggregateId,
+        transaction,
+        db,
+        trackableFetcher
+      );
       removedAggregateId = aggregate ? undefined : aggregateId;
     }
 

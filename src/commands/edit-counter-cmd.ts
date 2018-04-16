@@ -1,12 +1,12 @@
-import Knex from "knex";
-import { ICounter } from "models/counter";
-import { TrackableType } from "models/trackable";
-import TrackableFetcher from "services/trackable-fetcher";
 import {
   validateIconId,
   validateTitle,
   validateUserId
-} from "services/trackable-validators";
+} from "commands/trackable-validators";
+import Knex from "knex";
+import { ICounter } from "models/counter";
+import { TrackableType } from "models/trackable";
+import TrackableFetcher from "services/trackable-fetcher";
 import { validateIdAndClientId } from "utils/common-validators";
 import ConstraintViolationError, {
   throwIfNotEmpty

@@ -5,7 +5,7 @@ interface IReview {
   userId: ID;
   trackableId: ID;
   date: Date;
-  status: ReviewStatus;
+  statusId: ReviewStatus;
 }
 
 export { IReview };

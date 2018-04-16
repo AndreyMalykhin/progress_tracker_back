@@ -1,20 +1,17 @@
-import {
-  IEditGoalCmdInput,
-  validateInput
-} from "commands/edit-goal-cmd-helpers";
-import Knex from "knex";
-import Difficulty from "models/difficulty";
-import { INumericalGoal } from "models/numerical-goal";
-import ProgressDisplayMode from "models/progress-display-mode";
-import { TrackableType } from "models/trackable";
-import TrackableFetcher from "services/trackable-fetcher";
+import { IEditGoalCmdInput, validateInput } from "commands/edit-goal-cmd";
 import {
   validateDifficulty,
   validateIconId,
   validateProgressDisplayModeId,
   validateTitle,
   validateUserId
-} from "services/trackable-validators";
+} from "commands/trackable-validators";
+import Knex from "knex";
+import Difficulty from "models/difficulty";
+import { INumericalGoal } from "models/numerical-goal";
+import ProgressDisplayMode from "models/progress-display-mode";
+import { TrackableType } from "models/trackable";
+import TrackableFetcher from "services/trackable-fetcher";
 import {
   validateClientId,
   validateEnum,
@@ -48,13 +45,13 @@ function makeEditNumericalGoalCmd(
       transaction
     );
     validateInput(input, goal as INumericalGoal);
-    const dataToUpdate: Partial<INumericalGoal> = {
+    const dataToUpdate = {
       deadlineDate: input.deadlineDate,
       difficulty: undefinedIfNull(input.difficulty),
       iconId: undefinedIfNull(input.iconId),
       progressDisplayModeId: undefinedIfNull(input.progressDisplayModeId),
       title: undefinedIfNull(input.title)
-    };
+    } as INumericalGoal;
     const rows = await db(DbTable.Trackables)
       .transacting(transaction)
       .update(dataToUpdate, "*")

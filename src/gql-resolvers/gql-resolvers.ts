@@ -10,6 +10,7 @@ import gymExerciseResolver from "gql-resolvers/gym-exercise-resolver";
 import numericalGoalResolver from "gql-resolvers/numerical-goal-resolver";
 import primitiveTrackableResolver from "gql-resolvers/primitive-trackable-resolver";
 import progressDisplayModeResolver from "gql-resolvers/progress-display-mode-resolver";
+import rejectReasonResolver from "gql-resolvers/reject-reason-resolver";
 import reviewStatusResolver from "gql-resolvers/review-status-resolver";
 import taskGoalResolver from "gql-resolvers/task-goal-resolver";
 import taskResolver from "gql-resolvers/task-resolver";
@@ -32,6 +33,7 @@ const gqlResolvers = {
   NumericalGoal: numericalGoalResolver,
   ProgressDisplayMode: progressDisplayModeResolver,
   Query: gqlQueries,
+  RejectReason: rejectReasonResolver,
   ReviewStatus: reviewStatusResolver,
   Task: taskResolver,
   TaskGoal: taskGoalResolver,

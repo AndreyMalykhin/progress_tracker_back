@@ -1,7 +1,7 @@
+import { validateTitle } from "commands/trackable-validators";
 import Knex from "knex";
 import { ITask } from "models/task";
 import TaskFetcher from "services/task-fetcher";
-import { validateTitle } from "services/trackable-validators";
 import {
   validateClientId,
   validateId,

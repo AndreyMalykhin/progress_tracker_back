@@ -3,6 +3,12 @@ import {
   IAddTrackableCmdInput,
   makeAddTrackableCmd
 } from "commands/add-trackable-cmd";
+import {
+  validateDifficulty,
+  validateIconId,
+  validateProgressDisplayModeId,
+  validateTitle
+} from "commands/trackable-validators";
 import Knex from "knex";
 import { ActivityType } from "models/activity";
 import Difficulty from "models/difficulty";
@@ -13,12 +19,6 @@ import { TrackableType } from "models/trackable";
 import { ITrackableAddedActivity } from "models/trackable-added-activity";
 import { TrackableStatus } from "models/trackable-status";
 import IconFetcher from "services/icon-fetcher";
-import {
-  validateDifficulty,
-  validateIconId,
-  validateProgressDisplayModeId,
-  validateTitle
-} from "services/trackable-validators";
 import {
   validateClientId,
   validateEnum,
@@ -86,14 +86,14 @@ async function addTasks(
   transaction: Knex.Transaction,
   db: Knex
 ) {
-  const tasks: Array<Partial<ITask>> = input.tasks.map(task => {
+  const tasks: ITask[] = input.tasks.map(task => {
     return {
       clientId: task.clientId,
       goalId: trackable.id,
       isDone: false,
       title: task.title,
       userId: input.userId
-    };
+    } as ITask;
   });
   await db(DbTable.Tasks)
     .transacting(transaction)

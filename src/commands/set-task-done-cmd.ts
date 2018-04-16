@@ -1,4 +1,8 @@
-import { IAddGoalProgressCmd } from "commands/add-goal-progress-cmd";
+import addGoalProgress from "commands/add-goal-progress";
+import {
+  validateStatusIdIsActive,
+  validateUserId
+} from "commands/trackable-validators";
 import Knex from "knex";
 import { ActivityType } from "models/activity";
 import { IGoalAchievedActivity } from "models/goal-achieved-activity";
@@ -8,10 +12,6 @@ import { ITaskGoalProgressChangedActivity } from "models/task-goal-progress-chan
 import { TrackableStatus } from "models/trackable-status";
 import TaskFetcher from "services/task-fetcher";
 import TrackableFetcher from "services/trackable-fetcher";
-import {
-  validateStatusIdIsActive,
-  validateUserId
-} from "services/trackable-validators";
 import { validateIdAndClientId } from "utils/common-validators";
 import { throwIfNotEmpty } from "utils/constraint-violation-error";
 import DbTable from "utils/db-table";
@@ -34,8 +34,7 @@ interface ISetTaskDoneCmdInput {
 function makeSetTaskDoneCmd(
   db: Knex,
   taskFetcher: TaskFetcher,
-  trackableFetcher: TrackableFetcher,
-  addGoalProgressCmd: IAddGoalProgressCmd
+  trackableFetcher: TrackableFetcher
 ): ISetTaskDoneCmd {
   return async (input, transaction) => {
     let task = await taskFetcher.getByIdOrClientId(
@@ -58,9 +57,13 @@ function makeSetTaskDoneCmd(
       await addActivity(task!, db, transaction);
     }
 
-    await addGoalProgressCmd(
-      { goal: goal!, progressDelta: input.isDone ? 1 : -1 },
-      transaction
+    const progressDelta = input.isDone ? 1 : -1;
+    await addGoalProgress(
+      goal!,
+      progressDelta,
+      transaction,
+      db,
+      trackableFetcher
     );
     return task;
   };

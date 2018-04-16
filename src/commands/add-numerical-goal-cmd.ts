@@ -4,6 +4,11 @@ import {
   IAddTrackableCmdInput,
   makeAddTrackableCmd
 } from "commands/add-trackable-cmd";
+import {
+  validateDifficulty,
+  validateIconId,
+  validateProgressDisplayModeId
+} from "commands/trackable-validators";
 import Knex from "knex";
 import { ActivityType } from "models/activity";
 import Difficulty from "models/difficulty";
@@ -13,11 +18,6 @@ import { ITaskGoal } from "models/task-goal";
 import { TrackableType } from "models/trackable";
 import { ITrackableAddedActivity } from "models/trackable-added-activity";
 import { TrackableStatus } from "models/trackable-status";
-import {
-  validateDifficulty,
-  validateIconId,
-  validateProgressDisplayModeId
-} from "services/trackable-validators";
 import {
   validateClientId,
   validateEnum,

@@ -1,9 +1,9 @@
-import { IUpdateAggregateCmd } from "commands/update-aggregate-cmd";
+import aggregateProgress from "commands/aggregate-progress";
+import updateAggregate from "commands/update-aggregate";
 import Knex from "knex";
 import { IAggregatable } from "models/aggregatable";
 import { IAggregate } from "models/aggregate";
 import { ITrackable, TrackableType } from "models/trackable";
-import aggregateProgress from "services/aggregate-progress";
 import TrackableFetcher from "services/trackable-fetcher";
 import { validateId } from "utils/common-validators";
 import ConstraintViolationError, {
@@ -31,8 +31,7 @@ interface IUnaggregateTrackableCmdInput {
 
 function makeUnaggregateTrackableCmd(
   db: Knex,
-  trackableFetcher: TrackableFetcher,
-  updateAggregateCmd: IUpdateAggregateCmd
+  trackableFetcher: TrackableFetcher
 ): IUnaggregateTrackableCmd {
   return async (input, transaction) => {
     const trackableType = undefined;
@@ -46,9 +45,11 @@ function makeUnaggregateTrackableCmd(
     validateInput(trackable);
     const aggregateId = (trackable as IAggregatable).parentId!;
     trackable = await updateTrackable(trackable!.id, db, transaction);
-    const aggregate = await updateAggregateCmd(
-      { id: aggregateId },
-      transaction
+    const aggregate = await updateAggregate(
+      aggregateId,
+      transaction,
+      db,
+      trackableFetcher
     );
     const removedAggregateId = aggregate ? undefined : aggregateId;
     return { aggregate, trackable, removedAggregateId };

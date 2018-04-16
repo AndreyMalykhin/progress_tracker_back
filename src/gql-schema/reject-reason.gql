@@ -2,4 +2,5 @@ enum RejectReason {
   Abuse
   Spam
   Other
+  Fake
 }
