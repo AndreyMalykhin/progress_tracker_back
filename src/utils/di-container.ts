@@ -61,6 +61,10 @@ import {
 import { IEditUserCmd, makeEditUserCmd } from "commands/edit-user-cmd";
 import { ILoginCmd, makeLoginCmd } from "commands/login-cmd";
 import {
+  IProveTrackableCmd,
+  makeProveTrackableCmd
+} from "commands/prove-trackable-cmd";
+import {
   IRejectTrackableCmd,
   makeRejectTrackableCmd
 } from "commands/reject-trackable-cmd";
@@ -274,6 +278,10 @@ class DIContainer {
   public get reportUserCmd(): IReportUserCmd {
     return this.impl.reportUserCmd;
   }
+
+  public get proveTrackableCmd(): IProveTrackableCmd {
+    return this.impl.proveTrackableCmd;
+  }
 }
 
 function makeDIContainer() {
@@ -433,6 +441,13 @@ function makeDIContainer() {
     "db",
     "userFetcher",
     "userReportFetcher"
+  );
+  di.serviceFactory(
+    "proveTrackableCmd",
+    makeProveTrackableCmd,
+    "db",
+    "trackableFetcher",
+    "assetFetcher"
   );
   di.serviceFactory("editTaskCmd", makeEditTaskCmd, "db", "taskFetcher");
   di.service("fetcher", makeFetcher);

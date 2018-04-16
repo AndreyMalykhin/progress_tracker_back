@@ -1,5 +1,6 @@
 enum DbTable {
   Activities = "activities",
+  Assets = "assets",
   Avatars = "avatars",
   Friendships = "friendships",
   GymExerciseEntries = "gymExerciseEntries",

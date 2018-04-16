@@ -1,7 +1,7 @@
 import ID from "utils/id";
 
 interface IAggregatable {
-  parentId?: ID;
+  parentId?: ID | null;
 }
 
 export { IAggregatable };

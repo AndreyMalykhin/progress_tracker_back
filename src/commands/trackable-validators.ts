@@ -115,6 +115,12 @@ function validateStatusIdIsPendingReview(
     : undefined;
 }
 
+function validateStatusIdIsPendingProof(statusId: TrackableStatus | undefined) {
+  return statusId !== TrackableStatus.PendingProof
+    ? "Should be pending proof"
+    : undefined;
+}
+
 export {
   validateUserId,
   validateTitle,
@@ -124,5 +130,6 @@ export {
   validateChildren,
   validateProgressDelta,
   validateStatusIdIsActive,
-  validateStatusIdIsPendingReview
+  validateStatusIdIsPendingReview,
+  validateStatusIdIsPendingProof
 };
