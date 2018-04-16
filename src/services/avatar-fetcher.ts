@@ -25,7 +25,7 @@ class AvatarFetcher {
     userId?: ID,
     transaction?: Knex.Transaction
   ): Promise<IAvatar | undefined> {
-    const query = await this.db(DbTable.Avatars)
+    const query = this.db(DbTable.Avatars)
       .transacting(transaction)
       .where(q => {
         if (id) {
@@ -33,7 +33,7 @@ class AvatarFetcher {
         }
 
         if (clientId) {
-          q.andWhere("clientId", safeUUID(clientId));
+          q.orWhere("clientId", safeUUID(clientId));
         }
       })
       .first();

@@ -65,9 +65,7 @@ function validateInput(
   setError(errors, "id", validateId(user && user.id));
 
   if (input.avatar) {
-    const avatarErrors: IValidationErrors = {};
-    validateIdAndClientId(input.avatar, avatar, avatarErrors);
-    setError(errors, "avatar", avatarErrors);
+    setError(errors, "avatar", validateId(avatar && avatar.id));
   }
 
   setError(

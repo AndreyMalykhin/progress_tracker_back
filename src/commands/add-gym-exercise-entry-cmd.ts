@@ -64,7 +64,7 @@ function makeAddGymExerciseEntryCmd(
 
 async function validateInput(
   input: IAddGymExerciseEntryCmdInput,
-  gymExercise?: IGymExercise
+  gymExercise: IGymExercise | undefined
 ) {
   const errors: IValidationErrors = {};
   setError(errors, "userId", validateId(input.userId));
