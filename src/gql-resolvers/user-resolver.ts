@@ -24,11 +24,13 @@ async function avatarUrlMedium(
 
 async function isReported(user: IUser, args: object, context: IGqlContext) {
   const { diContainer, session } = context;
-  const report = await diContainer.userReportFetcher.get(
-    user.id,
-    session && session.userId
-  );
-  return report != null;
+  const viewerId = session && session.userId;
+
+  if (!viewerId) {
+    return false;
+  }
+
+  return (await diContainer.userReportFetcher.get(user.id, viewerId)) != null;
 }
 
 async function isMuted(user: IUser, args: object, context: IGqlContext) {

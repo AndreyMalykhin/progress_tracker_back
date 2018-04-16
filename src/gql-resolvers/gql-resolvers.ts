@@ -11,6 +11,7 @@ import numericalGoalResolver from "gql-resolvers/numerical-goal-resolver";
 import primitiveTrackableResolver from "gql-resolvers/primitive-trackable-resolver";
 import progressDisplayModeResolver from "gql-resolvers/progress-display-mode-resolver";
 import rejectReasonResolver from "gql-resolvers/reject-reason-resolver";
+import reportReasonResolver from "gql-resolvers/report-reason-resolver";
 import reviewStatusResolver from "gql-resolvers/review-status-resolver";
 import taskGoalResolver from "gql-resolvers/task-goal-resolver";
 import taskResolver from "gql-resolvers/task-resolver";
@@ -34,6 +35,7 @@ const gqlResolvers = {
   ProgressDisplayMode: progressDisplayModeResolver,
   Query: gqlQueries,
   RejectReason: rejectReasonResolver,
+  ReportReason: reportReasonResolver,
   ReviewStatus: reviewStatusResolver,
   Task: taskResolver,
   TaskGoal: taskGoalResolver,

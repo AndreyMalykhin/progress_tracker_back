@@ -68,6 +68,7 @@ import {
   IRemoveTrackableCmd,
   makeRemoveTrackableCmd
 } from "commands/remove-trackable-cmd";
+import { IReportUserCmd, makeReportUserCmd } from "commands/report-user-cmd";
 import {
   ISetTaskDoneCmd,
   makeSetTaskDoneCmd
@@ -269,6 +270,10 @@ class DIContainer {
   public get setUserMutedCmd(): ISetUserMutedCmd {
     return this.impl.setUserMutedCmd;
   }
+
+  public get reportUserCmd(): IReportUserCmd {
+    return this.impl.reportUserCmd;
+  }
 }
 
 function makeDIContainer() {
@@ -421,6 +426,13 @@ function makeDIContainer() {
     "db",
     "muteFetcher",
     "userFetcher"
+  );
+  di.serviceFactory(
+    "reportUserCmd",
+    makeReportUserCmd,
+    "db",
+    "userFetcher",
+    "userReportFetcher"
   );
   di.serviceFactory("editTaskCmd", makeEditTaskCmd, "db", "taskFetcher");
   di.service("fetcher", makeFetcher);

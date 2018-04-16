@@ -13,14 +13,10 @@ class UserReportFetcher {
 
   public async get(
     reportedId: ID,
-    viewerId: ID | undefined
+    reporterId: ID
   ): Promise<IUserReport | undefined> {
-    if (!viewerId) {
-      return undefined;
-    }
-
     return await this.db(DbTable.UserReports)
-      .where({ reporterId: safeId(viewerId), reportedId: safeId(reportedId) })
+      .where({ reporterId: safeId(reporterId), reportedId: safeId(reportedId) })
       .first();
   }
 }
