@@ -1,13 +1,14 @@
 import { RequestHandler } from "express";
 import { Unauthorized } from "http-errors";
 import jwt from "jsonwebtoken";
+import asyncMiddleware from "utils/async-middleware";
 import DIContainer from "utils/di-container";
 
 function makeAuthMiddleware(
   diContainer: DIContainer,
   isTerminating = true
 ): RequestHandler {
-  return async (req, res, next) => {
+  return asyncMiddleware(async (req, res, next) => {
     const authHeader = req.header("Authorization");
     let isSuccess = false;
     let error;
@@ -31,12 +32,12 @@ function makeAuthMiddleware(
     }
 
     if (!isSuccess && isTerminating) {
-      next(new Unauthorized(error));
+      next(new Unauthorized(error.toString()));
       return;
     }
 
     next();
-  };
+  });
 }
 
 export { makeAuthMiddleware };
