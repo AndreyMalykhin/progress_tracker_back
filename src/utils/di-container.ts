@@ -87,6 +87,10 @@ import {
   makeUnaggregateTrackableCmd
 } from "commands/unaggregate-trackable-cmd";
 import { IUploadAssetCmd, makeUploadAssetCmd } from "commands/upload-asset-cmd";
+import {
+  IUploadAvatarCmd,
+  makeUploadAvatarCmd
+} from "commands/upload-avatar-cmd";
 import Knex from "knex";
 import AccessTokenIssuer from "services/access-token-issuer";
 import AssetFetcher from "services/asset-fetcher";
@@ -287,6 +291,10 @@ class DIContainer {
   public get uploadAssetCmd(): IUploadAssetCmd {
     return this.impl.uploadAssetCmd;
   }
+
+  public get uploadAvatarCmd(): IUploadAvatarCmd {
+    return this.impl.uploadAvatarCmd;
+  }
 }
 
 function makeDIContainer() {
@@ -454,7 +462,14 @@ function makeDIContainer() {
     "trackableFetcher",
     "assetFetcher"
   );
-  di.serviceFactory("uploadAssetCmd", makeUploadAssetCmd, "db", "envConfig");
+  di.serviceFactory(
+    "uploadAssetCmd",
+    makeUploadAssetCmd,
+    "db",
+    "envConfig",
+    "trackableFetcher"
+  );
+  di.serviceFactory("uploadAvatarCmd", makeUploadAvatarCmd, "db", "envConfig");
   di.serviceFactory("editTaskCmd", makeEditTaskCmd, "db", "taskFetcher");
   di.service("fetcher", makeFetcher);
   di.service("avatarFetcher", AvatarFetcher, "db");

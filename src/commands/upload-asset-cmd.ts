@@ -1,5 +1,5 @@
 import Knex from "knex";
-import { IAsset } from "models/asset";
+import { assetSizes, IAsset } from "models/asset";
 import path from "path";
 import sharp from "sharp";
 import { validateClientId } from "utils/common-validators";
@@ -25,15 +25,17 @@ interface IUploadAssetCmdInput {
 function makeUploadAssetCmd(db: Knex, envConfig: IEnvConfig): IUploadAssetCmd {
   return async (input, transaction) => {
     validateInput(input);
-    const destFileName = uuid() + ".jpeg";
-    const destFilePath = envConfig.assetsDirPath + path.sep + destFileName;
-    await addImg(input.filePath, destFilePath);
+    const imgUrl = await addImg(
+      input.filePath,
+      envConfig.assetsDirPath,
+      envConfig.staticServerUrl
+    );
     const rows = await db(DbTable.Assets)
       .transacting(transaction)
       .insert(
         {
           clientId: input.clientId,
-          urlMedium: `${envConfig.staticServerUrl}/${destFileName}`,
+          urlMedium: imgUrl,
           userId: input.userId
         } as IAsset,
         "*"
@@ -57,12 +59,18 @@ function validateInput(input: IUploadAssetCmdInput) {
   throwIfNotEmpty(errors);
 }
 
-function addImg(srcFilePath: string, destFilePath: string) {
-  return sharp(srcFilePath)
-    .resize(480, 480)
+async function addImg(
+  srcFilePath: string,
+  assetsDirPath: string,
+  staticServerUrl: string
+) {
+  const destFileName = uuid() + ".jpeg";
+  await sharp(srcFilePath)
+    .resize(assetSizes.medium, assetSizes.medium)
     .max()
     .jpeg()
-    .toFile(destFilePath);
+    .toFile(assetsDirPath + path.sep + destFileName);
+  return `${staticServerUrl}/${destFileName}`;
 }
 
 export { makeUploadAssetCmd, IUploadAssetCmd };

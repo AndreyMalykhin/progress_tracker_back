@@ -1,13 +1,14 @@
 import { ISyncFriendsCmd } from "commands/sync-friends-cmd";
 import setUserAvatarResolver from "gql-resolvers/set-user-avatar-resolver";
 import Knex from "knex";
-import { IAvatar } from "models/avatar";
+import { avatarSizes, defaultAvatarId, IAvatar } from "models/avatar";
 import { IUser, rewardableReviewsPerDay } from "models/user";
 import AccessTokenIssuer from "services/access-token-issuer";
 import Facebook, { IFacebookUser } from "services/facebook";
 import UserFetcher from "services/user-fetcher";
 import DbTable from "utils/db-table";
 import ID from "utils/id";
+import isIdEqual from "utils/is-id-equal";
 import { makeLog } from "utils/log";
 
 type ILoginCmd = (
@@ -87,19 +88,9 @@ async function addUser(
   db: Knex,
   transaction: Knex.Transaction
 ) {
-  let pictureSize = 48;
-  const facebookPictureSmall = await facebook.getUserPicture(
+  const avatarId = await addAvatar(
     facebookAccessToken,
-    pictureSize
-  );
-  pictureSize = 256;
-  const facebookPictureMedium = await facebook.getUserPicture(
-    facebookAccessToken,
-    pictureSize
-  );
-  const avatar = await addAvatar(
-    facebookPictureMedium.url,
-    facebookPictureSmall.url,
+    facebook,
     db,
     transaction
   );
@@ -107,7 +98,7 @@ async function addUser(
     .transacting(transaction)
     .insert(
       {
-        avatarId: avatar.id,
+        avatarId,
         facebookAccessToken,
         facebookId: facebookUser.id,
         name: facebookUser.name,
@@ -116,7 +107,11 @@ async function addUser(
       "*"
     );
   const user = rows[0];
-  await updateAvatar(avatar.id, user.id, db, transaction);
+
+  if (!isIdEqual(avatarId, defaultAvatarId)) {
+    await updateAvatar(avatarId, user.id, db, transaction);
+  }
+
   return user;
 }
 
@@ -133,15 +128,34 @@ async function updateAvatar(
 }
 
 async function addAvatar(
-  urlMedium: string,
-  urlSmall: string,
+  facebookAccessToken: string,
+  facebook: Facebook,
   db: Knex,
   transaction: Knex.Transaction
 ) {
-  const rows = await db(DbTable.Avatars)
-    .transacting(transaction)
-    .insert({ urlSmall, urlMedium } as IAvatar, "*");
-  return rows[0];
+  const [facebookPictureSmall, facebookPictureMedium] = await Promise.all([
+    facebook.getUserPicture(facebookAccessToken, avatarSizes.small),
+    facebook.getUserPicture(facebookAccessToken, avatarSizes.medium)
+  ]);
+  let avatarId = defaultAvatarId;
+
+  if (
+    !facebookPictureSmall.is_silhouette &&
+    !facebookPictureMedium.is_silhouette
+  ) {
+    const rows = await db(DbTable.Avatars)
+      .transacting(transaction)
+      .insert(
+        {
+          urlMedium: facebookPictureMedium.url,
+          urlSmall: facebookPictureSmall.url
+        } as IAvatar,
+        "*"
+      );
+    avatarId = rows[0].id;
+  }
+
+  return avatarId;
 }
 
 async function makeAccessToken(

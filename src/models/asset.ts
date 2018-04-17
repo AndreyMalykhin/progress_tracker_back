@@ -8,4 +8,8 @@ interface IAsset {
   urlMedium: string;
 }
 
-export { IAsset };
+const assetSizes = {
+  medium: 480
+};
+
+export { IAsset, assetSizes };

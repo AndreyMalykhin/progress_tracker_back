@@ -10,5 +10,9 @@ interface IAvatar {
 }
 
 const defaultAvatarId = "1";
+const avatarSizes = {
+  medium: 256,
+  small: 48
+};
 
-export { IAvatar, defaultAvatarId };
+export { IAvatar, defaultAvatarId, avatarSizes };
