@@ -1,4 +1,5 @@
 import DataLoader from "dataloader";
+import { NotFound } from "http-errors";
 import { IAsset } from "models/asset";
 import { IAvatar } from "models/avatar";
 import { IIcon } from "models/icon";
@@ -10,6 +11,7 @@ import IconFetcher from "services/icon-fetcher";
 import TrackableFetcher from "services/trackable-fetcher";
 import UserFetcher from "services/user-fetcher";
 import ID from "utils/id";
+import isIdEqual from "utils/is-id-equal";
 
 type ILoaderMapFactory = () => ILoaderMap;
 
@@ -74,15 +76,18 @@ function makeAssetLoader(assetFetcher: AssetFetcher) {
   });
 }
 
-function mapRowsToIds<K, V extends { id: K }>(rows: V[], ids: K[]) {
+function mapRowsToIds<TId extends string, TRow extends { id: TId }>(
+  rows: TRow[],
+  ids: TId[]
+) {
   return ids.map(id => {
     for (const row of rows) {
-      if (row.id === id) {
+      if (isIdEqual(row.id, id)) {
         return row;
       }
     }
 
-    return new Error("ID not found: " + id);
+    return new NotFound("ID not found: " + id);
   });
 }
 

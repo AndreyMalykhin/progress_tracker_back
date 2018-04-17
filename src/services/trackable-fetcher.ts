@@ -19,6 +19,7 @@ import {
 import ConstraintViolationError from "utils/constraint-violation-error";
 import DbTable from "utils/db-table";
 import ID from "utils/id";
+import isIdEqual from "utils/is-id-equal";
 import safeId from "utils/safe-id";
 import safeUUID from "utils/safe-uuid";
 import UUID from "utils/uuid";
@@ -77,7 +78,42 @@ class TrackableFetcher {
       query.andWhere("order", "<", afterOrder);
     }
 
-    if (!viewerId || viewerId !== ownerId) {
+    if (!viewerId || !isIdEqual(viewerId, ownerId)) {
+      query.andWhere("isPublic", true);
+    }
+
+    return await query;
+  }
+
+  public async getArchived(
+    ownerId: ID,
+    statusId:
+      | TrackableStatus.Approved
+      | TrackableStatus.Expired
+      | TrackableStatus.Rejected,
+    afterStatusChangeDate?: Date,
+    viewerId?: ID,
+    limit = 8
+  ): Promise<ITrackable[]> {
+    if (
+      statusId !== TrackableStatus.Approved &&
+      statusId !== TrackableStatus.Rejected &&
+      statusId !== TrackableStatus.Expired
+    ) {
+      return [];
+    }
+
+    const query = this.db(DbTable.Trackables)
+      .where("statusId", statusId)
+      .andWhere("userId", safeId(ownerId))
+      .orderBy("statusChangeDate", "desc")
+      .limit(limit);
+
+    if (afterStatusChangeDate) {
+      query.andWhere("statusChangeDate", "<", afterStatusChangeDate);
+    }
+
+    if (!viewerId || !isIdEqual(viewerId, ownerId)) {
       query.andWhere("isPublic", true);
     }
 

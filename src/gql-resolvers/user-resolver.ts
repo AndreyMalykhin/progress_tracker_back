@@ -1,12 +1,24 @@
 import { IUser } from "models/user";
 import IGqlContext from "utils/gql-context";
+import isIdEqual from "utils/is-id-equal";
 
 const userResolver = {
   avatarUrlMedium,
   avatarUrlSmall,
   isMuted,
-  isReported
+  isReported,
+  rewardableReviewsLeft
 };
+
+function rewardableReviewsLeft(
+  user: IUser,
+  args: object,
+  context: IGqlContext
+) {
+  return isIdEqual(context.session && context.session.userId, user.id)
+    ? user.rewardableReviewsLeft
+    : 0;
+}
 
 async function avatarUrlSmall(user: IUser, args: object, context: IGqlContext) {
   const avatar = await context.loaderMap.avatar.load(user.avatarId);
