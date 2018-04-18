@@ -4,5 +4,6 @@ uploads/
 node_modules/
 .vscode/
 yarn-error.log
+package-lock.json
 .env.local
 .env.production.local

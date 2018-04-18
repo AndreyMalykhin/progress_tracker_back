@@ -326,7 +326,7 @@ function createUsers(knex: Knex) {
     table.increments("id").unsigned();
     table.string("name", 128).notNullable();
     table
-      .timestamp("creationDate")
+      .specificType("creationDate", "timestamp(3) with time zone")
       .notNullable()
       .defaultTo(knex.fn.now());
     table
@@ -373,11 +373,11 @@ async function createTrackables(knex: Knex) {
         .references("id")
         .inTable("trackableStatuses");
       table.boolean("isPublic").notNullable();
-      table.timestamp("statusChangeDate");
-      table.timestamp("achievementDate");
-      table.dateTime("deadlineDate");
+      table.specificType("statusChangeDate", "timestamp(3) with time zone");
+      table.specificType("achievementDate", "timestamp(3) with time zone");
+      table.specificType("deadlineDate", "timestamp(3) with time zone");
       table
-        .timestamp("creationDate")
+        .specificType("creationDate", "timestamp(3) with time zone")
         .notNullable()
         .defaultTo(knex.fn.now());
       table
@@ -452,7 +452,7 @@ function createTasks(knex: Knex) {
       .onDelete("cascade");
     table.uuid("clientId");
     table
-      .timestamp("creationDate")
+      .specificType("creationDate", "timestamp(3) with time zone")
       .notNullable()
       .defaultTo(knex.fn.now());
     table.boolean("isDone").notNullable();
@@ -481,7 +481,7 @@ function createGymExerciseEntries(knex: Knex) {
       .onDelete("cascade");
     table.uuid("clientId");
     table
-      .timestamp("date")
+      .specificType("date", "timestamp(3) with time zone")
       .notNullable()
       .defaultTo(knex.fn.now());
     table
@@ -509,7 +509,7 @@ function createActivities(knex: Knex) {
       .references("id")
       .inTable("activityTypes");
     table
-      .timestamp("date")
+      .specificType("date", "timestamp(3) with time zone")
       .notNullable()
       .defaultTo(knex.fn.now());
     table
@@ -570,7 +570,7 @@ async function createReviews(knex: Knex) {
       .inTable("rejectReasons");
     table.integer("difficulty").unsigned();
     table
-      .timestamp("date")
+      .specificType("date", "timestamp(3) with time zone")
       .notNullable()
       .defaultTo(knex.fn.now());
     table
@@ -586,7 +586,7 @@ async function createReviews(knex: Knex) {
 async function createUserReports(knex: Knex) {
   await knex.schema.createTable("userReports", table => {
     table
-      .timestamp("date")
+      .specificType("date", "timestamp(3) with time zone")
       .notNullable()
       .defaultTo(knex.fn.now());
     table
@@ -616,7 +616,7 @@ async function createUserReports(knex: Knex) {
 async function createMutes(knex: Knex) {
   await knex.schema.createTable("mutes", table => {
     table
-      .timestamp("date")
+      .specificType("date", "timestamp(3) with time zone")
       .notNullable()
       .defaultTo(knex.fn.now());
     table
@@ -640,7 +640,7 @@ async function createMutes(knex: Knex) {
 async function createFriendships(knex: Knex) {
   await knex.schema.createTable("friendships", table => {
     table
-      .timestamp("date")
+      .specificType("date", "timestamp(3) with time zone")
       .notNullable()
       .defaultTo(knex.fn.now());
     table

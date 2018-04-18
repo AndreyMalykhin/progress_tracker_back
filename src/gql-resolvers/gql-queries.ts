@@ -1,6 +1,6 @@
 import getActiveTrackablesResolver from "gql-resolvers/get-active-trackables-resolver";
 import getActivitiesResolver from "gql-resolvers/get-activities-resolver";
-import getArchivedTrackablesResolver from "gql-resolvers/get-archived-trackables";
+import getArchivedTrackablesResolver from "gql-resolvers/get-archived-trackables-resolver";
 import getFriendsResolver from "gql-resolvers/get-friends-resolver";
 import getLeadersResolver from "gql-resolvers/get-leaders-resolver";
 import getPendingReviewTrackablesResolver from "gql-resolvers/get-pending-review-trackables-resolver";

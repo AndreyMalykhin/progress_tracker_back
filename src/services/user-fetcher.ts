@@ -31,8 +31,10 @@ class UserFetcher {
   public async getFriends(userId: ID): Promise<IUser[]> {
     return await this.db(DbTable.Users + " as u")
       .select("u.*")
-      .innerJoin(DbTable.Friendships + " as f", "f.targetId", "u.id")
-      .where("f.srcId", safeId(userId));
+      .innerJoin(DbTable.Friendships + " as f", {
+        "f.srcId": safeId(userId),
+        "f.targetId": "u.id"
+      });
   }
 
   public async getByFacebookId(

@@ -1,5 +1,6 @@
 import Knex from "knex";
 import { IAggregateChildren } from "models/aggregate";
+import Audience from "models/audience";
 import Difficulty from "models/difficulty";
 import { INumericalGoal } from "models/numerical-goal";
 import ProgressDisplayMode from "models/progress-display-mode";
@@ -35,6 +36,49 @@ class TrackableFetcher {
 
   public constructor(db: Knex) {
     this.db = db;
+  }
+
+  public async getPendingReview(
+    audience: Audience,
+    afterStatusChangeDate?: Date,
+    viewerId?: ID,
+    limit = 4
+  ): Promise<ITrackable[]> {
+    const query = this.db(DbTable.Trackables + " as t")
+      .select("t.*")
+      .where("t.statusId", TrackableStatus.PendingReview)
+      .orderBy("t.statusChangeDate", "asc")
+      .limit(limit);
+
+    switch (audience) {
+      case Audience.Friends:
+        if (!viewerId) {
+          return [];
+        }
+
+        query.innerJoin(DbTable.Friendships + " as f", {
+          "f.srcId": safeId(viewerId),
+          "f.targetId": "t.userId"
+        });
+        break;
+      case Audience.Global:
+        break;
+      case Audience.Me:
+        if (!viewerId) {
+          return [];
+        }
+
+        query.andWhere("t.userId", safeId(viewerId));
+        break;
+      default:
+        throw new Error("Unexpected audience: " + audience);
+    }
+
+    if (afterStatusChangeDate) {
+      query.andWhere("t.statusChangeDate", ">", afterStatusChangeDate);
+    }
+
+    return await query;
   }
 
   public async getActiveAfterOrder(

@@ -1,5 +1,6 @@
 import aggregatableResolver from "gql-resolvers/aggregatable-resolver";
 import aggregateResolver from "gql-resolvers/aggregate-resolver";
+import audienceResolver from "gql-resolvers/audience-resolver";
 import counterResolver from "gql-resolvers/counter-resolver";
 import difficultyResolver from "gql-resolvers/difficulty-resolver";
 import goalResolver from "gql-resolvers/goal-resolver";
@@ -22,6 +23,7 @@ import { IResolvers } from "graphql-tools";
 
 const gqlResolvers = {
   Aggregate: aggregateResolver,
+  Audience: audienceResolver,
   Counter: counterResolver,
   Difficulty: difficultyResolver,
   GymExercise: gymExerciseResolver,
