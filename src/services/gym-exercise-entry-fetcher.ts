@@ -1,5 +1,6 @@
 import Knex from "knex";
 import { IGymExercise } from "models/gym-exercise";
+import { IGymExerciseEntry } from "models/gym-exercise-entry";
 import DbTable from "utils/db-table";
 import ID from "utils/id";
 import safeId from "utils/safe-id";
@@ -9,6 +10,13 @@ class GymExerciseEntryFetcher {
 
   public constructor(db: Knex) {
     this.db = db;
+  }
+
+  public async getByIds(ids: ID[]): Promise<IGymExerciseEntry[]> {
+    return await this.db(DbTable.GymExerciseEntries).whereIn(
+      "id",
+      ids.map(safeId)
+    );
   }
 
   public async getByGymExerciseId(

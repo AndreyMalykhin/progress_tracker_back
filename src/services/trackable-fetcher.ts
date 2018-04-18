@@ -71,7 +71,7 @@ class TrackableFetcher {
         query.andWhere("t.userId", safeId(viewerId));
         break;
       default:
-        throw new Error("Unexpected audience: " + audience);
+        return [];
     }
 
     if (afterStatusChangeDate) {

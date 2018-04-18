@@ -8,10 +8,9 @@ import {
 import Knex from "knex";
 import { ActivityType } from "models/activity";
 import { IAggregatable } from "models/aggregatable";
-import { IGoalAchievedActivity } from "models/goal-achieved-activity";
 import { INumericalGoal } from "models/numerical-goal";
 import { INumericalGoalProgressChangedActivity } from "models/numerical-goal-progress-changed-activity";
-import { TrackableType } from "models/trackable";
+import { ITrackable, TrackableType } from "models/trackable";
 import { TrackableStatus } from "models/trackable-status";
 import TrackableFetcher from "services/trackable-fetcher";
 import { validateIdAndClientId, validateRange } from "utils/common-validators";
@@ -51,13 +50,7 @@ function makeAddNumericalGoalProgressCmd(
       return goal!;
     }
 
-    await addActivity(
-      goal!.id,
-      input.progressDelta,
-      input.userId,
-      db,
-      transaction
-    );
+    await addActivity(goal!, input.progressDelta, db, transaction);
     return (await addGoalProgress(
       goal!,
       input.progressDelta,
@@ -92,17 +85,17 @@ function validateInput(
 }
 
 async function addActivity(
-  trackableId: ID,
+  trackable: ITrackable,
   progressDelta: number,
-  userId: ID,
   db: Knex,
   transaction: Knex.Transaction
 ) {
   const activity = {
+    isPublic: trackable.isPublic,
     progressDelta,
-    trackableId,
+    trackableId: trackable.id,
     typeId: ActivityType.NumericalGoalProgressChanged,
-    userId
+    userId: trackable.userId
   } as INumericalGoalProgressChangedActivity;
   await db(DbTable.Activities)
     .transacting(transaction)

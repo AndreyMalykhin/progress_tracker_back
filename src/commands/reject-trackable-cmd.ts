@@ -155,6 +155,7 @@ async function addActivity(
   await db(DbTable.Activities)
     .transacting(transaction)
     .insert({
+      isPublic: true,
       ratingDelta,
       reviewStatusId: ReviewStatus.Rejected,
       trackableId,

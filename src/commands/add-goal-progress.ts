@@ -44,7 +44,7 @@ async function updateGoal<TGoal extends ITrackable & IGoal>(
     progress = goal.maxProgress;
     statusId = TrackableStatus.PendingProof;
     statusChangeDate = new Date();
-    await addGoalAchievedActivity(goal.id, goal.userId, db, transaction);
+    await addGoalAchievedActivity(goal, db, transaction);
   }
 
   const dataToUpdate = {
@@ -61,15 +61,15 @@ async function updateGoal<TGoal extends ITrackable & IGoal>(
 }
 
 async function addGoalAchievedActivity(
-  trackableId: ID,
-  userId: ID,
+  trackable: ITrackable,
   db: Knex,
   transaction: Knex.Transaction
 ) {
   const activity = {
-    trackableId,
+    isPublic: trackable.isPublic,
+    trackableId: trackable.id,
     typeId: ActivityType.GoalAchieved,
-    userId
+    userId: trackable.userId
   } as IGoalAchievedActivity;
   await db(DbTable.Activities)
     .transacting(transaction)

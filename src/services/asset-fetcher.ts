@@ -40,13 +40,13 @@ class AssetFetcher {
   }
 
   public async get(id: ID): Promise<IAsset | undefined> {
-    return await this.db("assets")
+    return await this.db(DbTable.Assets)
       .where("id", safeId(id))
       .first();
   }
 
   public async getByIds(ids: ID[]): Promise<IAsset[]> {
-    return await this.db("assets").whereIn("id", ids.map(safeId));
+    return await this.db(DbTable.Assets).whereIn("id", ids.map(safeId));
   }
 }
 

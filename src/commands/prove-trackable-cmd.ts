@@ -1,10 +1,12 @@
 import { validateStatusIdIsPendingProof } from "commands/trackable-validators";
 import updateAggregate from "commands/update-aggregate";
 import Knex from "knex";
+import { ActivityType } from "models/activity";
 import { IAggregatable } from "models/aggregatable";
 import { IAggregate } from "models/aggregate";
 import { IAsset } from "models/asset";
 import { IGoal } from "models/goal";
+import { IGoalApprovedActivity } from "models/goal-approved-activity";
 import { ITrackable } from "models/trackable";
 import { TrackableStatus } from "models/trackable-status";
 import AssetFetcher from "services/asset-fetcher";
@@ -67,6 +69,10 @@ function makeProveTrackableCmd(
       removedAggregateId = aggregate ? undefined : aggregateId;
     }
 
+    if (!trackable.isPublic) {
+      await addActivity(trackable, db, transaction);
+    }
+
     return { removedAggregateId, aggregate, trackable };
   };
 }
@@ -124,6 +130,21 @@ async function updateTrackable(
     )
     .where("id", trackable.id);
   return rows[0];
+}
+
+async function addActivity(
+  trackable: ITrackable,
+  db: Knex,
+  transaction: Knex.Transaction
+) {
+  await db(DbTable.Activities)
+    .transacting(transaction)
+    .insert({
+      isPublic: false,
+      trackableId: trackable.id,
+      typeId: ActivityType.GoalApproved,
+      userId: trackable.userId
+    } as IGoalApprovedActivity);
 }
 
 export { makeProveTrackableCmd, IProveTrackableCmd };

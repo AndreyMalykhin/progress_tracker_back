@@ -339,8 +339,7 @@ function createUsers(knex: Knex) {
       .notNullable()
       .unsigned()
       .references("id")
-      .inTable("avatars")
-      .index();
+      .inTable("avatars");
     table
       .integer("rating")
       .notNullable()
@@ -354,90 +353,74 @@ function createUsers(knex: Knex) {
 }
 
 async function createTrackables(knex: Knex) {
-  return knex.schema
-    .createTable("trackables", table => {
-      table.increments("id").unsigned();
-      table.uuid("clientId");
-      table
-        .integer("typeId")
-        .unsigned()
-        .notNullable()
-        .references("id")
-        .inTable("trackableTypes");
-      table.string("title").notNullable();
-      table.specificType("order", "double precision").notNullable();
-      table
-        .integer("statusId")
-        .unsigned()
-        .notNullable()
-        .references("id")
-        .inTable("trackableStatuses");
-      table.boolean("isPublic").notNullable();
-      table.specificType("statusChangeDate", "timestamp(3) with time zone");
-      table.specificType("achievementDate", "timestamp(3) with time zone");
-      table.specificType("deadlineDate", "timestamp(3) with time zone");
-      table
-        .specificType("creationDate", "timestamp(3) with time zone")
-        .notNullable()
-        .defaultTo(knex.fn.now());
-      table
-        .integer("userId")
-        .notNullable()
-        .unsigned()
-        .references("id")
-        .inTable("users")
-        .onDelete("cascade");
-      table
-        .integer("parentId")
-        .unsigned()
-        .references("id")
-        .inTable("trackables")
-        .index();
-      table
-        .integer("iconId")
-        .unsigned()
-        .references("id")
-        .inTable("icons");
-      table.specificType("progress", "double precision");
-      table.specificType("maxProgress", "double precision");
-      table
-        .integer("progressDisplayModeId")
-        .unsigned()
-        .references("id")
-        .inTable("progressDisplayModes");
-      table.integer("difficulty").unsigned();
-      table.integer("estimatedDifficulty").unsigned();
-      table
-        .integer("proofPhotoId")
-        .unsigned()
-        .references("id")
-        .inTable("assets");
-      table.integer("rating").unsigned();
-      table.integer("approveCount").unsigned();
-      table.integer("rejectCount").unsigned();
-      table.unique(["userId", "clientId"]);
-    })
-    .raw(
-      `CREATE INDEX "trackables_userId_statusId_statusChangeDate_index"
-      ON trackables ("userId", "statusId", "statusChangeDate")
-      WHERE "statusId" NOT IN (
-        ${trackableStatusIdActive},
-        ${trackableStatusIdPendingProof}
-      )`
-    )
-    .raw(
-      `CREATE INDEX "trackables_userId_statusId_order_index"
-      ON trackables ("userId", "statusId", "order")
-      WHERE "statusId" IN (
-        ${trackableStatusIdActive},
-        ${trackableStatusIdPendingProof}
-      )`
-    )
-    .raw(
-      `CREATE INDEX "trackables_statusId_statusChangeDate_index"
-      ON trackables ("statusId", "statusChangeDate")
-      WHERE "statusId" = ${trackableStatusIdPendingReview}`
-    );
+  return knex.schema.createTable("trackables", table => {
+    table.increments("id").unsigned();
+    table.uuid("clientId");
+    table
+      .integer("typeId")
+      .unsigned()
+      .notNullable()
+      .references("id")
+      .inTable("trackableTypes");
+    table.string("title").notNullable();
+    table
+      .specificType("order", "double precision")
+      .notNullable()
+      .index();
+    table
+      .integer("statusId")
+      .unsigned()
+      .notNullable()
+      .references("id")
+      .inTable("trackableStatuses")
+      .index();
+    table.boolean("isPublic").notNullable();
+    table
+      .specificType("statusChangeDate", "timestamp(3) with time zone")
+      .index();
+    table.specificType("achievementDate", "timestamp(3) with time zone");
+    table.specificType("deadlineDate", "timestamp(3) with time zone");
+    table
+      .specificType("creationDate", "timestamp(3) with time zone")
+      .notNullable()
+      .defaultTo(knex.fn.now());
+    table
+      .integer("userId")
+      .notNullable()
+      .unsigned()
+      .references("id")
+      .inTable("users")
+      .onDelete("cascade");
+    table
+      .integer("parentId")
+      .unsigned()
+      .references("id")
+      .inTable("trackables")
+      .index();
+    table
+      .integer("iconId")
+      .unsigned()
+      .references("id")
+      .inTable("icons");
+    table.specificType("progress", "double precision");
+    table.specificType("maxProgress", "double precision");
+    table
+      .integer("progressDisplayModeId")
+      .unsigned()
+      .references("id")
+      .inTable("progressDisplayModes");
+    table.integer("difficulty").unsigned();
+    table.integer("estimatedDifficulty").unsigned();
+    table
+      .integer("proofPhotoId")
+      .unsigned()
+      .references("id")
+      .inTable("assets");
+    table.integer("rating").unsigned();
+    table.integer("approveCount").unsigned();
+    table.integer("rejectCount").unsigned();
+    table.unique(["userId", "clientId"]);
+  });
 }
 
 function createTasks(knex: Knex) {
@@ -543,6 +526,7 @@ function createActivities(knex: Knex) {
       .references("id")
       .inTable("tasks")
       .onDelete("cascade");
+    table.boolean("isPublic").notNullable();
     table.index(["userId", "date"]);
   });
 }

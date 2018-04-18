@@ -9,7 +9,7 @@ import { ActivityType } from "models/activity";
 import { IAggregatable } from "models/aggregatable";
 import { ICounter } from "models/counter";
 import { ICounterProgressChangedActivity } from "models/counter-progress-changed-activity";
-import { TrackableType } from "models/trackable";
+import { ITrackable, TrackableType } from "models/trackable";
 import TrackableFetcher from "services/trackable-fetcher";
 import {
   validateIdAndClientId,
@@ -68,13 +68,7 @@ function makeAddCounterProgressCmd(
       );
     }
 
-    await addActivity(
-      counter.id,
-      input.progressDelta,
-      input.userId,
-      db,
-      transaction
-    );
+    await addActivity(counter, input.progressDelta, db, transaction);
     return counter;
   };
 }
@@ -114,17 +108,17 @@ async function updateCounter(
 }
 
 async function addActivity(
-  trackableId: ID,
+  trackable: ITrackable,
   progressDelta: number,
-  userId: ID,
   db: Knex,
   transaction: Knex.Transaction
 ) {
   const activity = {
+    isPublic: trackable.isPublic,
     progressDelta,
-    trackableId,
+    trackableId: trackable.id,
     typeId: ActivityType.CounterProgressChanged,
-    userId
+    userId: trackable.userId
   } as ICounterProgressChangedActivity;
   await db(DbTable.Activities)
     .transacting(transaction)

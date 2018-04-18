@@ -45,26 +45,21 @@ function makeAddTrackableCmd<
 ): IAddTrackableCmd<TTrackable, TInput> {
   return async (input, transaction) => {
     await validate(input, validateInput);
-    const inputTrackable = await inputToTrackable(input);
+    const dataToAdd = await inputToTrackable(input);
     const rows = await db(DbTable.Trackables)
       .transacting(transaction)
-      .insert(inputTrackable, "*");
-    const outputTrackable: TTrackable = rows[0];
+      .insert(dataToAdd, "*");
+    const trackable: TTrackable = rows[0];
 
     if (afterAdd) {
-      await afterAdd(input, outputTrackable, transaction, db);
+      await afterAdd(input, trackable, transaction, db);
     }
 
     if (!dontAddActivity) {
-      await addTrackableAddedActivity(
-        outputTrackable.id,
-        outputTrackable.userId,
-        transaction,
-        db
-      );
+      await addTrackableAddedActivity(trackable, transaction, db);
     }
 
-    return outputTrackable;
+    return trackable;
   };
 }
 
@@ -86,20 +81,19 @@ async function validate<TInput extends IAddTrackableCmdInput>(
 }
 
 async function addTrackableAddedActivity(
-  trackableId: ID,
-  userId: ID,
+  trackable: ITrackable,
   transaction: Knex.Transaction,
   db: Knex
-): Promise<ITrackableAddedActivity> {
+) {
   const activity = {
-    trackableId,
+    isPublic: trackable.isPublic,
+    trackableId: trackable.id,
     typeId: ActivityType.TrackableAdded,
-    userId
-  };
-  const rows = await db(DbTable.Activities)
+    userId: trackable.userId
+  } as ITrackableAddedActivity;
+  await db(DbTable.Activities)
     .transacting(transaction)
-    .insert(activity, "*");
-  return rows[0];
+    .insert(activity);
 }
 
 export { makeAddTrackableCmd, IAddTrackableCmdInput, IAddTrackableCmd };

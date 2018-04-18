@@ -5,10 +5,10 @@ import {
 } from "commands/trackable-validators";
 import Knex from "knex";
 import { ActivityType } from "models/activity";
-import { IGoalAchievedActivity } from "models/goal-achieved-activity";
 import { ITask } from "models/task";
 import { ITaskGoal } from "models/task-goal";
 import { ITaskGoalProgressChangedActivity } from "models/task-goal-progress-changed-activity";
+import { ITrackable } from "models/trackable";
 import { TrackableStatus } from "models/trackable-status";
 import TaskFetcher from "services/task-fetcher";
 import TrackableFetcher from "services/trackable-fetcher";
@@ -54,7 +54,7 @@ function makeSetTaskDoneCmd(
     task = await updateTask(task!.id, input.isDone, db, transaction);
 
     if (input.isDone) {
-      await addActivity(task!, db, transaction);
+      await addActivity(task!, goal!, db, transaction);
     }
 
     const progressDelta = input.isDone ? 1 : -1;
@@ -101,12 +101,14 @@ async function updateTask(
 
 async function addActivity(
   task: ITask,
+  trackable: ITrackable,
   db: Knex,
   transaction: Knex.Transaction
 ) {
   const activity = {
+    isPublic: trackable.isPublic,
     taskId: task.id,
-    trackableId: task.goalId,
+    trackableId: trackable.id,
     typeId: ActivityType.TaskGoalProgressChanged,
     userId: task.userId
   } as ITaskGoalProgressChangedActivity;

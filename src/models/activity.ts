@@ -5,6 +5,7 @@ interface IActivity {
   typeId: ActivityType;
   date: Date;
   userId: ID;
+  isPublic: boolean;
 }
 
 enum ActivityType {

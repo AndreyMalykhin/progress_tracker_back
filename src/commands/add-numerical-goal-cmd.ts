@@ -16,7 +16,6 @@ import { INumericalGoal } from "models/numerical-goal";
 import ProgressDisplayMode from "models/progress-display-mode";
 import { ITaskGoal } from "models/task-goal";
 import { TrackableType } from "models/trackable";
-import { ITrackableAddedActivity } from "models/trackable-added-activity";
 import { TrackableStatus } from "models/trackable-status";
 import {
   validateClientId,

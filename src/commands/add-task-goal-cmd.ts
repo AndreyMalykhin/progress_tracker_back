@@ -16,7 +16,6 @@ import ProgressDisplayMode from "models/progress-display-mode";
 import { ITask } from "models/task";
 import { ITaskGoal } from "models/task-goal";
 import { TrackableType } from "models/trackable";
-import { ITrackableAddedActivity } from "models/trackable-added-activity";
 import { TrackableStatus } from "models/trackable-status";
 import IconFetcher from "services/icon-fetcher";
 import {

@@ -3,7 +3,7 @@ import { ActivityType } from "models/activity";
 import { IGymExercise } from "models/gym-exercise";
 import { IGymExerciseEntry } from "models/gym-exercise-entry";
 import { IGymExerciseEntryAddedActivity } from "models/gym-exercise-entry-added-activity";
-import { TrackableType } from "models/trackable";
+import { ITrackable, TrackableType } from "models/trackable";
 import TrackableFetcher from "services/trackable-fetcher";
 import {
   validateClientId,
@@ -57,7 +57,7 @@ function makeAddGymExerciseEntryCmd(
       .transacting(transaction)
       .insert(entry, "*");
     entry = rows[0];
-    await addActivity(entry, db, transaction);
+    await addActivity(entry, gymExercise!, db, transaction);
     return entry;
   };
 }
@@ -105,11 +105,13 @@ async function validateInput(
 
 async function addActivity(
   entry: IGymExerciseEntry,
+  trackable: ITrackable,
   db: Knex,
   transaction: Knex.Transaction
 ) {
   const activity = {
     gymExerciseEntryId: entry.id,
+    isPublic: trackable.isPublic,
     trackableId: entry.gymExerciseId,
     typeId: ActivityType.GymExerciseEntryAdded,
     userId: entry.userId

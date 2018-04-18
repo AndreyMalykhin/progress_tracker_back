@@ -97,6 +97,7 @@ import {
 } from "commands/upload-avatar-cmd";
 import Knex from "knex";
 import AccessTokenIssuer from "services/access-token-issuer";
+import ActivityFetcher from "services/activity-fetcher";
 import AssetFetcher from "services/asset-fetcher";
 import AvatarFetcher from "services/avatar-fetcher";
 import Facebook from "services/facebook";
@@ -303,6 +304,10 @@ class DIContainer {
   public get reorderTrackableCmd(): IReorderTrackableCmd {
     return this.impl.reorderTrackableCmd;
   }
+
+  public get activityFetcher(): ActivityFetcher {
+    return this.impl.activityFetcher;
+  }
 }
 
 function makeDIContainer() {
@@ -316,7 +321,9 @@ function makeDIContainer() {
     "userFetcher",
     "iconFetcher",
     "trackableFetcher",
-    "assetFetcher"
+    "assetFetcher",
+    "gymExerciseEntryFetcher",
+    "taskFetcher"
   );
   di.serviceFactory(
     "loginCmd",
@@ -498,6 +505,7 @@ function makeDIContainer() {
   di.service("userReportFetcher", UserReportFetcher, "db");
   di.service("trackableFetcher", TrackableFetcher, "db");
   di.service("iconFetcher", IconFetcher, "db");
+  di.service("activityFetcher", ActivityFetcher, "db");
   return new DIContainer(di.container);
 }
 

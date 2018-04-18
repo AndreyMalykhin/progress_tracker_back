@@ -44,6 +44,10 @@ class TaskFetcher {
       .where("goalId", safeId(id))
       .orderBy("isDone", "asc");
   }
+
+  public async getByIds(ids: ID[]): Promise<ITask[]> {
+    return await this.db(DbTable.Tasks).whereIn("id", ids.map(safeId));
+  }
 }
 
 export default TaskFetcher;
