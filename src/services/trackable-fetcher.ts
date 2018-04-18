@@ -37,6 +37,38 @@ class TrackableFetcher {
     this.db = db;
   }
 
+  public async getActiveAfterOrder(
+    order: number,
+    userId: ID,
+    transaction?: Knex.Transaction
+  ): Promise<ITrackable | undefined> {
+    return await this.db(DbTable.Trackables)
+      .transacting(transaction)
+      .whereIn("statusId", [
+        TrackableStatus.Active,
+        TrackableStatus.PendingProof
+      ])
+      .andWhere("userId", safeId(userId))
+      .andWhere("order", ">", order)
+      .first();
+  }
+
+  public async getActiveBeforeOrder(
+    order: number,
+    userId: ID,
+    transaction?: Knex.Transaction
+  ): Promise<ITrackable | undefined> {
+    return await this.db(DbTable.Trackables)
+      .transacting(transaction)
+      .whereIn("statusId", [
+        TrackableStatus.Active,
+        TrackableStatus.PendingProof
+      ])
+      .andWhere("userId", safeId(userId))
+      .andWhere("order", "<", order)
+      .first();
+  }
+
   public async get(
     id: ID,
     typeId?: TrackableType,

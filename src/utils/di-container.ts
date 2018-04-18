@@ -72,6 +72,10 @@ import {
   IRemoveTrackableCmd,
   makeRemoveTrackableCmd
 } from "commands/remove-trackable-cmd";
+import {
+  IReorderTrackableCmd,
+  makeReorderTrackableCmd
+} from "commands/reorder-trackable-cmd";
 import { IReportUserCmd, makeReportUserCmd } from "commands/report-user-cmd";
 import {
   ISetTaskDoneCmd,
@@ -295,6 +299,10 @@ class DIContainer {
   public get uploadAvatarCmd(): IUploadAvatarCmd {
     return this.impl.uploadAvatarCmd;
   }
+
+  public get reorderTrackableCmd(): IReorderTrackableCmd {
+    return this.impl.reorderTrackableCmd;
+  }
 }
 
 function makeDIContainer() {
@@ -467,6 +475,12 @@ function makeDIContainer() {
     makeUploadAssetCmd,
     "db",
     "envConfig",
+    "trackableFetcher"
+  );
+  di.serviceFactory(
+    "reorderTrackableCmd",
+    makeReorderTrackableCmd,
+    "db",
     "trackableFetcher"
   );
   di.serviceFactory("uploadAvatarCmd", makeUploadAvatarCmd, "db", "envConfig");

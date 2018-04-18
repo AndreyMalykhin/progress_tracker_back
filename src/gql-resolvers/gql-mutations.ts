@@ -20,6 +20,7 @@ import loginResolver from "gql-resolvers/login-resolver";
 import proveTrackableResolver from "gql-resolvers/prove-trackable-resolver";
 import rejectTrackableResolver from "gql-resolvers/reject-trackable-resolver";
 import removeTrackableResolver from "gql-resolvers/remove-trackable-resolver";
+import reorderTrackableResolver from "gql-resolvers/reorder-trackable-resolver";
 import reportUserResolver from "gql-resolvers/report-user-resolver";
 import setTaskDoneResolver from "gql-resolvers/set-task-done-resolver";
 import setUserAvatarResolver from "gql-resolvers/set-user-avatar-resolver";
@@ -49,6 +50,7 @@ const gqlMutations = {
   proveTrackable: proveTrackableResolver,
   rejectTrackable: rejectTrackableResolver,
   removeTrackable: removeTrackableResolver,
+  reorderTrackable: reorderTrackableResolver,
   reportUser: reportUserResolver,
   setTaskDone: setTaskDoneResolver,
   setUserAvatar: setUserAvatarResolver,
