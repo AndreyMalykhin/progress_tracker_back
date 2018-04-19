@@ -11,6 +11,7 @@
     "dotenv": "^5.0.1",
     "express": "^4.16.2",
     "faker": "^4.1.0",
+    "glob": "^7.1.2",
     "graphql": "^0.12.3",
     "graphql-resolvers": "^0.2.2",
     "graphql-tools": "^2.16.0",
@@ -26,8 +27,17 @@
     "validator": "^9.4.1"
   },
   "scripts": {
-    "knex": "env-cmd ./.env.local knex --knexfile=src/utils/db-config.ts",
-    "start": "env-cmd ./.env.local nodemon --inspect build/bundle.js",
+    "knex-migrate-latest":
+      "env-cmd ./.env.local knex --knexfile=build/db-config.js migrate:latest",
+    "knex-migrate-rollback":
+      "env-cmd ./.env.local knex --knexfile=build/db-config.js migrate:rollback",
+    "knex-migrate-make":
+      "env-cmd ./.env.local knex --cwd src --knexfile=build/db-config.js migrate:make -x ts",
+    "knex-seed-make":
+      "env-cmd ./.env.local knex --cwd src --knexfile=build/db-config.js seed:make -x ts",
+    "knex-seed-run":
+      "env-cmd ./.env.local knex --knexfile=build/db-config.js seed:run",
+    "start": "env-cmd ./.env.local nodemon --inspect build/app.js",
     "dev": "env-cmd ./.env.local webpack --watch --display-modules",
     "precommit": "lint-staged"
   },
@@ -50,6 +60,7 @@
     "@types/sharp": "^0.17.8",
     "@types/uuid": "^3.4.3",
     "@types/validator": "^9.4.0",
+    "copy-webpack-plugin": "^4.5.1",
     "env-cmd": "^7.0.0",
     "husky": "^0.14.3",
     "lint-staged": "^7.0.0",

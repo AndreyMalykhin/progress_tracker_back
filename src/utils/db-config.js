@@ -1,13 +1,10 @@
-import { Config, MigratorConfig, SeedsConfig } from "knex";
-
-const migrations: MigratorConfig = {
-  directory: "../migrations",
-  extension: "ts"
+const migrations = {
+  directory: "migrations"
 };
-const seeds: SeedsConfig = {
-  directory: "../seeds"
+const seeds = {
+  directory: "seeds"
 };
-const dbConfig: { [env: string]: Config } = {
+const dbConfig = {
   development: {
     client: "pg",
     connection: {},

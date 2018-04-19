@@ -1,9 +1,4 @@
 import * as Knex from "knex";
-import { TrackableStatus } from "models/trackable-status";
-
-const trackableStatusIdActive = 1;
-const trackableStatusIdPendingProof = 3;
-const trackableStatusIdPendingReview = 4;
 
 async function createReviewStatuses(knex: Knex) {
   await knex.schema.createTable("reviewStatuses", table => {
@@ -140,10 +135,10 @@ async function createTrackableStatuses(knex: Knex) {
   });
 
   await knex("trackableStatuses").insert([
-    { id: trackableStatusIdActive, name: "Active" },
+    { id: 1, name: "Active" },
     { id: 2, name: "Expired" },
-    { id: trackableStatusIdPendingProof, name: "PendingProof" },
-    { id: trackableStatusIdPendingReview, name: "PendingReview" },
+    { id: 3, name: "PendingProof" },
+    { id: 4, name: "PendingReview" },
     { id: 5, name: "Approved" },
     { id: 6, name: "Rejected" }
   ]);
@@ -662,7 +657,7 @@ async function createForeignKeys(knex: Knex) {
   });
 }
 
-exports.up = async (knex: Knex) => {
+async function up(knex: Knex) {
   await createReviewStatuses(knex);
   await createRejectReasons(knex);
   await createReportReasons(knex);
@@ -683,9 +678,9 @@ exports.up = async (knex: Knex) => {
   await createMutes(knex);
   await createFriendships(knex);
   await createForeignKeys(knex);
-};
+}
 
-exports.down = async (knex: Knex) => {
+async function down(knex: Knex) {
   const tables = [
     "friendships",
     "mutes",
@@ -711,4 +706,6 @@ exports.down = async (knex: Knex) => {
   for (const table of tables) {
     await knex.schema.raw(`drop table if exists "${table}" cascade`);
   }
-};
+}
+
+export { up, down };

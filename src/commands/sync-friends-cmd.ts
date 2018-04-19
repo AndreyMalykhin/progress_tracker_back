@@ -1,4 +1,5 @@
 import Knex from "knex";
+import { IFriendship } from "models/friendship";
 import Facebook from "services/facebook";
 import UserFetcher from "services/user-fetcher";
 import DbTable from "utils/db-table";
@@ -47,7 +48,7 @@ async function removeFriend(srcId: ID, targetId: ID, db: Knex) {
 }
 
 async function addFriend(srcId: ID, targetId: ID, db: Knex) {
-  await db(DbTable.Friendships).insert({ srcId, targetId });
+  await db(DbTable.Friendships).insert({ srcId, targetId } as IFriendship);
 }
 
 async function getRemoteFriendIds(
