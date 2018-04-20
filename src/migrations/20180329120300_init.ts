@@ -317,34 +317,38 @@ async function createIcons(knex: Knex) {
 }
 
 function createUsers(knex: Knex) {
-  return knex.schema.createTable("users", table => {
-    table.increments("id").unsigned();
-    table.string("name", 128).notNullable();
-    table
-      .specificType("creationDate", "timestamp(3) with time zone")
-      .notNullable()
-      .defaultTo(knex.fn.now());
-    table
-      .string("facebookId")
-      .notNullable()
-      .unique();
-    table.text("facebookAccessToken").notNullable();
-    table
-      .integer("avatarId")
-      .notNullable()
-      .unsigned()
-      .references("id")
-      .inTable("avatars");
-    table
-      .integer("rating")
-      .notNullable()
-      .unsigned()
-      .defaultTo(0);
-    table
-      .integer("rewardableReviewsLeft")
-      .notNullable()
-      .unsigned();
-  });
+  return knex.schema
+    .createTable("users", table => {
+      table.increments("id").unsigned();
+      table.string("name", 128).notNullable();
+      table
+        .specificType("creationDate", "timestamp(3) with time zone")
+        .notNullable()
+        .defaultTo(knex.fn.now());
+      table
+        .string("facebookId")
+        .notNullable()
+        .unique();
+      table.text("facebookAccessToken").notNullable();
+      table
+        .integer("avatarId")
+        .notNullable()
+        .unsigned()
+        .references("id")
+        .inTable("avatars");
+      table
+        .integer("rating")
+        .notNullable()
+        .unsigned()
+        .defaultTo(0);
+      table
+        .integer("rewardableReviewsLeft")
+        .notNullable()
+        .unsigned();
+    })
+    .raw(
+      'create index "users_rating_index" on "users" ("rating" desc) where "rating" > 0'
+    );
 }
 
 async function createTrackables(knex: Knex) {
