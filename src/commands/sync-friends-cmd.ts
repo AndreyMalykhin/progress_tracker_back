@@ -1,5 +1,6 @@
 import Knex from "knex";
 import { IFriendship } from "models/friendship";
+import { IUser } from "models/user";
 import Facebook from "services/facebook";
 import UserFetcher from "services/user-fetcher";
 import DbTable from "utils/db-table";
@@ -43,8 +44,7 @@ function makeSyncFriendsCmd(
 async function removeFriend(srcId: ID, targetId: ID, db: Knex) {
   await db(DbTable.Friendships)
     .where({ srcId, targetId })
-    .delete()
-    .limit(1);
+    .delete();
 }
 
 async function addFriend(srcId: ID, targetId: ID, db: Knex) {
@@ -78,10 +78,22 @@ async function getRemoteFriendIds(
 
 async function getLocalFriendIds(userId: ID, userFetcher: UserFetcher) {
   const localFriendIds: { [facebookId: string]: ID } = {};
+  let friends: IUser[];
+  let pageOffset = 0;
+  const pageSize = 32;
 
-  for (const friend of await userFetcher.getFriends(userId)) {
-    localFriendIds[friend.facebookId!] = friend.id;
-  }
+  do {
+    friends = await userFetcher.getFriendsUnordered(
+      userId,
+      pageOffset,
+      pageSize
+    );
+    pageOffset += pageSize;
+
+    for (const friend of friends) {
+      localFriendIds[friend.facebookId!] = friend.id;
+    }
+  } while (friends.length);
 
   return localFriendIds;
 }

@@ -1,20 +1,22 @@
 function makeConnection<TItem, TCursor = string | number>(
-  list: TItem[],
+  items: TItem[],
   getCursor: (item: TItem) => TCursor,
-  getNextPage: (endCursor: TCursor) => Promise<TItem[]>
+  itemsPerPage: number
 ) {
-  const endCursor = list.length ? getCursor(list[list.length - 1]) : null;
+  const pageItems =
+    items.length > itemsPerPage ? items.slice(0, itemsPerPage) : items;
   return {
-    edges: list.map(item => {
+    edges: pageItems.map(item => {
       return {
         cursor: getCursor(item),
         node: item
       };
     }),
     pageInfo: {
-      endCursor,
-      hasNextPage: async () =>
-        endCursor ? (await getNextPage(endCursor)).length > 0 : false
+      endCursor: pageItems.length
+        ? getCursor(pageItems[pageItems.length - 1])
+        : null,
+      hasNextPage: items.length > itemsPerPage
     }
   };
 }

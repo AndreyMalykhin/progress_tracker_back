@@ -17,23 +17,17 @@ async function getActivitiesResolver(
 ) {
   const { activityFetcher } = context.diContainer;
   const viewerId = context.session!.userId;
+  const limit = 16;
   const activities = await activityFetcher.getByAudience(
     args.audience,
     viewerId,
-    strToDateCursor(args.after)
+    strToDateCursor(args.after),
+    limit + 1
   );
   return makeConnection(
     activities,
     activity => cursorToStr({ value: activity.date, id: activity.id }),
-    endCursor => {
-      const limit = 1;
-      return activityFetcher.getByAudience(
-        args.audience,
-        viewerId,
-        strToDateCursor(endCursor),
-        limit
-      );
-    }
+    limit
   );
 }
 

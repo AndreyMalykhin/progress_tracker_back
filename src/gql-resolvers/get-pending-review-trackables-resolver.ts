@@ -17,24 +17,18 @@ async function getPendingReviewTrackablesResolver(
 ) {
   const { trackableFetcher } = context.diContainer;
   const viewerId = context.session && context.session.userId;
+  const limit = 8;
   const trackables = await trackableFetcher.getPendingReview(
     args.audience,
     strToDateCursor(args.after),
-    viewerId
+    viewerId,
+    limit + 1
   );
   return makeConnection(
     trackables,
     trackable =>
       cursorToStr({ value: trackable.statusChangeDate!, id: trackable.id }),
-    endCursor => {
-      const limit = 1;
-      return trackableFetcher.getPendingReview(
-        args.audience,
-        strToDateCursor(endCursor),
-        viewerId,
-        limit
-      );
-    }
+    limit
   );
 }
 

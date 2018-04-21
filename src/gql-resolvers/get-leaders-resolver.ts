@@ -18,23 +18,17 @@ async function getLeadersResolver(
 ) {
   const { userFetcher } = context.diContainer;
   const viewerId = context.session && context.session.userId;
+  const limit = 16;
   const users = await userFetcher.getLeaders(
     args.audience,
     viewerId,
-    strToNumberCursor(args.after)
+    strToNumberCursor(args.after),
+    limit + 1
   );
   return makeConnection(
     users,
     user => cursorToStr({ value: user.rating, id: user.id }),
-    endCursor => {
-      const limit = 1;
-      return userFetcher.getLeaders(
-        args.audience,
-        viewerId,
-        strToNumberCursor(endCursor),
-        limit
-      );
-    }
+    limit
   );
 }
 

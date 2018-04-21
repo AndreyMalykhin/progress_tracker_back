@@ -24,26 +24,19 @@ async function getArchivedTrackablesResolver(
   const { trackableFetcher } = context.diContainer;
   const viewerId = context.session && context.session.userId;
   const ownerId = args.userId || viewerId;
+  const limit = 8;
   const trackables = await trackableFetcher.getArchived(
     ownerId!,
     args.status,
     strToDateCursor(args.after),
-    viewerId
+    viewerId,
+    limit + 1
   );
   return makeConnection(
     trackables,
     trackable =>
       cursorToStr({ value: trackable.statusChangeDate!, id: trackable.id }),
-    endCursor => {
-      const limit = 1;
-      return trackableFetcher.getArchived(
-        ownerId!,
-        args.status,
-        strToDateCursor(endCursor),
-        viewerId,
-        limit
-      );
-    }
+    limit
   );
 }
 

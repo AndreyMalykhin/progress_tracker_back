@@ -43,7 +43,7 @@ class TrackableFetcher {
     audience: Audience,
     afterCursor?: IDbCursor<Date>,
     viewerId?: ID,
-    limit = 4
+    limit = 8
   ): Promise<ITrackable[]> {
     const query = this.db(DbTable.Trackables + " as t")
       .select("t.*")

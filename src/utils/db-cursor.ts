@@ -13,7 +13,14 @@ function strToCursor<T>(
     return undefined;
   }
 
-  const [value, id] = str.split("_");
+  const separatorIndex = str.lastIndexOf("_");
+
+  if (separatorIndex === -1) {
+    return undefined;
+  }
+
+  const value = str.substring(0, separatorIndex);
+  const id = str.substring(separatorIndex + 1);
   return makeCursor(value, id);
 }
 
@@ -31,9 +38,23 @@ function strToNumberCursor(
   });
 }
 
+function strToStringCursor(
+  str: string | undefined
+): IDbCursor<string> | undefined {
+  return strToCursor(str, (value, id) => {
+    return { value, id };
+  });
+}
+
 function cursorToStr<T>(cursor: IDbCursor<T>) {
   const { value } = cursor;
   return `${value instanceof Date ? value.getTime() : value}_${cursor.id}`;
 }
 
-export { IDbCursor, cursorToStr, strToDateCursor, strToNumberCursor };
+export {
+  IDbCursor,
+  cursorToStr,
+  strToDateCursor,
+  strToNumberCursor,
+  strToStringCursor
+};

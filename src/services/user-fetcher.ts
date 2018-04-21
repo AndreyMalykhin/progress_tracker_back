@@ -30,13 +30,45 @@ class UserFetcher {
     return await this.db(DbTable.Users).whereIn("id", ids.map(safeId));
   }
 
-  public async getFriends(userId: ID): Promise<IUser[]> {
+  public async getFriends(
+    userId: ID,
+    afterCursor?: IDbCursor<string>,
+    limit = 16
+  ): Promise<IUser[]> {
+    const query = this.db(DbTable.Users + " as u")
+      .select("u.*")
+      .innerJoin(DbTable.Friendships + " as f", {
+        "f.srcId": safeId(userId),
+        "f.targetId": "u.id"
+      })
+      .orderByRaw("row(??, ??) asc", ["u.name", "u.id"])
+      .limit(limit);
+
+    if (afterCursor) {
+      query.whereRaw("row(??, ??) > row(?, ?)::varchar_cursor", [
+        "u.name",
+        "u.id",
+        afterCursor.value,
+        afterCursor.id
+      ]);
+    }
+
+    return await query;
+  }
+
+  public async getFriendsUnordered(
+    userId: ID,
+    offset = 0,
+    limit = 16
+  ): Promise<IUser[]> {
     return await this.db(DbTable.Users + " as u")
       .select("u.*")
       .innerJoin(DbTable.Friendships + " as f", {
         "f.srcId": safeId(userId),
         "f.targetId": "u.id"
-      });
+      })
+      .offset(offset)
+      .limit(limit);
   }
 
   public async getLeaders(

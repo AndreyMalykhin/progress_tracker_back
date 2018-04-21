@@ -18,19 +18,14 @@ async function getActiveTrackablesResolver(
   const { trackableFetcher } = context.diContainer;
   const viewerId = context.session && context.session.userId;
   const ownerId = args.userId || viewerId;
+  const limit = 8;
   const trackables = await trackableFetcher.getActive(
     ownerId!,
     args.after,
-    viewerId
+    viewerId,
+    limit + 1
   );
-  return makeConnection(
-    trackables,
-    trackable => trackable.order,
-    endCursor => {
-      const limit = 1;
-      return trackableFetcher.getActive(ownerId!, endCursor, viewerId, limit);
-    }
-  );
+  return makeConnection(trackables, trackable => trackable.order, limit);
 }
 
 export default combineResolvers(

@@ -350,6 +350,10 @@ function createUsers(knex: Knex) {
       `create index "users_rating_cursor_index"
       on "users" ((row("rating", "id")::integer_cursor) desc)
       where "rating" > 0`
+    )
+    .raw(
+      `create index "users_name_cursor_index"
+      on "users" ((row("name", "id")::varchar_cursor) asc)`
     );
 }
 
@@ -682,6 +686,12 @@ async function createTypes(knex: Knex) {
         "value" integer,
         "id" integer
       )`
+    )
+    .raw(
+      `create type "varchar_cursor" as (
+        "value" varchar,
+        "id" integer
+      )`
     );
 }
 
@@ -736,7 +746,7 @@ async function down(knex: Knex) {
     await knex.schema.raw(`drop table if exists "${table}" cascade`);
   }
 
-  const types = ["timestamp_cursor", "integer_cursor"];
+  const types = ["timestamp_cursor", "integer_cursor", "varchar_cursor"];
 
   for (const type of types) {
     await knex.schema.raw(`drop type if exists "${type}"`);
