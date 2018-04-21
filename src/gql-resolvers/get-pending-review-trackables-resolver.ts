@@ -1,12 +1,13 @@
 import { combineResolvers } from "graphql-resolvers";
 import Audience from "models/audience";
 import { makeConnection } from "utils/connection";
+import { cursorToStr, strToDateCursor } from "utils/db-cursor";
 import IGqlContext from "utils/gql-context";
 import { makeCheckAuthResolver } from "utils/gql-resolver-utils";
 
 interface IArgs {
   audience: Audience;
-  after?: number;
+  after?: string;
 }
 
 async function getPendingReviewTrackablesResolver(
@@ -18,17 +19,18 @@ async function getPendingReviewTrackablesResolver(
   const viewerId = context.session && context.session.userId;
   const trackables = await trackableFetcher.getPendingReview(
     args.audience,
-    args.after ? new Date(args.after) : undefined,
+    strToDateCursor(args.after),
     viewerId
   );
   return makeConnection(
     trackables,
-    trackable => trackable.statusChangeDate,
+    trackable =>
+      cursorToStr({ value: trackable.statusChangeDate!, id: trackable.id }),
     endCursor => {
       const limit = 1;
       return trackableFetcher.getPendingReview(
         args.audience,
-        endCursor,
+        strToDateCursor(endCursor),
         viewerId,
         limit
       );

@@ -1,5 +1,5 @@
 type UserEdge {
-  cursor: Float!
+  cursor: ID!
   node: User!
 }
 

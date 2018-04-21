@@ -4,6 +4,7 @@ import { IMute } from "models/mute";
 import { IUser } from "models/user";
 import { IUserReport } from "models/user-report";
 import { IFacebookUser } from "services/facebook";
+import { IDbCursor } from "utils/db-cursor";
 import DbTable from "utils/db-table";
 import ID from "utils/id";
 import safeId from "utils/safe-id";
@@ -41,21 +42,23 @@ class UserFetcher {
   public async getLeaders(
     audience: Audience.Global | Audience.Friends,
     viewerId?: ID,
-    offset = 0,
+    afterCursor?: IDbCursor<number>,
     limit = 16
-  ): Promise<Array<IUser & { index: number }>> {
+  ): Promise<IUser[]> {
     const query = this.db(DbTable.Users + " as u")
-      .select(
-        "u.*",
-        this.db.raw("row_number() over(order by ?? desc) as ??", [
-          "u.rating",
-          "index"
-        ])
-      )
-      .orderBy("u.rating", "desc")
+      .select("u.*")
+      .orderByRaw(this.db.raw("row(??, ??) desc", ["u.rating", "u.id"]))
       .where("u.rating", ">", 0)
-      .offset(offset)
       .limit(limit);
+
+    if (afterCursor) {
+      query.andWhereRaw("row(??, ??) < row(?, ?)::integer_cursor", [
+        "u.rating",
+        "u.id",
+        afterCursor.value,
+        afterCursor.id
+      ]);
+    }
 
     switch (audience) {
       case Audience.Friends:

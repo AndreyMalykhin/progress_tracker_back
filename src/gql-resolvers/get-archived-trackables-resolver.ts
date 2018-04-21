@@ -2,6 +2,7 @@ import { combineResolvers } from "graphql-resolvers";
 import { TrackableStatus } from "models/trackable-status";
 import TrackableFetcher from "services/trackable-fetcher";
 import { makeConnection } from "utils/connection";
+import { cursorToStr, strToDateCursor } from "utils/db-cursor";
 import IGqlContext from "utils/gql-context";
 import { makeCheckAuthResolver } from "utils/gql-resolver-utils";
 import ID from "utils/id";
@@ -12,7 +13,7 @@ interface IArgs {
     | TrackableStatus.Rejected
     | TrackableStatus.Expired;
   userId?: ID;
-  after?: number;
+  after?: string;
 }
 
 async function getArchivedTrackablesResolver(
@@ -26,18 +27,19 @@ async function getArchivedTrackablesResolver(
   const trackables = await trackableFetcher.getArchived(
     ownerId!,
     args.status,
-    args.after ? new Date(args.after) : undefined,
+    strToDateCursor(args.after),
     viewerId
   );
   return makeConnection(
     trackables,
-    trackable => trackable.statusChangeDate,
+    trackable =>
+      cursorToStr({ value: trackable.statusChangeDate!, id: trackable.id }),
     endCursor => {
       const limit = 1;
       return trackableFetcher.getArchived(
         ownerId!,
         args.status,
-        endCursor,
+        strToDateCursor(endCursor),
         viewerId,
         limit
       );

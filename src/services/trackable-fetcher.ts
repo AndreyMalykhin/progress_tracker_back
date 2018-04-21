@@ -18,6 +18,7 @@ import {
   validateRange
 } from "utils/common-validators";
 import ConstraintViolationError from "utils/constraint-violation-error";
+import { IDbCursor } from "utils/db-cursor";
 import DbTable from "utils/db-table";
 import ID from "utils/id";
 import isIdEqual from "utils/is-id-equal";
@@ -40,14 +41,14 @@ class TrackableFetcher {
 
   public async getPendingReview(
     audience: Audience,
-    afterStatusChangeDate?: Date,
+    afterCursor?: IDbCursor<Date>,
     viewerId?: ID,
     limit = 4
   ): Promise<ITrackable[]> {
     const query = this.db(DbTable.Trackables + " as t")
       .select("t.*")
       .where("t.statusId", TrackableStatus.PendingReview)
-      .orderBy("t.statusChangeDate", "asc")
+      .orderByRaw("row(??, ??) asc", ["t.statusChangeDate", "id"])
       .limit(limit);
 
     switch (audience) {
@@ -74,8 +75,13 @@ class TrackableFetcher {
         return [];
     }
 
-    if (afterStatusChangeDate) {
-      query.andWhere("t.statusChangeDate", ">", afterStatusChangeDate);
+    if (afterCursor) {
+      query.andWhereRaw("row(??, ??) > row(?, ?)::timestamp_cursor", [
+        "t.statusChangeDate",
+        "t.id",
+        afterCursor.value,
+        afterCursor.id
+      ]);
     }
 
     return await query;
@@ -167,7 +173,7 @@ class TrackableFetcher {
       | TrackableStatus.Approved
       | TrackableStatus.Expired
       | TrackableStatus.Rejected,
-    afterStatusChangeDate?: Date,
+    afterCursor?: IDbCursor<Date>,
     viewerId?: ID,
     limit = 8
   ): Promise<ITrackable[]> {
@@ -182,11 +188,16 @@ class TrackableFetcher {
     const query = this.db(DbTable.Trackables)
       .where("statusId", statusId)
       .andWhere("userId", safeId(ownerId))
-      .orderBy("statusChangeDate", "desc")
+      .orderByRaw("row(??, ??) desc", ["statusChangeDate", "id"])
       .limit(limit);
 
-    if (afterStatusChangeDate) {
-      query.andWhere("statusChangeDate", "<", afterStatusChangeDate);
+    if (afterCursor) {
+      query.andWhereRaw("row(??, ??) < row(?, ?)::timestamp_cursor", [
+        "statusChangeDate",
+        "id",
+        afterCursor.value,
+        afterCursor.id
+      ]);
     }
 
     if (!viewerId || !isIdEqual(viewerId, ownerId)) {

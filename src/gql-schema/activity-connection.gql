@@ -1,5 +1,5 @@
 type ActivityEdge {
-  cursor: Float!
+  cursor: ID!
   node: IActivity!
 }
 

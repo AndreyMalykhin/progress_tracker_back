@@ -347,79 +347,83 @@ function createUsers(knex: Knex) {
         .unsigned();
     })
     .raw(
-      'create index "users_rating_index" on "users" ("rating" desc) where "rating" > 0'
+      `create index "users_rating_cursor_index"
+      on "users" ((row("rating", "id")::integer_cursor) desc)
+      where "rating" > 0`
     );
 }
 
 async function createTrackables(knex: Knex) {
-  return knex.schema.createTable("trackables", table => {
-    table.increments("id").unsigned();
-    table.uuid("clientId");
-    table
-      .integer("typeId")
-      .unsigned()
-      .notNullable()
-      .references("id")
-      .inTable("trackableTypes");
-    table.string("title").notNullable();
-    table
-      .specificType("order", "double precision")
-      .notNullable()
-      .index();
-    table
-      .integer("statusId")
-      .unsigned()
-      .notNullable()
-      .references("id")
-      .inTable("trackableStatuses")
-      .index();
-    table.boolean("isPublic").notNullable();
-    table
-      .specificType("statusChangeDate", "timestamp(3) with time zone")
-      .index();
-    table.specificType("achievementDate", "timestamp(3) with time zone");
-    table.specificType("deadlineDate", "timestamp(3) with time zone");
-    table
-      .specificType("creationDate", "timestamp(3) with time zone")
-      .notNullable()
-      .defaultTo(knex.fn.now());
-    table
-      .integer("userId")
-      .notNullable()
-      .unsigned()
-      .references("id")
-      .inTable("users")
-      .onDelete("cascade");
-    table
-      .integer("parentId")
-      .unsigned()
-      .references("id")
-      .inTable("trackables")
-      .index();
-    table
-      .integer("iconId")
-      .unsigned()
-      .references("id")
-      .inTable("icons");
-    table.specificType("progress", "double precision");
-    table.specificType("maxProgress", "double precision");
-    table
-      .integer("progressDisplayModeId")
-      .unsigned()
-      .references("id")
-      .inTable("progressDisplayModes");
-    table.integer("difficulty").unsigned();
-    table.integer("estimatedDifficulty").unsigned();
-    table
-      .integer("proofPhotoId")
-      .unsigned()
-      .references("id")
-      .inTable("assets");
-    table.integer("rating").unsigned();
-    table.integer("approveCount").unsigned();
-    table.integer("rejectCount").unsigned();
-    table.unique(["userId", "clientId"]);
-  });
+  return knex.schema
+    .createTable("trackables", table => {
+      table.increments("id").unsigned();
+      table.uuid("clientId");
+      table
+        .integer("typeId")
+        .unsigned()
+        .notNullable()
+        .references("id")
+        .inTable("trackableTypes");
+      table.string("title").notNullable();
+      table.specificType("order", "double precision").notNullable();
+      table
+        .integer("statusId")
+        .unsigned()
+        .notNullable()
+        .references("id")
+        .inTable("trackableStatuses")
+        .index();
+      table.boolean("isPublic").notNullable();
+      table.specificType("statusChangeDate", "timestamp(3) with time zone");
+      table.specificType("achievementDate", "timestamp(3) with time zone");
+      table.specificType("deadlineDate", "timestamp(3) with time zone");
+      table
+        .specificType("creationDate", "timestamp(3) with time zone")
+        .notNullable()
+        .defaultTo(knex.fn.now());
+      table
+        .integer("userId")
+        .notNullable()
+        .unsigned()
+        .references("id")
+        .inTable("users")
+        .onDelete("cascade");
+      table
+        .integer("parentId")
+        .unsigned()
+        .references("id")
+        .inTable("trackables")
+        .index();
+      table
+        .integer("iconId")
+        .unsigned()
+        .references("id")
+        .inTable("icons");
+      table.specificType("progress", "double precision");
+      table.specificType("maxProgress", "double precision");
+      table
+        .integer("progressDisplayModeId")
+        .unsigned()
+        .references("id")
+        .inTable("progressDisplayModes");
+      table.integer("difficulty").unsigned();
+      table.integer("estimatedDifficulty").unsigned();
+      table
+        .integer("proofPhotoId")
+        .unsigned()
+        .references("id")
+        .inTable("assets");
+      table.integer("rating").unsigned();
+      table.integer("approveCount").unsigned();
+      table.integer("rejectCount").unsigned();
+      table.unique(["userId", "clientId"]);
+      table.unique(["userId", "order"]);
+    })
+    .raw(
+      `create index "trackables_status_change_date_cursor_index"
+      on "trackables" ((row("statusChangeDate", "id")::timestamp_cursor))
+      where "statusChangeDate" is not null`
+    );
 }
 
 function createTasks(knex: Knex) {
@@ -482,52 +486,56 @@ function createGymExerciseEntries(knex: Knex) {
 }
 
 function createActivities(knex: Knex) {
-  return knex.schema.createTable("activities", table => {
-    table.increments("id").unsigned();
-    table
-      .integer("typeId")
-      .unsigned()
-      .notNullable()
-      .references("id")
-      .inTable("activityTypes");
-    table
-      .specificType("date", "timestamp(3) with time zone")
-      .notNullable()
-      .defaultTo(knex.fn.now());
-    table
-      .integer("userId")
-      .unsigned()
-      .notNullable()
-      .references("id")
-      .inTable("users")
-      .onDelete("cascade");
-    table
-      .integer("trackableId")
-      .unsigned()
-      .references("id")
-      .inTable("trackables")
-      .onDelete("cascade");
-    table
-      .integer("reviewStatusId")
-      .references("id")
-      .inTable("reviewStatuses");
-    table.integer("ratingDelta");
-    table.specificType("progressDelta", "double precision");
-    table
-      .integer("gymExerciseEntryId")
-      .unsigned()
-      .references("id")
-      .inTable("gymExerciseEntries")
-      .onDelete("cascade");
-    table
-      .integer("taskId")
-      .unsigned()
-      .references("id")
-      .inTable("tasks")
-      .onDelete("cascade");
-    table.boolean("isPublic").notNullable();
-    table.index(["userId", "date"]);
-  });
+  return knex.schema
+    .createTable("activities", table => {
+      table.increments("id").unsigned();
+      table
+        .integer("typeId")
+        .unsigned()
+        .notNullable()
+        .references("id")
+        .inTable("activityTypes");
+      table
+        .specificType("date", "timestamp(3) with time zone")
+        .notNullable()
+        .defaultTo(knex.fn.now());
+      table
+        .integer("userId")
+        .unsigned()
+        .notNullable()
+        .references("id")
+        .inTable("users")
+        .onDelete("cascade");
+      table
+        .integer("trackableId")
+        .unsigned()
+        .references("id")
+        .inTable("trackables")
+        .onDelete("cascade");
+      table
+        .integer("reviewStatusId")
+        .references("id")
+        .inTable("reviewStatuses");
+      table.integer("ratingDelta");
+      table.specificType("progressDelta", "double precision");
+      table
+        .integer("gymExerciseEntryId")
+        .unsigned()
+        .references("id")
+        .inTable("gymExerciseEntries")
+        .onDelete("cascade");
+      table
+        .integer("taskId")
+        .unsigned()
+        .references("id")
+        .inTable("tasks")
+        .onDelete("cascade");
+      table.boolean("isPublic").notNullable();
+    })
+    .raw(
+      `create index "activities_user_id_date_cursor_index"
+      on "activities" ("userId", (row("date", "id")::timestamp_cursor) desc)`
+    );
 }
 
 async function createReviews(knex: Knex) {
@@ -661,7 +669,24 @@ async function createForeignKeys(knex: Knex) {
   });
 }
 
+async function createTypes(knex: Knex) {
+  return knex.schema
+    .raw(
+      `create type "timestamp_cursor" as (
+        "value" timestamp(3) with time zone,
+        "id" integer
+      )`
+    )
+    .raw(
+      `create type "integer_cursor" as (
+        "value" integer,
+        "id" integer
+      )`
+    );
+}
+
 async function up(knex: Knex) {
+  await createTypes(knex);
   await createReviewStatuses(knex);
   await createRejectReasons(knex);
   await createReportReasons(knex);
@@ -709,6 +734,12 @@ async function down(knex: Knex) {
 
   for (const table of tables) {
     await knex.schema.raw(`drop table if exists "${table}" cascade`);
+  }
+
+  const types = ["timestamp_cursor", "integer_cursor"];
+
+  for (const type of types) {
+    await knex.schema.raw(`drop type if exists "${type}"`);
   }
 }
 

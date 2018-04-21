@@ -2,12 +2,13 @@ import { combineResolvers } from "graphql-resolvers";
 import Audience from "models/audience";
 import UserFetcher from "services/user-fetcher";
 import { makeConnection } from "utils/connection";
+import { cursorToStr, IDbCursor, strToNumberCursor } from "utils/db-cursor";
 import IGqlContext from "utils/gql-context";
 import { makeCheckAuthResolver } from "utils/gql-resolver-utils";
 
 interface IArgs {
   audience: Audience.Friends | Audience.Global;
-  after?: number;
+  after?: string;
 }
 
 async function getLeadersResolver(
@@ -20,14 +21,19 @@ async function getLeadersResolver(
   const users = await userFetcher.getLeaders(
     args.audience,
     viewerId,
-    args.after
+    strToNumberCursor(args.after)
   );
   return makeConnection(
     users,
-    user => user.index,
+    user => cursorToStr({ value: user.rating, id: user.id }),
     endCursor => {
       const limit = 1;
-      return userFetcher.getLeaders(args.audience, viewerId, endCursor, limit);
+      return userFetcher.getLeaders(
+        args.audience,
+        viewerId,
+        strToNumberCursor(endCursor),
+        limit
+      );
     }
   );
 }

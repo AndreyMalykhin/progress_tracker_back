@@ -1,4 +1,4 @@
-function makeConnection<TItem, TCursor>(
+function makeConnection<TItem, TCursor = string | number>(
   list: TItem[],
   getCursor: (item: TItem) => TCursor,
   getNextPage: (endCursor: TCursor) => Promise<TItem[]>

@@ -1,5 +1,5 @@
 type TrackableEdge {
-  cursor: Float!
+  cursor: ID!
   node: ITrackable!
 }
 

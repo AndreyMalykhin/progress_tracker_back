@@ -2,6 +2,6 @@ extend type Query {
   getArchivedTrackables(
     status: TrackableStatus!
     userId: ID
-    after: Float
+    after: ID
   ): TrackableConnection!
 }

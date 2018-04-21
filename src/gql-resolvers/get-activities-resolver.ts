@@ -1,12 +1,13 @@
 import { combineResolvers } from "graphql-resolvers";
 import Audience from "models/audience";
 import { makeConnection } from "utils/connection";
+import { cursorToStr, strToDateCursor } from "utils/db-cursor";
 import IGqlContext from "utils/gql-context";
 import { makeCheckAuthResolver } from "utils/gql-resolver-utils";
 
 interface IArgs {
   audience: Audience.Me | Audience.Friends;
-  after?: number;
+  after?: string;
 }
 
 async function getActivitiesResolver(
@@ -19,17 +20,17 @@ async function getActivitiesResolver(
   const activities = await activityFetcher.getByAudience(
     args.audience,
     viewerId,
-    args.after ? new Date(args.after) : undefined
+    strToDateCursor(args.after)
   );
   return makeConnection(
     activities,
-    activity => activity.date,
+    activity => cursorToStr({ value: activity.date, id: activity.id }),
     endCursor => {
       const limit = 1;
       return activityFetcher.getByAudience(
         args.audience,
         viewerId,
-        endCursor,
+        strToDateCursor(endCursor),
         limit
       );
     }
