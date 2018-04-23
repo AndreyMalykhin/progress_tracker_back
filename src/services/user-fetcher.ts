@@ -3,7 +3,6 @@ import Audience from "models/audience";
 import { IMute } from "models/mute";
 import { IUser } from "models/user";
 import { IUserReport } from "models/user-report";
-import { IFacebookUser } from "services/facebook";
 import { IDbCursor } from "utils/db-cursor";
 import DbTable from "utils/db-table";
 import ID from "utils/id";
@@ -14,6 +13,12 @@ class UserFetcher {
 
   public constructor(db: Knex) {
     this.db = db;
+  }
+
+  public async getUnordered(offset = 0, limit = 16): Promise<IUser[]> {
+    return await this.db(DbTable.Users)
+      .offset(offset)
+      .limit(16);
   }
 
   public async get(

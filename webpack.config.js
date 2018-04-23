@@ -32,9 +32,12 @@ const baseConfig = {
 
 const appConfig = {
   ...baseConfig,
-  entry: { app: path.resolve(__dirname, "src", "index.ts") },
+  entry: {
+    app: path.resolve(__dirname, "src", "index.ts"),
+    "task-runner": path.resolve(__dirname, "src", "tasks", "task-runner.ts")
+  },
   output: {
-    filename: "app.js",
+    filename: "[name].js",
     path: path.resolve(__dirname, "build")
   }
 };
