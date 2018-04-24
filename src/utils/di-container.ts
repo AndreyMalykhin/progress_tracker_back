@@ -59,6 +59,10 @@ import {
   makeEditTaskGoalCmd
 } from "commands/edit-task-goal-cmd";
 import { IEditUserCmd, makeEditUserCmd } from "commands/edit-user-cmd";
+import {
+  IEvaluateTrackableCmd,
+  makeEvaluateTrackableCmd
+} from "commands/evaluate-trackable-cmd";
 import { ILoginCmd, makeLoginCmd } from "commands/login-cmd";
 import {
   IProveTrackableCmd,
@@ -308,6 +312,10 @@ class DIContainer {
   public get activityFetcher(): ActivityFetcher {
     return this.impl.activityFetcher;
   }
+
+  public get evaluateTrackableCmd(): IEvaluateTrackableCmd {
+    return this.impl.evaluateTrackableCmd;
+  }
 }
 
 function makeDIContainer() {
@@ -492,6 +500,11 @@ function makeDIContainer() {
   );
   di.serviceFactory("uploadAvatarCmd", makeUploadAvatarCmd, "db", "envConfig");
   di.serviceFactory("editTaskCmd", makeEditTaskCmd, "db", "taskFetcher");
+  di.serviceFactory(
+    "evaluateTrackableCmd",
+    makeEvaluateTrackableCmd,
+    "reviewFetcher"
+  );
   di.service("fetcher", makeFetcher);
   di.service("avatarFetcher", AvatarFetcher, "db");
   di.service("reviewFetcher", ReviewFetcher, "db");

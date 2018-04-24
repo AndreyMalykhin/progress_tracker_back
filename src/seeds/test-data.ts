@@ -36,7 +36,6 @@ import { TrackableStatus } from "models/trackable-status";
 import { bonusRatingForReview, IUser } from "models/user";
 import { IUserReport } from "models/user-report";
 import DbTable from "utils/db-table";
-import { newPendingReviewTrackables } from "utils/fake-data";
 import ID from "utils/id";
 
 async function seed(db: Knex) {

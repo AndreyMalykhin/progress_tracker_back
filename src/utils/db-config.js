@@ -8,7 +8,7 @@ const dbConfig = {
   development: {
     client: "pg",
     connection: {},
-    debug: true,
+    debug: false,
     migrations,
     seeds,
     useNullAsDefault: true

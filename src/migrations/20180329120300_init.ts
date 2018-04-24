@@ -411,7 +411,7 @@ async function createTrackables(knex: Knex) {
         .references("id")
         .inTable("progressDisplayModes");
       table.integer("difficulty").unsigned();
-      table.integer("estimatedDifficulty").unsigned();
+      table.specificType("estimatedDifficulty", "double precision");
       table
         .integer("proofPhotoId")
         .unsigned()

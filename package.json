@@ -41,7 +41,7 @@
       "env-cmd ./.env.local knex --knexfile=build/db-config.js seed:run",
     "start": "env-cmd ./.env.local nodemon --inspect build/app.js",
     "dev": "env-cmd ./.env.local webpack --watch --display-modules",
-    "task": "env-cmd ./.env.local node --inspect build/task-runner.js",
+    "task": "env-cmd ./.env.local node build/task-runner.js",
     "precommit": "lint-staged"
   },
   "lint-staged": {

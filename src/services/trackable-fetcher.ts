@@ -2,6 +2,7 @@ import Knex from "knex";
 import { IAggregateChildren } from "models/aggregate";
 import Audience from "models/audience";
 import Difficulty from "models/difficulty";
+import { IGoal } from "models/goal";
 import { INumericalGoal } from "models/numerical-goal";
 import ProgressDisplayMode from "models/progress-display-mode";
 import { IReview } from "models/review";
@@ -32,6 +33,8 @@ import {
   setError
 } from "utils/validation-result";
 
+const millisecondsInDay = 86400 * 1000;
+
 class TrackableFetcher {
   private db: Knex;
 
@@ -39,12 +42,28 @@ class TrackableFetcher {
     this.db = db;
   }
 
+  public async getNextForEvaluation(
+    transaction: Knex.Transaction
+  ): Promise<(ITrackable & IGoal) | undefined> {
+    return await this.db(DbTable.Trackables)
+      .transacting(transaction)
+      .forUpdate()
+      .where("statusId", TrackableStatus.PendingReview)
+      .andWhereRaw("?? + ?? >= ?", ["approveCount", "rejectCount", 8])
+      .andWhere(
+        "statusChangeDate",
+        ">",
+        new Date(Date.now() - millisecondsInDay)
+      )
+      .first();
+  }
+
   public async getPendingReview(
     audience: Audience,
     afterCursor?: IDbCursor<Date>,
     viewerId?: ID,
     limit = 8
-  ): Promise<ITrackable[]> {
+  ): Promise<Array<ITrackable & IGoal>> {
     const query = this.db(DbTable.Trackables + " as t")
       .select("t.*")
       .where("t.statusId", TrackableStatus.PendingReview)
