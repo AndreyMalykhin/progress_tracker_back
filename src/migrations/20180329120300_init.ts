@@ -427,6 +427,10 @@ async function createTrackables(knex: Knex) {
       `create index "trackables_status_change_date_cursor_index"
       on "trackables" ((row("statusChangeDate", "id")::timestamp_cursor))
       where "statusChangeDate" is not null`
+    )
+    .raw(
+      `create index "trackables_deadline_date_index"
+      on "trackables" ("deadlineDate") where "deadlineDate" is not null`
     );
 }
 

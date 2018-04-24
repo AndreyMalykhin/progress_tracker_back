@@ -16,7 +16,7 @@ function makeApp(diContainer: DIContainer) {
   app.use(makeGqlRouter(diContainer));
   app.use(makeAssetRouter(diContainer));
   app.use(makeAvatarRouter(diContainer));
-  app.use(makeErrorMiddleware());
+  app.use(makeErrorMiddleware(diContainer));
   return app;
 }
 

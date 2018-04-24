@@ -25,7 +25,6 @@ function makeEvaluateTrackableCmd(reviewFetcher: ReviewFetcher) {
   ) => {
     log.trace("evaluateTrackableCmd");
     let bonusRating: number | undefined;
-    const statusChangeDate = new Date();
     let statusId = TrackableStatus.Rejected;
     const estimatedDifficulty = await estimateDifficulty(
       trackable,
@@ -56,7 +55,6 @@ function makeEvaluateTrackableCmd(reviewFetcher: ReviewFetcher) {
         trackable.id,
         estimatedDifficulty,
         bonusRating,
-        statusChangeDate,
         statusId,
         transaction
       )
@@ -137,7 +135,6 @@ async function updateTrackable(
   id: ID,
   estimatedDifficulty: number,
   rating: number | undefined,
-  statusChangeDate: Date,
   statusId: TrackableStatus,
   transaction: Knex.Transaction
 ) {
@@ -145,7 +142,7 @@ async function updateTrackable(
     .update({
       estimatedDifficulty,
       rating,
-      statusChangeDate,
+      statusChangeDate: new Date(),
       statusId
     } as ITrackable & IGoal)
     .where("id", id);

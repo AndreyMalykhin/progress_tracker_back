@@ -33,7 +33,8 @@ function makeGqlRouter(diContainer: DIContainer) {
           session: res!.locals.session
         } as IGqlContext,
         debug: isDevEnv,
-        formatError: (error: any) => handleError(error, res!),
+        formatError: (error: any) =>
+          handleError(error, diContainer.envConfig, res!),
         schema,
         tracing: isDevEnv
       };

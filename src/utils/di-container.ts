@@ -63,6 +63,10 @@ import {
   IEvaluateTrackableCmd,
   makeEvaluateTrackableCmd
 } from "commands/evaluate-trackable-cmd";
+import {
+  IExpireTrackableCmd,
+  makeExpireTrackableCmd
+} from "commands/expire-trackable-cmd";
 import { ILoginCmd, makeLoginCmd } from "commands/login-cmd";
 import {
   IProveTrackableCmd,
@@ -316,6 +320,10 @@ class DIContainer {
   public get evaluateTrackableCmd(): IEvaluateTrackableCmd {
     return this.impl.evaluateTrackableCmd;
   }
+
+  public get expireTrackableCmd(): IExpireTrackableCmd {
+    return this.impl.expireTrackableCmd;
+  }
 }
 
 function makeDIContainer() {
@@ -504,6 +512,12 @@ function makeDIContainer() {
     "evaluateTrackableCmd",
     makeEvaluateTrackableCmd,
     "reviewFetcher"
+  );
+  di.serviceFactory(
+    "expireTrackableCmd",
+    makeExpireTrackableCmd,
+    "db",
+    "trackableFetcher"
   );
   di.service("fetcher", makeFetcher);
   di.service("avatarFetcher", AvatarFetcher, "db");

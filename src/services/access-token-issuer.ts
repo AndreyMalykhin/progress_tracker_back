@@ -11,7 +11,7 @@ class AccessTokenIssuer {
   }
 
   public sign(expirationDate: number, userId: ID) {
-    return new Promise((resolve, reject) => {
+    return new Promise<string>((resolve, reject) => {
       jwt.sign(
         {
           exp: expirationDate,
@@ -32,7 +32,7 @@ class AccessTokenIssuer {
   }
 
   public verify(token: string) {
-    return new Promise((resolve, reject) => {
+    return new Promise<ISession>((resolve, reject) => {
       jwt.verify(token, this.envConfig.secret, undefined, (error, payload) => {
         if (error) {
           reject(error);

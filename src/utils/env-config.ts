@@ -12,6 +12,9 @@ const config = {
   staticServerUrl: process.env.PT_STATIC_SERVER_URL!,
   trackablesEvaluationPeriod: Number(
     process.env.PT_TRACKABLES_EVALUATION_PERIOD!
+  ),
+  trackablesExpirationPeriod: Number(
+    process.env.PT_TRACKABLES_EXPIRATION_PERIOD!
   )
 };
 

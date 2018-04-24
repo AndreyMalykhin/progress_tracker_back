@@ -1,9 +1,10 @@
 import { ErrorRequestHandler } from "express";
+import DIContainer from "utils/di-container";
 import handleError from "utils/handle-error";
 
-function makeErrorMiddleware(): ErrorRequestHandler {
+function makeErrorMiddleware(diContainer: DIContainer): ErrorRequestHandler {
   return (e, req, res, next) => {
-    const errors = [handleError(e, res)];
+    const errors = [handleError(e, diContainer.envConfig, res)];
     res.json({ errors });
   };
 }

@@ -135,7 +135,18 @@ class FacebookError extends Error {
   }
 }
 
+function isAuthError(e: FacebookError) {
+  return e.response.error.code === 190;
+}
+
+function isPermissionError(e: FacebookError) {
+  const { code } = e.response.error;
+  return code >= 200 && code <= 299;
+}
+
 export {
+  isAuthError,
+  isPermissionError,
   FacebookError,
   IFacebookErrorResponse,
   IFacebookUser,

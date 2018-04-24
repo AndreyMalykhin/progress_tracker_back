@@ -1,6 +1,7 @@
 import { CommanderStatic } from "commander";
 import { IGoal } from "models/goal";
 import { ITrackable } from "models/trackable";
+import { makeTryRun } from "tasks/try-run";
 import DIContainer from "utils/di-container";
 import { makeLog } from "utils/log";
 
@@ -17,12 +18,13 @@ function registerEvaluateTrackablesTask(
 }
 
 async function run(diContainer: DIContainer) {
+  log.trace("run");
   const { evaluateTrackableCmd, trackableFetcher, db, envConfig } = diContainer;
   let trackable: (ITrackable & IGoal) | undefined;
-  let consecutiveErrorCount = 0;
+  const tryRun = makeTryRun(log);
 
   do {
-    try {
+    const shouldContinue = await tryRun(async () => {
       await db.transaction(async transaction => {
         trackable = await trackableFetcher.getNextForEvaluation(transaction);
 
@@ -30,15 +32,10 @@ async function run(diContainer: DIContainer) {
           return await evaluateTrackableCmd(trackable, transaction);
         }
       });
-      consecutiveErrorCount = 0;
-    } catch (e) {
-      log.error("run", e);
-      ++consecutiveErrorCount;
+    });
 
-      if (consecutiveErrorCount >= 8) {
-        log.error("run", "Too many consecutive errors");
-        break;
-      }
+    if (!shouldContinue) {
+      break;
     }
   } while (trackable);
 

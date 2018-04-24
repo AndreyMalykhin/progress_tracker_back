@@ -1,4 +1,10 @@
 import { CommanderStatic } from "commander";
+import {
+  FacebookError,
+  isAuthError,
+  isPermissionError
+} from "services/facebook";
+import { makeTryRun } from "tasks/try-run";
 import DIContainer from "utils/di-container";
 import { makeLog } from "utils/log";
 
@@ -18,13 +24,13 @@ async function run(diContainer: DIContainer) {
   log.trace("run");
   const promises: Array<Promise<void>> = [];
   const batchSize = 4;
-  const pageSize = 32;
+  const pageSize = 16;
   let fetchedUserCount = 0;
-  let consecutiveErrorCount = 0;
   let pageOffset = 0;
+  const tryRun = makeTryRun(log);
 
   do {
-    try {
+    const shouldContinue = await tryRun(async () => {
       const users = await diContainer.userFetcher.getUnordered(
         pageOffset,
         pageSize
@@ -38,18 +44,23 @@ async function run(diContainer: DIContainer) {
           promises.push(promise);
         }
 
-        await Promise.all(promises);
+        try {
+          await Promise.all(promises);
+        } catch (e) {
+          if (
+            e instanceof FacebookError &&
+            (isAuthError(e) || isPermissionError(e))
+          ) {
+            log.error("run", e);
+          } else {
+            throw e;
+          }
+        }
       }
+    });
 
-      consecutiveErrorCount = 0;
-    } catch (e) {
-      log.error("run", e);
-      ++consecutiveErrorCount;
-
-      if (consecutiveErrorCount >= 8) {
-        log.error("run", "Too many consecutive errors");
-        break;
-      }
+    if (!shouldContinue) {
+      break;
     }
 
     pageOffset += pageSize;

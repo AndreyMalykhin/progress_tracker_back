@@ -1,4 +1,5 @@
 import Knex from "knex";
+import { IAggregatable } from "models/aggregatable";
 import { IAggregateChildren } from "models/aggregate";
 import Audience from "models/audience";
 import Difficulty from "models/difficulty";
@@ -40,6 +41,17 @@ class TrackableFetcher {
 
   public constructor(db: Knex) {
     this.db = db;
+  }
+
+  public async getNextForExpiration(
+    transaction: Knex.Transaction
+  ): Promise<(ITrackable & IAggregatable) | undefined> {
+    return await this.db(DbTable.Trackables)
+      .transacting(transaction)
+      .forUpdate()
+      .where("statusId", TrackableStatus.Active)
+      .andWhere("deadlineDate", "<=", new Date())
+      .first();
   }
 
   public async getNextForEvaluation(

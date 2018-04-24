@@ -18,7 +18,7 @@ class UserFetcher {
   public async getUnordered(offset = 0, limit = 16): Promise<IUser[]> {
     return await this.db(DbTable.Users)
       .offset(offset)
-      .limit(16);
+      .limit(limit);
   }
 
   public async get(

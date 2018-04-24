@@ -14,11 +14,11 @@ import { makeLog } from "utils/log";
 type ILoginCmd = (
   facebookAccessToken: string,
   transaction: Knex.Transaction
-) => {
+) => Promise<{
   accessToken: string;
   isNewUser: boolean;
   user: IUser;
-};
+}>;
 
 const log = makeLog("login-cmd");
 
@@ -29,7 +29,7 @@ function makeLoginCmd(
   db: Knex,
   syncFriendsCmd: ISyncFriendsCmd
 ) {
-  return async (facebookAccessToken: string, transaction: Knex.Transaction) => {
+  const loginCmd: ILoginCmd = async (facebookAccessToken, transaction) => {
     const facebookUser = await facebook.getUser(facebookAccessToken);
     let user = await userFetcher.getByFacebookId(facebookUser.id, transaction);
     const isNewUser = !user;
@@ -52,7 +52,7 @@ function makeLoginCmd(
     }
 
     syncFriendsCmd(user!.id, facebookAccessToken).catch(e =>
-      log.error("makeLoginCmd", e)
+      log.error("loginCmd", e)
     );
     const accessToken = await makeAccessToken(
       user!.id,
@@ -63,9 +63,10 @@ function makeLoginCmd(
     return {
       accessToken,
       isNewUser,
-      user
+      user: user!
     };
   };
+  return loginCmd;
 }
 
 async function setFacebookAccessToken(
