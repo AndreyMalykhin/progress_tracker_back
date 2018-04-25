@@ -2,11 +2,7 @@ import Raven from "raven";
 import { IEnvConfig } from "utils/env-config";
 
 function registerErrorReporter(envConfig: IEnvConfig) {
-  if (!envConfig.sentryDsn) {
-    return;
-  }
-
-  Raven.config(envConfig.sentryDsn, {
+  Raven.config(envConfig.sentryDsn || false, {
     release: envConfig.version
   }).install();
 }

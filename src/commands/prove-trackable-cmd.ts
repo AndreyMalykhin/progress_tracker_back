@@ -120,12 +120,11 @@ async function updateTrackable(
     .update(
       {
         approveCount,
-        parentId: null,
         proofPhotoId: assetId,
         rejectCount,
         statusChangeDate: new Date(),
         statusId
-      } as Partial<IGoal & IAggregatable>,
+      } as ITrackable & IGoal,
       "*"
     )
     .where("id", trackable.id);

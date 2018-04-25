@@ -130,6 +130,7 @@ class TrackableFetcher {
         TrackableStatus.PendingProof
       ])
       .andWhere("userId", safeId(userId))
+      .andWhereRaw("?? is null", "parentId")
       .andWhere("order", ">", order)
       .first();
   }
@@ -146,6 +147,7 @@ class TrackableFetcher {
         TrackableStatus.PendingProof
       ])
       .andWhere("userId", safeId(userId))
+      .andWhereRaw("?? is null", "parentId")
       .andWhere("order", "<", order)
       .first();
   }
@@ -184,6 +186,7 @@ class TrackableFetcher {
         TrackableStatus.PendingProof
       ])
       .andWhere("userId", safeId(ownerId))
+      .andWhereRaw("?? is null", "parentId")
       .orderBy("order", "desc")
       .limit(limit);
 

@@ -94,7 +94,7 @@ async function updateTask(
 ): Promise<ITask> {
   const rows = await db(DbTable.Tasks)
     .transacting(transaction)
-    .update({ isDone }, "*")
+    .update({ isDone } as ITask, "*")
     .where("id", id);
   return rows[0];
 }

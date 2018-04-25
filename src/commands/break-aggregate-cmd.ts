@@ -1,4 +1,5 @@
 import Knex from "knex";
+import { IAggregatable } from "models/aggregatable";
 import { IAggregate, IAggregateChildren } from "models/aggregate";
 import { ITrackable, TrackableType } from "models/trackable";
 import TrackableFetcher from "services/trackable-fetcher";
@@ -67,7 +68,7 @@ async function updateChildren(
   for (const child of children) {
     const rows = await db(DbTable.Trackables)
       .transacting(transaction)
-      .update({ parentId: null, order }, "*")
+      .update({ parentId: null, order } as IAggregatable & ITrackable, "*")
       .where("id", child.id);
     result.push(rows[0]);
     --order;
