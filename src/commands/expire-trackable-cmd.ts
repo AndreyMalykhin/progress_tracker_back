@@ -16,13 +16,22 @@ type IExpireTrackableCmd = (
 
 const log = makeLog("expire-trackable-cmd");
 
-function makeExpireTrackableCmd() {
+function makeExpireTrackableCmd(db: Knex, trackableFetcher: TrackableFetcher) {
   const expireTrackableCmd: IExpireTrackableCmd = async (
     trackable,
     transaction
   ) => {
     log.trace("expireTrackableCmd");
     await updateTrackable(trackable.id, transaction);
+
+    if (trackable.parentId) {
+      await updateAggregate(
+        trackable.parentId,
+        transaction,
+        db,
+        trackableFetcher
+      );
+    }
   };
   return expireTrackableCmd;
 }

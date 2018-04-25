@@ -23,7 +23,6 @@ type IProveTrackableCmd = (
   transaction: Knex.Transaction
 ) => Promise<{
   removedAggregateId?: ID;
-  aggregate?: IAggregate;
   trackable: ITrackable;
 }>;
 
@@ -57,10 +56,9 @@ function makeProveTrackableCmd(
     const aggregateId = (trackable as IAggregatable).parentId;
     trackable = await updateTrackable(trackable!, asset!.id, db, transaction);
     let removedAggregateId: ID | undefined;
-    let aggregate: IAggregate | undefined;
 
     if (aggregateId) {
-      aggregate = await updateAggregate(
+      const aggregate = await updateAggregate(
         aggregateId,
         transaction,
         db,
@@ -73,7 +71,7 @@ function makeProveTrackableCmd(
       await addActivity(trackable, db, transaction);
     }
 
-    return { removedAggregateId, aggregate, trackable };
+    return { removedAggregateId, trackable };
   };
 }
 

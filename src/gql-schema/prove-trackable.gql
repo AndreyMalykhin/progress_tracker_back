@@ -1,6 +1,5 @@
 type ProveTrackableResponse {
   removedAggregateId: ID
-  aggregate: Aggregate
   trackable: ITrackable!
 }
 

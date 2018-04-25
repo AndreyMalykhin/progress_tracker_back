@@ -397,6 +397,7 @@ async function createTrackables(knex: Knex) {
         .unsigned()
         .references("id")
         .inTable("trackables")
+        .onDelete("set null")
         .index();
       table
         .integer("iconId")

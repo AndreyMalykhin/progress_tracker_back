@@ -513,7 +513,12 @@ function makeDIContainer() {
     makeEvaluateTrackableCmd,
     "reviewFetcher"
   );
-  di.serviceFactory("expireTrackableCmd", makeExpireTrackableCmd);
+  di.serviceFactory(
+    "expireTrackableCmd",
+    makeExpireTrackableCmd,
+    "db",
+    "trackableFetcher"
+  );
   di.service("fetcher", makeFetcher);
   di.service("avatarFetcher", AvatarFetcher, "db");
   di.service("reviewFetcher", ReviewFetcher, "db");
