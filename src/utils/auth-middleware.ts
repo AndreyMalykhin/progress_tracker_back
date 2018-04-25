@@ -1,8 +1,10 @@
 import { RequestHandler } from "express";
 import { Unauthorized } from "http-errors";
 import jwt from "jsonwebtoken";
+import Raven from "raven";
 import asyncMiddleware from "utils/async-middleware";
 import DIContainer from "utils/di-container";
+import { ISession } from "utils/session";
 
 function makeAuthMiddleware(
   diContainer: DIContainer,
@@ -12,7 +14,8 @@ function makeAuthMiddleware(
     const authHeader = req.header("Authorization");
     let isSuccess = false;
     let error;
-    let accessToken;
+    let accessToken: string | undefined;
+    let session: ISession | undefined;
 
     if (authHeader) {
       accessToken = authHeader.split(" ")[1];
@@ -22,13 +25,16 @@ function makeAuthMiddleware(
 
     if (accessToken) {
       try {
-        res.locals.session = await diContainer.accessTokenIssuer.verify(
-          accessToken
-        );
+        session = await diContainer.accessTokenIssuer.verify(accessToken);
+        res.locals.session = session;
         isSuccess = true;
       } catch (e) {
         error = e;
       }
+    }
+
+    if (session) {
+      Raven.mergeContext({ user: { id: session.userId } });
     }
 
     if (!isSuccess && isTerminating) {

@@ -9,13 +9,15 @@ const config = {
   isDevEnv: process.env.NODE_ENV === "development",
   port: Number(process.env.PT_PORT!),
   secret: process.env.PT_SECRET!,
+  sentryDsn: process.env.SENTRY_DSN,
   staticServerUrl: process.env.PT_STATIC_SERVER_URL!,
   trackablesEvaluationPeriod: Number(
     process.env.PT_TRACKABLES_EVALUATION_PERIOD!
   ),
   trackablesExpirationPeriod: Number(
     process.env.PT_TRACKABLES_EXPIRATION_PERIOD!
-  )
+  ),
+  version: process.env.PT_VERSION!
 };
 
 function makeEnvConfig() {

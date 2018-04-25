@@ -1,4 +1,5 @@
 import { ErrorRequestHandler } from "express";
+import Raven from "raven";
 import DIContainer from "utils/di-container";
 import handleError from "utils/handle-error";
 

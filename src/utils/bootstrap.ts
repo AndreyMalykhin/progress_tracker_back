@@ -1,12 +1,14 @@
 import http from "http";
 import { makeApp } from "utils/app";
 import { makeDIContainer } from "utils/di-container";
+import { registerErrorReporter } from "utils/error-reporter";
 import { makeLog } from "utils/log";
 
 const log = makeLog("bootstrap");
 
 function bootstrap() {
   const diContainer = makeDIContainer();
+  registerErrorReporter(diContainer.envConfig);
   const port = diContainer.envConfig.port;
   const server = http.createServer(makeApp(diContainer));
   server.listen(port);

@@ -1,4 +1,5 @@
 import debug from "debug";
+import Raven from "raven";
 
 class Log {
   private namespace: string;
@@ -15,7 +16,19 @@ class Log {
 
   public error(funcName: string, e: Error | string, info?: object) {
     this.trace(funcName, "error=%o; info=%o", e, info);
-    // TODO persist
+    const namespacedFuncName = `${this.namespace}.${funcName}`;
+    const options: Raven.CaptureOptions = {
+      extra: info,
+      fingerprint: ["{{ default }}", namespacedFuncName],
+      tags: { func: namespacedFuncName }
+    };
+
+    if (typeof e === "string") {
+      Raven.captureMessage(e, options);
+      return;
+    }
+
+    Raven.captureException(e, options);
   }
 }
 

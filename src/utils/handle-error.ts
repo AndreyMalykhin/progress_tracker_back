@@ -8,7 +8,6 @@ import { makeLog } from "utils/log";
 const log = makeLog("handle-error");
 
 function handleError(error: any, envConfig: IEnvConfig, response: Response) {
-  // TODO
   log.error("handleError", error);
   let status: number;
   let msg: string;
