@@ -3,10 +3,24 @@ const TsconfigPathsPlugin = require("tsconfig-paths-webpack-plugin");
 const nodeExternals = require("webpack-node-externals");
 const glob = require("glob");
 const CopyWebpackPlugin = require("copy-webpack-plugin");
+const CleanWebpackPlugin = require("clean-webpack-plugin");
+
+const isDevEnv = process.env.NODE_ENV === "development";
+const plugins = [];
+const optimization = {};
+let devtool = "inline-source-map";
+
+if (!isDevEnv) {
+  devtool = "source-map";
+  optimization.splitChunks = {
+    chunks: "all",
+    automaticNameDelimiter: "-"
+  };
+}
 
 const baseConfig = {
   mode: process.env.NODE_ENV,
-  devtool: "inline-source-map",
+  devtool,
   target: "node",
   module: {
     rules: [
@@ -26,8 +40,9 @@ const baseConfig = {
     plugins: [new TsconfigPathsPlugin()],
     modules: [path.resolve(__dirname, "src"), "node_modules"]
   },
-  plugins: [],
-  externals: [nodeExternals()]
+  plugins,
+  externals: [nodeExternals()],
+  optimization
 };
 
 const appConfig = {
@@ -39,7 +54,17 @@ const appConfig = {
   output: {
     filename: "[name].js",
     path: path.resolve(__dirname, "build")
-  }
+  },
+  plugins: [
+    ...baseConfig.plugins,
+    new CleanWebpackPlugin([path.resolve(__dirname, "build")]),
+    new CopyWebpackPlugin([
+      {
+        from: path.resolve(__dirname, "src", "resources"),
+        to: path.resolve(__dirname, "build", "resources")
+      }
+    ])
+  ]
 };
 
 const migrationEntries = {};
@@ -53,13 +78,16 @@ const migrationsConfig = {
   entry: migrationEntries,
   output: {
     filename: "[name].js",
-    path: path.resolve(__dirname, "build/migrations"),
+    path: path.resolve(__dirname, "build", "migrations"),
     libraryTarget: "commonjs2"
   },
   plugins: [
     ...baseConfig.plugins,
     new CopyWebpackPlugin([
-      { from: "src/utils/db-config.js", to: path.resolve(__dirname, "build") }
+      {
+        from: path.resolve(__dirname, "src", "utils", "db-config.js"),
+        to: path.resolve(__dirname, "build")
+      }
     ])
   ]
 };
@@ -75,7 +103,7 @@ const seedsConfig = {
   entry: seedEntries,
   output: {
     filename: "[name].js",
-    path: path.resolve(__dirname, "build/seeds"),
+    path: path.resolve(__dirname, "build", "seeds"),
     libraryTarget: "commonjs2"
   }
 };
