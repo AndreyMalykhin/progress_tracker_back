@@ -119,6 +119,7 @@ import UserFetcher from "services/user-fetcher";
 import UserReportFetcher from "services/user-report-fetcher";
 import { IEnvConfig, makeEnvConfig } from "utils/env-config";
 import { IFetcher, makeFetcher } from "utils/fetcher";
+import { IImgProcessor, makeImgProcessor } from "utils/img-processor";
 import { ILoaderMapFactory, makeLoaderMapFactory } from "utils/loader-map";
 import makeDb from "utils/make-db";
 
@@ -324,10 +325,15 @@ class DIContainer {
   public get expireTrackableCmd(): IExpireTrackableCmd {
     return this.impl.expireTrackableCmd;
   }
+
+  public get imgProcessor(): IImgProcessor {
+    return this.impl.imgProcessor;
+  }
 }
 
 function makeDIContainer() {
   const di = new Bottle();
+  di.factory("imgProcessor", makeImgProcessor);
   di.factory("envConfig", makeEnvConfig);
   di.serviceFactory("db", makeDb, "envConfig");
   di.serviceFactory(
@@ -506,7 +512,13 @@ function makeDIContainer() {
     "db",
     "trackableFetcher"
   );
-  di.serviceFactory("uploadAvatarCmd", makeUploadAvatarCmd, "db", "envConfig");
+  di.serviceFactory(
+    "uploadAvatarCmd",
+    makeUploadAvatarCmd,
+    "db",
+    "envConfig",
+    "imgProcessor"
+  );
   di.serviceFactory("editTaskCmd", makeEditTaskCmd, "db", "taskFetcher");
   di.serviceFactory(
     "evaluateTrackableCmd",

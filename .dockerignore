@@ -1,0 +1,8 @@
+Dockerfile
+docker-compose.*.yml
+node_modules
+uploads
+temp
+build
+.vscode
+.git

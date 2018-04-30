@@ -33,6 +33,8 @@
   "scripts": {
     "knex-migrate-latest":
       "env-cmd ./.env.local knex --knexfile=build/db-config.js migrate:latest",
+    "knex-migrate-latest-prod":
+      "env-cmd ./.env.production.local knex --knexfile=build/db-config.js migrate:latest",
     "knex-migrate-rollback":
       "env-cmd ./.env.local knex --knexfile=build/db-config.js migrate:rollback",
     "knex-migrate-make":
@@ -42,13 +44,14 @@
     "knex-seed-run":
       "env-cmd ./.env.local knex --knexfile=build/db-config.js seed:run",
     "start": "env-cmd ./.env.local nodemon --inspect build/app.js",
-    "start-prod": "env-cmd ./.env.production.local pm2 start build/app.js",
+    "start-prod": "env-cmd ./.env.production.local node build/app.js",
     "dev": "env-cmd ./.env.local webpack --watch --display-modules",
     "build": "env-cmd ./.env.local webpack --display-modules",
     "build-prod": "env-cmd ./.env.production.local webpack --display-modules",
     "task": "env-cmd ./.env.local node build/task-runner.js",
-    "task-prod":
-      "env-cmd ./.env.production.local pm2 start build/task-runner.js",
+    "task-prod": "env-cmd ./.env.production.local node build/task-runner.js",
+    "docker-compose-prod":
+      "env-cmd ./.env.production.local docker-compose -f docker-compose.production.yml",
     "precommit": "lint-staged"
   },
   "lint-staged": {

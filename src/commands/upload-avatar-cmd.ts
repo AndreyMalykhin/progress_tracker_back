@@ -1,12 +1,13 @@
 import Knex from "knex";
 import { avatarSizes, IAvatar } from "models/avatar";
 import path from "path";
-import sharp from "sharp";
+import { SharpInstance } from "sharp";
 import { validateClientId } from "utils/common-validators";
 import { throwIfNotEmpty } from "utils/constraint-violation-error";
 import DbTable from "utils/db-table";
 import { IEnvConfig } from "utils/env-config";
 import ID from "utils/id";
+import { IImgProcessor } from "utils/img-processor";
 import UUID from "utils/uuid";
 import { IValidationErrors, setError } from "utils/validation-result";
 import uuid from "uuid/v4";
@@ -24,15 +25,12 @@ interface IUploadAvatarCmdInput {
 
 function makeUploadAvatarCmd(
   db: Knex,
-  envConfig: IEnvConfig
+  envConfig: IEnvConfig,
+  imgProcessor: IImgProcessor
 ): IUploadAvatarCmd {
   return async (input, transaction) => {
     validateInput(input);
-    const imgUrls = await addImages(
-      input.filePath,
-      envConfig.avatarsDirPath,
-      envConfig.staticServerUrl
-    );
+    const imgUrls = await addImages(input.filePath, envConfig, imgProcessor);
     const rows = await db(DbTable.Avatars)
       .transacting(transaction)
       .insert(
@@ -65,26 +63,30 @@ function validateInput(input: IUploadAvatarCmdInput) {
 
 async function addImages(
   srcFilePath: string,
-  assetsDirPath: string,
-  staticServerUrl: string
+  envConfig: IEnvConfig,
+  imgProcessor: IImgProcessor
 ) {
-  const pipeline = sharp(srcFilePath)
+  const pipeline = imgProcessor(srcFilePath)
     .max()
     .jpeg();
   const destFileNameSmall = uuid() + ".jpeg";
   const result1 = pipeline
     .clone()
     .resize(avatarSizes.small, avatarSizes.small)
-    .toFile(assetsDirPath + path.sep + destFileNameSmall);
+    .toFile(envConfig.assetsDirPath + path.sep + destFileNameSmall);
   const destFileNameMedium = uuid() + ".jpeg";
   const result2 = pipeline
     .clone()
     .resize(avatarSizes.medium, avatarSizes.medium)
-    .toFile(assetsDirPath + path.sep + destFileNameMedium);
+    .toFile(envConfig.assetsDirPath + path.sep + destFileNameMedium);
   await Promise.all([result1, result2]);
   return {
-    medium: `${staticServerUrl}/${destFileNameMedium}`,
-    small: `${staticServerUrl}/${destFileNameSmall}`
+    medium: `${envConfig.staticServerUrl}/${
+      envConfig.avatarsDirName
+    }/${destFileNameMedium}`,
+    small: `${envConfig.staticServerUrl}/${
+      envConfig.avatarsDirName
+    }/${destFileNameSmall}`
   };
 }
 

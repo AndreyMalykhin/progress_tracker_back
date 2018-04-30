@@ -1,0 +1,87 @@
+version: "3.6"
+
+x-args:
+  &args
+  PT_DIR_PATH: "${PT_DIR_PATH}"
+  PT_AVATARS_DIR_PATH: "${PT_AVATARS_DIR_PATH}"
+  PT_PORT: "${PT_PORT}"
+
+services:
+  db:
+    image: "postgres:10.3-alpine"
+    volumes:
+      - "db-data:/var/lib/postgresql/data"
+    environment:
+      POSTGRES_PASSWORD: "${PGPASSWORD}"
+      POSTGRES_USER: "${PGUSER}"
+      POSTGRES_DB: "${PGDATABASE}"
+    restart: "always"
+
+  proxy:
+    build:
+      context: .
+      target: "proxy"
+      args: *args
+    depends_on:
+      - app
+    env_file:
+      - ".env.${NODE_ENV}.local"
+    ports:
+      - "80:80"
+      - "8080:8080"
+    volumes:
+      - "assets:${PT_ASSETS_DIR_PATH}"
+      - "avatars:${PT_AVATARS_DIR_PATH}"
+    restart: "always"
+
+  app:
+    build:
+      context: .
+      target: "app"
+      args: *args
+    depends_on:
+      - db
+    env_file:
+      - ".env.${NODE_ENV}.local"
+    volumes:
+      - "assets:${PT_ASSETS_DIR_PATH}"
+      - "avatars:${PT_AVATARS_DIR_PATH}"
+    restart: "always"
+
+  sync-friends-task:
+    build:
+      context: .
+      target: "sync-friends-task"
+      args: *args
+    depends_on:
+      - app
+    env_file:
+      - ".env.${NODE_ENV}.local"
+    restart: "always"
+
+  evaluate-trackables-task:
+    build:
+      context: .
+      target: "evaluate-trackables-task"
+      args: *args
+    depends_on:
+      - app
+    env_file:
+      - ".env.${NODE_ENV}.local"
+    restart: "always"
+
+  expire-trackables-task:
+    build:
+      context: .
+      target: "expire-trackables-task"
+      args: *args
+    depends_on:
+      - app
+    env_file:
+      - ".env.${NODE_ENV}.local"
+    restart: "always"
+
+volumes:
+  db-data:
+  assets:
+  avatars:

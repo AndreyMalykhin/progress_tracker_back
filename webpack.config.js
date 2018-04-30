@@ -7,15 +7,10 @@ const CleanWebpackPlugin = require("clean-webpack-plugin");
 
 const isDevEnv = process.env.NODE_ENV === "development";
 const plugins = [];
-const optimization = {};
 let devtool = "inline-source-map";
 
 if (!isDevEnv) {
   devtool = "source-map";
-  optimization.splitChunks = {
-    chunks: "all",
-    automaticNameDelimiter: "-"
-  };
 }
 
 const baseConfig = {
@@ -41,8 +36,7 @@ const baseConfig = {
     modules: [path.resolve(__dirname, "src"), "node_modules"]
   },
   plugins,
-  externals: [nodeExternals()],
-  optimization
+  externals: [nodeExternals()]
 };
 
 const appConfig = {

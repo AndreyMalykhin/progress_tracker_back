@@ -1,7 +1,9 @@
 type IEnvConfig = typeof config;
 
 const config = {
+  assetsDirName: process.env.PT_ASSETS_DIR_NAME!,
   assetsDirPath: process.env.PT_ASSETS_DIR_PATH!,
+  avatarsDirName: process.env.PT_AVATARS_DIR_NAME!,
   avatarsDirPath: process.env.PT_AVATARS_DIR_PATH!,
   env: process.env.NODE_ENV!,
   facebookAppAccessToken: process.env.PT_FACEBOOK_APP_ACCESS_TOKEN!,
