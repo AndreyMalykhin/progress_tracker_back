@@ -51,7 +51,9 @@
     "task": "env-cmd ./.env.local node build/task-runner.js",
     "task-prod": "env-cmd ./.env.production.local node build/task-runner.js",
     "docker-compose-prod":
-      "env-cmd ./.env.production.local docker-compose -f docker-compose.production.yml",
+      "env $(cat .env.production.local | xargs) docker-compose -f docker-compose.production.yml",
+    "make-certificate-prod":
+      "chmod +x make-certificate.sh && env $(cat .env.production.local | xargs) ./make-certificate.sh",
     "precommit": "lint-staged"
   },
   "lint-staged": {
