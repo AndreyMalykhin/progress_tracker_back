@@ -73,12 +73,12 @@ async function addImages(
   const result1 = pipeline
     .clone()
     .resize(avatarSizes.small, avatarSizes.small)
-    .toFile(envConfig.assetsDirPath + path.sep + destFileNameSmall);
+    .toFile(envConfig.avatarsDirPath + path.sep + destFileNameSmall);
   const destFileNameMedium = uuid() + ".jpeg";
   const result2 = pipeline
     .clone()
     .resize(avatarSizes.medium, avatarSizes.medium)
-    .toFile(envConfig.assetsDirPath + path.sep + destFileNameMedium);
+    .toFile(envConfig.avatarsDirPath + path.sep + destFileNameMedium);
   await Promise.all([result1, result2]);
   return {
     medium: `${envConfig.staticServerUrl}/${
