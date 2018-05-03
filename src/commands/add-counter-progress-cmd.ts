@@ -60,12 +60,16 @@ function makeAddCounterProgressCmd(
     );
 
     if (counter.parentId) {
-      await updateAggregate(
+      const aggregate = await updateAggregate(
         counter.parentId,
         transaction,
         db,
         trackableFetcher
       );
+
+      if (!aggregate) {
+        counter.parentId = null;
+      }
     }
 
     await addActivity(counter, input.progressDelta, db, transaction);

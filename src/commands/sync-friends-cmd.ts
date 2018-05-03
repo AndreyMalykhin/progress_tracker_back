@@ -21,6 +21,7 @@ function makeSyncFriendsCmd(
 ) {
   const syncFriendsCmd = async (userId: ID, facebookAccessToken: string) => {
     log.trace("syncFriendsCmd", "userId=%o", userId);
+    await updateUser(userId, db);
     const [remoteFriendIds, localFriendIds] = await Promise.all([
       getRemoteFriendIds(facebookAccessToken, facebook),
       getLocalFriendIds(userId, userFetcher)
@@ -55,6 +56,12 @@ function makeSyncFriendsCmd(
     await removeFriendships(friendshipsToRemove, db);
   };
   return syncFriendsCmd;
+}
+
+async function updateUser(id: ID, db: Knex) {
+  await db(DbTable.Users)
+    .update("friendsSyncStartDate", new Date())
+    .where("id", id);
 }
 
 async function removeFriendships(friendships: IFriendship[], db: Knex) {

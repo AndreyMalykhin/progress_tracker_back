@@ -25,12 +25,16 @@ function makeExpireTrackableCmd(db: Knex, trackableFetcher: TrackableFetcher) {
     await updateTrackable(trackable.id, transaction);
 
     if (trackable.parentId) {
-      await updateAggregate(
+      const aggregate = await updateAggregate(
         trackable.parentId,
         transaction,
         db,
         trackableFetcher
       );
+
+      if (!aggregate) {
+        trackable.parentId = null;
+      }
     }
   };
   return expireTrackableCmd;

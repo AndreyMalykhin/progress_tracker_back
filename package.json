@@ -45,6 +45,7 @@
       "env-cmd ./.env.local knex --knexfile=build/db-config.js seed:run",
     "start": "env-cmd ./.env.local nodemon --inspect build/app.js",
     "start-prod": "env-cmd ./.env.production.local node build/app.js",
+    "start-static": "cd uploads && python -m SimpleHTTPServer 8000",
     "dev": "env-cmd ./.env.local webpack --watch --display-modules",
     "build": "env-cmd ./.env.local webpack --display-modules",
     "build-prod": "env-cmd ./.env.production.local webpack --display-modules",

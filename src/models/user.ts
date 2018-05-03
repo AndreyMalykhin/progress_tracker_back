@@ -8,6 +8,8 @@ interface IUser {
   facebookAccessToken: string;
   rating: number;
   rewardableReviewsLeft: number;
+  friendsSyncStartDate?: Date;
+  creationDate: Date;
 }
 
 const rewardableReviewsPerDay = 4;

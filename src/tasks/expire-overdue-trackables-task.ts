@@ -22,6 +22,7 @@ async function run(diContainer: DIContainer) {
   const { trackableFetcher, expireTrackableCmd, db, envConfig } = diContainer;
   const tryRun = makeTryRun(log);
   let trackable: (ITrackable & IAggregatable) | undefined;
+  let expiredTrackableCount = 0;
 
   do {
     const shouldContinue = await tryRun(async () => {
@@ -30,6 +31,7 @@ async function run(diContainer: DIContainer) {
 
         if (trackable) {
           await expireTrackableCmd(trackable, transaction);
+          ++expiredTrackableCount;
         }
       });
     });
@@ -39,6 +41,7 @@ async function run(diContainer: DIContainer) {
     }
   } while (trackable);
 
+  log.trace("run", "expiredTrackableCount=%o", expiredTrackableCount);
   setTimeout(() => run(diContainer), envConfig.trackablesExpirationPeriod);
 }
 

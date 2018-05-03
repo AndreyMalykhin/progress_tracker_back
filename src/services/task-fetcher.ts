@@ -42,7 +42,8 @@ class TaskFetcher {
   public async getByTrackableId(id: ID): Promise<ITask[]> {
     return await this.db(DbTable.Tasks)
       .where("goalId", safeId(id))
-      .orderBy("isDone", "asc");
+      .orderBy("isDone", "asc")
+      .orderBy("order", "asc");
   }
 
   public async getByIds(ids: ID[]): Promise<ITask[]> {

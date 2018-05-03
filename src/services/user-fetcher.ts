@@ -15,10 +15,13 @@ class UserFetcher {
     this.db = db;
   }
 
-  public async getUnordered(offset = 0, limit = 16): Promise<IUser[]> {
+  public async getBeforefriendsSyncStartDate(
+    date: Date
+  ): Promise<IUser | undefined> {
     return await this.db(DbTable.Users)
-      .offset(offset)
-      .limit(limit);
+      .where("friendsSyncStartDate", "<", date)
+      .orWhereNull("friendsSyncStartDate")
+      .first();
   }
 
   public async get(
@@ -82,36 +85,42 @@ class UserFetcher {
     afterCursor?: IDbCursor<number>,
     limit = 16
   ): Promise<IUser[]> {
-    const query = this.db(DbTable.Users + " as u")
-      .select("u.*")
-      .orderByRaw(this.db.raw("row(??, ??) desc", ["u.rating", "u.id"]))
-      .where("u.rating", ">", 0)
+    const db = this.db;
+    const query = db
+      .from(function(this: Knex) {
+        this.from(DbTable.Users + " as u")
+          .select("u.*")
+          .orderByRaw(db.raw("row(??, ??) desc", ["u.rating", "u.id"]))
+          .where("u.rating", ">", 0)
+          .limit(100)
+          .as("subquery");
+
+        switch (audience) {
+          case Audience.Friends:
+            if (!viewerId) {
+              return [];
+            }
+
+            this.innerJoin(DbTable.Friendships + " as f", {
+              "f.srcId": safeId(viewerId),
+              "f.targetId": "u.id"
+            });
+            break;
+          case Audience.Global:
+            break;
+          default:
+            return [];
+        }
+      })
       .limit(limit);
 
     if (afterCursor) {
       query.andWhereRaw("row(??, ??) < row(?, ?)::integer_cursor", [
-        "u.rating",
-        "u.id",
+        "rating",
+        "id",
         afterCursor.value,
         afterCursor.id
       ]);
-    }
-
-    switch (audience) {
-      case Audience.Friends:
-        if (!viewerId) {
-          return [];
-        }
-
-        query.innerJoin(DbTable.Friendships + " as f", {
-          "f.srcId": safeId(viewerId),
-          "f.targetId": "u.id"
-        });
-        break;
-      case Audience.Global:
-        break;
-      default:
-        return [];
     }
 
     return await query;

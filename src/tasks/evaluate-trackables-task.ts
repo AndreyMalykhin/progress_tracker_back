@@ -22,6 +22,7 @@ async function run(diContainer: DIContainer) {
   const { evaluateTrackableCmd, trackableFetcher, db, envConfig } = diContainer;
   let trackable: (ITrackable & IGoal) | undefined;
   const tryRun = makeTryRun(log);
+  let evaluatedTrackableCount = 0;
 
   do {
     const shouldContinue = await tryRun(async () => {
@@ -29,7 +30,8 @@ async function run(diContainer: DIContainer) {
         trackable = await trackableFetcher.getNextForEvaluation(transaction);
 
         if (trackable) {
-          return await evaluateTrackableCmd(trackable, transaction);
+          await evaluateTrackableCmd(trackable, transaction);
+          ++evaluatedTrackableCount;
         }
       });
     });
@@ -39,6 +41,7 @@ async function run(diContainer: DIContainer) {
     }
   } while (trackable);
 
+  log.trace("run", "evaluatedTrackableCount=%o", evaluatedTrackableCount);
   setTimeout(() => run(diContainer), envConfig.trackablesEvaluationPeriod);
 }
 

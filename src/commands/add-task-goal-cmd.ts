@@ -85,11 +85,14 @@ async function addTasks(
   transaction: Knex.Transaction,
   db: Knex
 ) {
+  let order = Date.now();
   const tasks: ITask[] = input.tasks.map(task => {
+    ++order;
     return {
       clientId: task.clientId,
       goalId: trackable.id,
       isDone: false,
+      order,
       title: task.title,
       userId: input.userId
     } as ITask;

@@ -10,6 +10,9 @@ const config = {
   friendsSyncPeriod: Number(process.env.PT_FRIENDS_SYNC_PERIOD!),
   isDevEnv: process.env.NODE_ENV === "development",
   port: Number(process.env.PT_PORT!),
+  rewardableReviewCountResetPeriod: Number(
+    process.env.PT_REWARDABLE_REVIEW_COUNT_RESET_PERIOD!
+  ),
   secret: process.env.PT_SECRET!,
   sentryDsn: process.env.SENTRY_DSN,
   staticServerUrl: process.env.PT_STATIC_SERVER_URL!,

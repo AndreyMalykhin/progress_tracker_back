@@ -1,4 +1,5 @@
 import { CommanderStatic } from "commander";
+import { IUser } from "models/user";
 import {
   FacebookError,
   isAuthError,
@@ -22,39 +23,34 @@ function registerSyncFriendsTask(
 
 async function run(diContainer: DIContainer) {
   log.trace("run");
-  const promises: Array<Promise<void>> = [];
-  const batchSize = 4;
-  const pageSize = 16;
-  let fetchedUserCount = 0;
-  let pageOffset = 0;
-  const tryRun = makeTryRun(log);
+  const { envConfig, userFetcher, syncFriendsCmd } = diContainer;
+  const attemptCount = 1;
+  const tryRun = makeTryRun(log, attemptCount);
+  let user: IUser | undefined;
+  const syncFromDate = new Date(Date.now() - envConfig.friendsSyncPeriod);
+  let syncedUserCount = 0;
 
   do {
     const shouldContinue = await tryRun(async () => {
-      const users = await diContainer.userFetcher.getUnordered(
-        pageOffset,
-        pageSize
-      );
-      fetchedUserCount = users.length;
+      user = await userFetcher.getBeforefriendsSyncStartDate(syncFromDate);
 
-      for (let i = 0; i < fetchedUserCount; ) {
-        for (let j = 0; j < batchSize && i < fetchedUserCount; ++i, ++j) {
-          const { id, facebookAccessToken } = users[i];
-          const promise = diContainer.syncFriendsCmd(id, facebookAccessToken);
-          promises.push(promise);
-        }
+      if (!user) {
+        return;
+      }
 
-        try {
-          await Promise.all(promises);
-        } catch (e) {
-          if (
-            e instanceof FacebookError &&
-            (isAuthError(e) || isPermissionError(e))
-          ) {
-            log.error("run", e);
-          } else {
-            throw e;
-          }
+      const { id, facebookAccessToken } = user;
+
+      try {
+        await syncFriendsCmd(id, facebookAccessToken);
+        ++syncedUserCount;
+      } catch (e) {
+        if (
+          e instanceof FacebookError &&
+          (isAuthError(e) || isPermissionError(e))
+        ) {
+          log.error("run", e);
+        } else {
+          throw e;
         }
       }
     });
@@ -62,11 +58,10 @@ async function run(diContainer: DIContainer) {
     if (!shouldContinue) {
       break;
     }
+  } while (user);
 
-    pageOffset += pageSize;
-  } while (fetchedUserCount === pageSize);
-
-  setTimeout(() => run(diContainer), diContainer.envConfig.friendsSyncPeriod);
+  log.trace("run", "syncedUserCount=%o", syncedUserCount);
+  setTimeout(() => run(diContainer), envConfig.friendsSyncPeriod);
 }
 
 export { registerSyncFriendsTask };

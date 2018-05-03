@@ -9,6 +9,7 @@ interface ITask {
   creationDate: Date;
   title: string;
   isDone: boolean;
+  order: number;
 }
 
 export { ITask };

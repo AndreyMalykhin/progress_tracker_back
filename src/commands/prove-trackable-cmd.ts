@@ -64,7 +64,11 @@ function makeProveTrackableCmd(
         db,
         trackableFetcher
       );
-      removedAggregateId = aggregate ? undefined : aggregateId;
+
+      if (!aggregate) {
+        removedAggregateId = aggregateId;
+        (trackable as IAggregatable).parentId = null;
+      }
     }
 
     if (!trackable.isPublic) {

@@ -421,6 +421,7 @@ async function newTasks(db: Knex, goal: ITaskGoal) {
       clientId: newClientId(),
       goalId: goal.id,
       isDone: i < goal.progress ? true : false,
+      order: i,
       title: newTitle(),
       userId: goal.userId
     } as ITask);

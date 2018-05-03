@@ -24,7 +24,16 @@ async function addGoalProgress(
   goal = await updateGoal(goal, value, db, transaction);
 
   if (goal.parentId) {
-    await updateAggregate(goal.parentId, transaction, db, trackableFetcher);
+    const aggregate = await updateAggregate(
+      goal.parentId,
+      transaction,
+      db,
+      trackableFetcher
+    );
+
+    if (!aggregate) {
+      goal.parentId = null;
+    }
   }
 
   return goal;

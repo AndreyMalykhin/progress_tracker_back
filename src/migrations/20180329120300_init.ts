@@ -345,6 +345,7 @@ function createUsers(knex: Knex) {
         .integer("rewardableReviewsLeft")
         .notNullable()
         .unsigned();
+      table.specificType("friendsSyncStartDate", "timestamp(3) with time zone");
     })
     .raw(
       `create index "users_rating_cursor_index"
@@ -354,6 +355,10 @@ function createUsers(knex: Knex) {
     .raw(
       `create index "users_name_cursor_index"
       on "users" ((row("name", "id")::varchar_cursor) asc)`
+    )
+    .raw(
+      `create index "users_friends_sync_start_date"
+      on "users" ("friendsSyncStartDate" desc)`
     );
 }
 
@@ -460,6 +465,7 @@ function createTasks(knex: Knex) {
       .inTable("trackables")
       .onDelete("cascade")
       .index();
+    table.specificType("order", "double precision").notNullable();
     table.unique(["userId", "clientId"]);
   });
 }

@@ -86,6 +86,10 @@ import {
 } from "commands/reorder-trackable-cmd";
 import { IReportUserCmd, makeReportUserCmd } from "commands/report-user-cmd";
 import {
+  IResetRewardableReviewCountCmd,
+  makeResetRewardableReviewCountCmd
+} from "commands/reset-rewardable-review-count-cmd";
+import {
   ISetTaskDoneCmd,
   makeSetTaskDoneCmd
 } from "commands/set-task-done-cmd";
@@ -329,6 +333,10 @@ class DIContainer {
   public get imgProcessor(): IImgProcessor {
     return this.impl.imgProcessor;
   }
+
+  public get resetRewardableReviewCountCmd(): IResetRewardableReviewCountCmd {
+    return this.impl.resetRewardableReviewCountCmd;
+  }
 }
 
 function makeDIContainer() {
@@ -504,7 +512,7 @@ function makeDIContainer() {
     makeUploadAssetCmd,
     "db",
     "envConfig",
-    "trackableFetcher"
+    "imgProcessor"
   );
   di.serviceFactory(
     "reorderTrackableCmd",
@@ -530,6 +538,10 @@ function makeDIContainer() {
     makeExpireTrackableCmd,
     "db",
     "trackableFetcher"
+  );
+  di.serviceFactory(
+    "resetRewardableReviewCountCmd",
+    makeResetRewardableReviewCountCmd
   );
   di.service("fetcher", makeFetcher);
   di.service("avatarFetcher", AvatarFetcher, "db");
