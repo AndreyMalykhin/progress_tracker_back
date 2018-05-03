@@ -83,6 +83,17 @@ services:
       - ".env.${NODE_ENV}.local"
     restart: "always"
 
+  reset-rewardable-review-count-task:
+    build:
+      context: .
+      target: "reset-rewardable-review-count-task"
+      args: *args
+    depends_on:
+      - app
+    env_file:
+      - ".env.${NODE_ENV}.local"
+    restart: "always"
+
 volumes:
   db-data:
   assets:

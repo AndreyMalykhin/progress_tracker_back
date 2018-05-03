@@ -29,6 +29,9 @@ CMD ["yarn", "task-prod", "evaluate-trackables"]
 FROM app as expire-trackables-task
 CMD ["yarn", "task-prod", "expire-trackables"]
 
+FROM app as reset-rewardable-review-count-task
+CMD ["yarn", "task-prod", "reset-rewardable-review-count"]
+
 FROM nginx:1.13.12-alpine as proxy
 WORKDIR /etc/nginx
 COPY nginx-config/ ./
