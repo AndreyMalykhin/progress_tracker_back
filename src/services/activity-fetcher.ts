@@ -35,11 +35,17 @@ class ActivityFetcher {
 
     switch (audience) {
       case Audience.Friends:
-        query.innerJoin(DbTable.Friendships + " as f", {
-          "f.srcId": safeId(viewerId),
-          "f.targetId": "a.userId"
-        });
-        query.andWhere("a.isPublic", true);
+        query
+          .innerJoin(DbTable.Friendships + " as f", {
+            "f.srcId": safeId(viewerId),
+            "f.targetId": "a.userId"
+          })
+          .leftJoin(DbTable.Mutes + " as m", {
+            "m.srcId": safeId(viewerId),
+            "m.targetId": "a.userId"
+          })
+          .andWhereRaw(this.db.raw("?? is null", "m.targetId"))
+          .andWhere("a.isPublic", true);
         break;
       case Audience.Me:
         query.andWhere("a.userId", safeId(viewerId));
