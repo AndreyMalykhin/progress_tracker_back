@@ -10,6 +10,7 @@ interface IUser {
   rewardableReviewsLeft: number;
   friendsSyncStartDate?: Date;
   creationDate: Date;
+  email: string;
 }
 
 const rewardableReviewsPerDay = 4;

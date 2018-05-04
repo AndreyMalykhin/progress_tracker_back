@@ -100,6 +100,7 @@ async function addUser(
     .insert(
       {
         avatarId,
+        email: facebookUser.email,
         facebookAccessToken,
         facebookId: facebookUser.id,
         name: facebookUser.name,

@@ -36,6 +36,7 @@ interface IFacebookPicture {
 interface IFacebookUser {
   id: string;
   name: string;
+  email: string;
 }
 
 interface IFacebookTokenInfo {
@@ -54,7 +55,7 @@ class Facebook {
   }
 
   public async getUser(token: string): Promise<IFacebookUser> {
-    const response = await this.fetch("me", token, { fields: "name" });
+    const response = await this.fetch("me", token, { fields: "name,email" });
 
     if (response.error) {
       throw new FacebookError(response);

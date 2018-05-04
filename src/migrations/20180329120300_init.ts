@@ -320,7 +320,8 @@ function createUsers(knex: Knex) {
   return knex.schema
     .createTable("users", table => {
       table.increments("id").unsigned();
-      table.string("name", 128).notNullable();
+      table.string("name").notNullable();
+      table.string("email").notNullable();
       table
         .specificType("creationDate", "timestamp(3) with time zone")
         .notNullable()

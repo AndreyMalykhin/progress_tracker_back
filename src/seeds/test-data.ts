@@ -202,6 +202,7 @@ async function newUser(db: Knex): Promise<IUser> {
   const rows = await db(DbTable.Users).insert(
     {
       avatarId: avatar.id,
+      email: Faker.internet.email(),
       facebookAccessToken: Faker.random.alphaNumeric(256),
       facebookId: Faker.random.uuid(),
       name: Faker.name.findName(),
