@@ -94,10 +94,6 @@ class TrackableFetcher {
         });
         break;
       case Audience.Global:
-        if (viewerId) {
-          query.where("t.userId", "!=", safeId(viewerId));
-        }
-
         break;
       case Audience.Me:
         if (!viewerId) {
