@@ -46,7 +46,7 @@ class UserFetcher {
     const query = this.db(DbTable.Users + " as u")
       .select("u.*")
       .innerJoin(DbTable.Friendships + " as f", {
-        "f.srcId": safeId(userId),
+        "f.srcId": this.db.raw(safeId(userId)),
         "f.targetId": "u.id"
       })
       .orderByRaw("row(??, ??) asc", ["u.name", "u.id"])
@@ -72,7 +72,7 @@ class UserFetcher {
     return await this.db(DbTable.Users + " as u")
       .select("u.*")
       .innerJoin(DbTable.Friendships + " as f", {
-        "f.srcId": safeId(userId),
+        "f.srcId": this.db.raw(safeId(userId)),
         "f.targetId": "u.id"
       })
       .offset(offset)
@@ -102,7 +102,7 @@ class UserFetcher {
             }
 
             this.innerJoin(DbTable.Friendships + " as f", {
-              "f.srcId": safeId(viewerId),
+              "f.srcId": this.raw(safeId(viewerId)),
               "f.targetId": "u.id"
             });
             break;

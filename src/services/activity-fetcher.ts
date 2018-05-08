@@ -37,11 +37,11 @@ class ActivityFetcher {
       case Audience.Friends:
         query
           .innerJoin(DbTable.Friendships + " as f", {
-            "f.srcId": safeId(viewerId),
+            "f.srcId": this.db.raw(safeId(viewerId)),
             "f.targetId": "a.userId"
           })
           .leftJoin(DbTable.Mutes + " as m", {
-            "m.srcId": safeId(viewerId),
+            "m.srcId": this.db.raw(safeId(viewerId)),
             "m.targetId": "a.userId"
           })
           .andWhereRaw(this.db.raw("?? is null", "m.targetId"))

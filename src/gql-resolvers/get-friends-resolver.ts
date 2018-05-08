@@ -15,7 +15,7 @@ async function getFriendsResolver(
 ) {
   const { userFetcher } = context.diContainer;
   const viewerId = context.session!.userId;
-  const limit = 1;
+  const limit = 16;
   const users = await userFetcher.getFriends(
     viewerId,
     strToStringCursor(args.after),

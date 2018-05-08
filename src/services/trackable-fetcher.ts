@@ -89,7 +89,7 @@ class TrackableFetcher {
         }
 
         query.innerJoin(DbTable.Friendships + " as f", {
-          "f.srcId": safeId(viewerId),
+          "f.srcId": this.db.raw(safeId(viewerId)),
           "f.targetId": "t.userId"
         });
         break;
