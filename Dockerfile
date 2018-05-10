@@ -1,9 +1,7 @@
 FROM node:9.11.1-alpine as app
 ARG PT_DIR_PATH
 ARG PT_AVATARS_DIR_PATH
-ARG PT_APP_PORT
 WORKDIR ${PT_DIR_PATH}
-EXPOSE ${PT_APP_PORT}
 RUN mkdir -p ${PT_AVATARS_DIR_PATH}
 RUN apk add --no-cache --virtual .deps python make g++
 RUN apk add --no-cache --repository https://dl-3.alpinelinux.org/alpine/edge/testing/ vips-dev fftw-dev
@@ -16,18 +14,6 @@ COPY src/ src/
 RUN yarn build-prod \
   && cp build/resources/default-avatar-*.png ${PT_AVATARS_DIR_PATH}/
 CMD yarn knex-migrate-latest-prod && yarn start-prod
-
-FROM app as sync-friends-task
-CMD ["yarn", "task-prod", "sync-friends"]
-
-FROM app as evaluate-trackables-task
-CMD ["yarn", "task-prod", "evaluate-trackables"]
-
-FROM app as expire-trackables-task
-CMD ["yarn", "task-prod", "expire-trackables"]
-
-FROM app as reset-rewardable-review-count-task
-CMD ["yarn", "task-prod", "reset-rewardable-review-count"]
 
 FROM nginx:1.13.12-alpine as proxy
 WORKDIR /etc/nginx

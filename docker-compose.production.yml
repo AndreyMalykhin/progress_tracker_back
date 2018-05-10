@@ -4,7 +4,6 @@ x-args:
   &args
   PT_DIR_PATH: "${PT_DIR_PATH}"
   PT_AVATARS_DIR_PATH: "${PT_AVATARS_DIR_PATH}"
-  PT_APP_PORT: "${PT_APP_PORT}"
 
 services:
   db:
@@ -49,6 +48,8 @@ services:
     volumes:
       - "assets:${PT_ASSETS_DIR_PATH}"
       - "avatars:${PT_AVATARS_DIR_PATH}"
+    expose:
+      - "${PT_APP_PORT}"
     restart: "always"
 
   landing:
@@ -58,8 +59,9 @@ services:
   sync-friends-task:
     build:
       context: .
-      target: "sync-friends-task"
+      target: "app"
       args: *args
+    command: ["sh", "-c", "yarn knex-migrate-latest-prod && yarn task-prod sync-friends"]
     depends_on:
       - app
     env_file:
@@ -69,8 +71,9 @@ services:
   evaluate-trackables-task:
     build:
       context: .
-      target: "evaluate-trackables-task"
+      target: "app"
       args: *args
+    command: ["sh", "-c", "yarn knex-migrate-latest-prod && yarn task-prod evaluate-trackables"]
     depends_on:
       - app
     env_file:
@@ -80,8 +83,9 @@ services:
   expire-trackables-task:
     build:
       context: .
-      target: "expire-trackables-task"
+      target: "app"
       args: *args
+    command: ["sh", "-c", "yarn knex-migrate-latest-prod && yarn task-prod expire-trackables"]
     depends_on:
       - app
     env_file:
@@ -91,8 +95,9 @@ services:
   reset-rewardable-review-count-task:
     build:
       context: .
-      target: "reset-rewardable-review-count-task"
+      target: "app"
       args: *args
+    command: ["sh", "-c", "yarn knex-migrate-latest-prod && yarn task-prod reset-rewardable-review-count"]
     depends_on:
       - app
     env_file:
