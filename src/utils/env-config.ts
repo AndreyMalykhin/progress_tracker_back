@@ -9,7 +9,7 @@ const config = {
   facebookAppAccessToken: process.env.PT_FACEBOOK_APP_ACCESS_TOKEN!,
   friendsSyncPeriod: Number(process.env.PT_FRIENDS_SYNC_PERIOD!),
   isDevEnv: process.env.NODE_ENV === "development",
-  port: Number(process.env.PT_PORT!),
+  port: Number(process.env.PT_APP_PORT!),
   rewardableReviewCountResetPeriod: Number(
     process.env.PT_REWARDABLE_REVIEW_COUNT_RESET_PERIOD!
   ),

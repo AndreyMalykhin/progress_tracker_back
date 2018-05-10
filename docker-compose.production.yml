@@ -4,13 +4,13 @@ x-args:
   &args
   PT_DIR_PATH: "${PT_DIR_PATH}"
   PT_AVATARS_DIR_PATH: "${PT_AVATARS_DIR_PATH}"
-  PT_PORT: "${PT_PORT}"
+  PT_APP_PORT: "${PT_APP_PORT}"
 
 services:
   db:
     image: "postgres:10.3-alpine"
     volumes:
-      - "db-data:/var/lib/postgresql/data"
+      - "db:/var/lib/postgresql/data"
     environment:
       POSTGRES_PASSWORD: "${PGPASSWORD}"
       POSTGRES_USER: "${PGUSER}"
@@ -24,6 +24,7 @@ services:
       args: *args
     depends_on:
       - app
+      - landing
     env_file:
       - ".env.${NODE_ENV}.local"
     ports:
@@ -48,6 +49,10 @@ services:
     volumes:
       - "assets:${PT_ASSETS_DIR_PATH}"
       - "avatars:${PT_AVATARS_DIR_PATH}"
+    restart: "always"
+
+  landing:
+    image: "progresstracker:landing"
     restart: "always"
 
   sync-friends-task:
@@ -95,6 +100,9 @@ services:
     restart: "always"
 
 volumes:
-  db-data:
+  db:
+    name: "progress-tracker-db"
   assets:
+    name: "progress-tracker-assets"
   avatars:
+    name: "progress-tracker-avatars"

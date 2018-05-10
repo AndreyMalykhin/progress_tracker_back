@@ -28,4 +28,5 @@ docker run \
   -m "${PT_ADMIN_EMAIL}" \
   -d "${PT_STATIC_SERVER_NAME}" \
   -d "${PT_APP_SERVER_NAME}" \
+  -d "${PT_LANDING_SERVER_NAME}" \
   --cert-name "${PT_CERTIFICATE_NAME}"
