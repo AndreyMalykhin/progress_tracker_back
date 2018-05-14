@@ -61,7 +61,7 @@ class TrackableFetcher {
       .transacting(transaction)
       .forUpdate()
       .where("statusId", TrackableStatus.PendingReview)
-      .andWhereRaw("?? + ?? >= ?", ["approveCount", "rejectCount", 8])
+      .andWhereRaw("?? + ?? >= ?", ["approveCount", "rejectCount", 5])
       .andWhere(
         "statusChangeDate",
         ">",
