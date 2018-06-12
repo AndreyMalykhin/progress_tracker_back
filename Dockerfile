@@ -18,8 +18,8 @@ CMD yarn knex-migrate-latest-prod && yarn start-prod
 FROM nginx:1.13.12-alpine as proxy
 WORKDIR /etc/nginx
 COPY nginx-config/ ./
-CMD envsubst \$PT_CERTIFICATE_NAME,\$PT_LETSENCRYPT_CONFIG_DIR_PATH,\$PT_STATIC_SERVER_NAME,\$PT_AVATARS_DIR_NAME,\$PT_AVATARS_DIR_PATH,\$PT_ASSETS_DIR_NAME,\$PT_ASSETS_DIR_PATH < sites-available/static.conf > sites-enabled/static.conf \
-  && envsubst \$PT_CERTIFICATE_NAME,\$PT_LETSENCRYPT_CONFIG_DIR_PATH,\$PT_APP_SERVER_NAME,\$PT_APP_PORT < sites-available/app.conf > sites-enabled/app.conf \
-  && envsubst \$PT_CERTIFICATE_NAME,\$PT_LETSENCRYPT_CONFIG_DIR_PATH,\$PT_LANDING_SERVER_NAME < sites-available/landing.conf > sites-enabled/landing.conf \
+CMD envsubst \$PT_CERTIFICATE_NAME,\$PT_LETSENCRYPT_CONFIG_DIR_PATH,\$PT_STATIC_SERVER_NAME,\$PT_AVATARS_DIR_NAME,\$PT_AVATARS_DIR_PATH,\$PT_ASSETS_DIR_NAME,\$PT_ASSETS_DIR_PATH < sites-available/static-ssl.conf > sites-enabled/static-ssl.conf \
+  && envsubst \$PT_CERTIFICATE_NAME,\$PT_LETSENCRYPT_CONFIG_DIR_PATH,\$PT_APP_SERVER_NAME,\$PT_APP_PORT < sites-available/app-ssl.conf > sites-enabled/app-ssl.conf \
+  && envsubst \$PT_CERTIFICATE_NAME,\$PT_LETSENCRYPT_CONFIG_DIR_PATH,\$PT_LANDING_SERVER_NAME < sites-available/landing-ssl.conf > sites-enabled/landing-ssl.conf \
   && nginx -g "daemon off;"
 # CMD tail -f /dev/null
