@@ -102,7 +102,7 @@ class UserFetcher {
             }
 
             this.innerJoin(DbTable.Friendships + " as f", {
-              "f.srcId": this.raw(safeId(viewerId)),
+              "f.srcId": db.raw(safeId(viewerId)),
               "f.targetId": "u.id"
             });
             break;
